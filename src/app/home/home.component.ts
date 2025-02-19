@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext'
 @Component({
   selector: 'app-home',
-  imports: [InputTextModule, FormsModule],
+  imports: [InputTextModule, ReactiveFormsModule, ButtonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-  curpValue = ""
+  curp = new FormControl('');
 }

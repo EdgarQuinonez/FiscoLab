@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { PrimeNG } from 'primeng/config';
 
 @Component({
   selector: 'app-root',
@@ -10,4 +11,6 @@ import { ButtonModule } from 'primeng/button';
 })
 export class AppComponent {
   title = 'fisco-lab';
+
+
 }
