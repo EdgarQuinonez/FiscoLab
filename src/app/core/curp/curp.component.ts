@@ -1,18 +1,16 @@
 import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext'
-import { CurpService } from '../services/curp.service';
-import { Console } from 'node:console';
-@Component({
-  selector: 'app-home',
-  imports: [InputTextModule, ReactiveFormsModule, ButtonModule],
-  providers: [CurpService],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
-})
-export class HomeComponent {  
+import { InputTextModule } from 'primeng/inputtext';
+import { CurpService } from './curp.service';
 
+@Component({
+  selector: 'app-curp',
+  imports: [InputTextModule, ReactiveFormsModule, ButtonModule],
+  templateUrl: './curp.component.html',
+  styleUrl: './curp.component.scss'
+})
+export class CurpComponent {
   constructor(private curpService: CurpService) {}
 
   curpForm = new FormGroup({
@@ -29,4 +27,5 @@ export class HomeComponent {
     
     this.curpService.validateCURP(formValues.curp)        
   }
+
 }

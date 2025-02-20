@@ -11,6 +11,4 @@ import { PrimeNG } from 'primeng/config';
 })
 export class AppComponent {
   title = 'fisco-lab';
-
-
 }
