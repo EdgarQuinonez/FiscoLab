@@ -20,12 +20,12 @@ export class CurpComponent {
   onSubmit() {    
     const formValues = this.curpForm.value
     
-    if (typeof formValues.curp != "string") {
-      console.error("No valid CURP provided.")
-      return
-    }
+    // if (typeof formValues.curp != "string") {
+    //   console.error("No valid CURP provided.")
+    //   return
+    // }
     
-    this.curpService.validateCURP(formValues.curp)        
+    this.curpService.validateCURP(formValues.curp || "")        
     
     this.curpForm.reset()
   }

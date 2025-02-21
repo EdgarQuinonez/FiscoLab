@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development'
+import { Curp } from './curp';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +16,15 @@ export class CurpService {
 
   validateCURP(curp: string) {
     
-    this.http.post(this.endpoint, { curp }).subscribe(response =>
-      console.log(response)
+    this.http.post<Curp>(this.endpoint, { curp }).subscribe(response => {
+
+      if (response.status === "SUCCESS") {
+        const data = response.response
+        if (data.status === "FOUND") {
+          // Redirect from home to dashboard
+        }
+      }
+    }
     )            
     
   }
