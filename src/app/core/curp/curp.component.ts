@@ -26,6 +26,8 @@ export class CurpComponent {
     }
     
     this.curpService.validateCURP(formValues.curp)        
+    
+    this.curpForm.reset()
   }
 
 }
