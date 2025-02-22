@@ -6,7 +6,24 @@ export interface RequestBody {
         tipoResponsabilidad: string,
         tipoContrato: string,
         claveUsuario: string,
-        contrasenaUsuario: string
+        contrasenaUsuario: string,
+        numeroReferenciaOperador: string,
+        importeContrato: number,
+        monedaCredito: string,
+        idioma: string
+    },
+    nombre: {
+        apellidoPaterno: string,
+        apellidoMaterno: string,
+        primerNombre: string,
+        segundoNombre: string,
+        rfc: string,
+    },
+    domicilio: {
+        direccion: {
+            direccion: string,
+            cp: string,
+        }
     }
 }
 

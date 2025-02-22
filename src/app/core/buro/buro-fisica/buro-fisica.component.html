@@ -1,23 +1,78 @@
 <form [formGroup]="queryBuroGroup" (ngSubmit)="onSubmit()">
-    <label>
-        <span>Producto Requerido: </span>
-        <input type="text" pInputText formControlName="productoRequerido" />
-    </label>
-    <label>
-        <span>Tipo de Responsabilidad: </span>
-        <input type="text" pInputText formControlName="tipoResponsabilidad" />
-    </label>
-    <label>
-        <span>Tipo de Contrato: </span>
-        <input type="text" pInputText formControlName="tipoContrato" />
-    </label>
-    <label>
-        <span>Clave de Usuario: </span>
-        <input type="text" pInputText formControlName="claveUsuario" />
-    </label>
-    <label>
-        <span>Contraseña de Usuario: </span>
-        <input type="text" pInputText formControlName="contrasenaUsuario" />
-    </label>
-    <p-button icon="pi pi-send" label="Enviar" type="submit"/>
+    <h1>Reporte de Buró de Crédito</h1>
+    <div formGroupName="encabezado">
+        <label>
+            <span>Producto requerido: </span>
+            <input type="text" pInputText formControlName="productoRequerido" />
+        </label>
+        <label>
+            <span>Tipo de responsabilidad: </span>
+            <input type="text" pInputText formControlName="tipoResponsabilidad" />
+        </label>
+        <label>
+            <span>Tipo de contrato: </span>
+            <input type="text" pInputText formControlName="tipoContrato" />
+        </label>
+        <label>
+            <span>Clave de usuario: </span>
+            <input type="text" pInputText formControlName="claveUsuario" />
+        </label>
+        <label>
+            <span>Contraseña de usuario: </span>
+            <input type="text" pInputText formControlName="contrasenaUsuario" />
+        </label>
+        <label>
+            <span>Número de referencia del operador: </span>
+            <input type="text" pInputText formControlName="numeroReferenciaOperador" />
+        </label>
+        <label>
+            <span>Importe del contrato: </span>
+            <p-input-number inputId="currency-mx" mode="currency" currency="MXN" locale="es-MX" formControlName="importeContrato" />
+        </label>
+        <label>
+            <span>Moneda crédito: </span>
+            <p-autocomplete formControlName="monedaCredito" [dropdown]="true" [suggestions]="monedaCreditoOptions" (completeMethod)="searchMoneda($event)" />
+        </label>
+        <label>
+            <span>Idioma: </span>
+            <p-autocomplete formControlName="idioma" [dropdown]="true" [suggestions]="idiomaOptions" (completeMethod)="searchIdioma($event)" />
+        </label>
+    </div>
+    <div formGroupName="nombre">
+
+        <label>
+            <span>Nombre: </span>
+            <input type="text" pInputText formControlName="primerNombre" />
+        </label>
+        <label>
+            <span>Segundo nombre: </span>
+            <input type="text" pInputText formControlName="segundoNombre" />
+        </label>
+        <label>
+            <span>Apellido paterno: </span>
+            <input type="text" pInputText formControlName="apellidoPaterno" />
+        </label>
+        <label>
+            <span>Apellido materno: </span>
+            <input type="text" pInputText formControlName="apellidoMaterno" />
+        </label>
+        <label>
+            <span>RFC: </span>
+            <input type="text" pInputText formControlName="rfc" />
+        </label>
+    </div>
+    <div formGroupName="domicilio">
+        <div formGroupName="direccion">
+
+            <label>
+                <span>Dirección: </span>
+                <input type="text" pInputText formControlName="direccion" />
+            </label>
+            <label>
+                <span>Código postal: </span>
+                <input type="text" pInputText formControlName="cp" />
+            </label>
+        </div>
+    </div>
+    <p-button icon="pi pi-send" label="Enviar" type="submit" class=""/>
 </form>
