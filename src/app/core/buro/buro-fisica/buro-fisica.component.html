@@ -1,1 +1,23 @@
-<p>buro-fisica works!</p>
+<form [formGroup]="queryBuroGroup" (ngSubmit)="onSubmit()">
+    <label>
+        <span>Producto Requerido: </span>
+        <input type="text" pInputText formControlName="productoRequerido" />
+    </label>
+    <label>
+        <span>Tipo de Responsabilidad: </span>
+        <input type="text" pInputText formControlName="tipoResponsabilidad" />
+    </label>
+    <label>
+        <span>Tipo de Contrato: </span>
+        <input type="text" pInputText formControlName="tipoContrato" />
+    </label>
+    <label>
+        <span>Clave de Usuario: </span>
+        <input type="text" pInputText formControlName="claveUsuario" />
+    </label>
+    <label>
+        <span>Contraseña de Usuario: </span>
+        <input type="text" pInputText formControlName="contrasenaUsuario" />
+    </label>
+    <p-button icon="pi pi-send" label="Enviar" type="submit"/>
+</form>
