@@ -1,18 +1,14 @@
-type Status = "SUCCESS" | "SERVICE_ERROR"
+import { KibanResponse } from '@types';
 
-export interface KibanResponse {
-    id: string,
-    finishedAt: Date,
-    duration: number,
-    createdAt: Date,
-    request: Object,
-    response: Object,
-    status: Status
+export interface RequestBody {
+    curp: string
 }
+
+export interface Response extends KibanResponse {}
 
 type CurpSuccessStatus = "FOUND" | "NOT_FOUND" | "NOT_VALID"
 
-export interface Curp extends KibanResponse {
+export interface Curp extends Response {
     response: {
         claveEntidad: string,
         curp: string,

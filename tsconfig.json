@@ -21,7 +21,8 @@
     "paths": {
       "@environments/*" : ["environments/*"],
       "@core/*" : ["app/core/*"],
-      "@shared/*" : ["app/shared/*"]
+      "@shared/*" : ["app/shared/*"],
+      "@types": ["app/shared/types.ts"]
     }
   },
   "angularCompilerOptions": {
