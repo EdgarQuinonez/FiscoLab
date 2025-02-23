@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RfcComponent } from './rfc.component';
+import { RfcFisicaComponent } from './rfc-fisica.component';
 
-describe('RfcComponent', () => {
-  let component: RfcComponent;
-  let fixture: ComponentFixture<RfcComponent>;
+describe('RfcFisicaComponent', () => {
+  let component: RfcFisicaComponent;
+  let fixture: ComponentFixture<RfcFisicaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RfcComponent]
+      imports: [RfcFisicaComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RfcComponent);
+    fixture = TestBed.createComponent(RfcFisicaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

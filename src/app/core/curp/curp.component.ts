@@ -20,7 +20,7 @@ export class CurpComponent {
     curp: new FormControl('', [Validators.required])
   })
 
-  async onSubmit() {    
+  onSubmit() {    
     if (!this.curpForm.valid) {
       console.error("CURP field is required.")
       return
@@ -28,21 +28,23 @@ export class CurpComponent {
 
     const formValues = this.curpForm.value
     
-    const response = await this.curpService.validateCURP(formValues.curp as string)        
-    if (response.status === "SUCCESS") {
-      if (response.response.status === "FOUND") {
-        this.router.navigateByUrl("dashboard")
-        
-        this.storageService.setItem("curp", response.response.curp)
-        this.storageService.setItem("personalData", JSON.stringify(this.storageService.setItem("personalData", JSON.stringify({
-          nombres: response.response.nombres,
-          apellidoPaterno: response.response.primerApellido,
-          apellidoMaterno: response.response.segundoApellido,
-          fechaNacimiento: response.response.fechaNacimiento
-        }))
-      ))}
-
-      this.curpForm.reset()
-    }    
+    this.curpService.validateCURP(formValues.curp as string).subscribe(value => {
+      const response = value.response
+      if (value.status === "SUCCESS") {
+        if (response.status === "FOUND") {
+          this.router.navigateByUrl("dashboard")
+          
+          this.storageService.setItem("curp", response.curp)
+          this.storageService.setItem("personalData", JSON.stringify(this.storageService.setItem("personalData", JSON.stringify({
+            nombres: response.nombres,
+            apellidoPaterno: response.primerApellido,
+            apellidoMaterno: response.segundoApellido,
+            fechaNacimiento: response.fechaNacimiento
+          }))
+        ))}
+  
+        this.curpForm.reset()
+      }    
+    })
   }
 }

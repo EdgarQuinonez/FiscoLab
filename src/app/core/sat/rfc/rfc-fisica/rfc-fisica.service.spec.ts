@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RfcService } from './rfc.service';
+import { RfcFisicaService } from './rfc-fisica.service';
 
-describe('RfcService', () => {
-  let service: RfcService;
+describe('RfcFisicaService', () => {
+  let service: RfcFisicaService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(RfcService);
+    service = TestBed.inject(RfcFisicaService);
   });
 
   it('should be created', () => {
