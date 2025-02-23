@@ -21,10 +21,10 @@ export class BuroFisicaService {
 
   queryBuroFisica(requestBody: RequestBody) {
     this.http.post<BuroFisicaReporte>(this.endpoint, requestBody).subscribe(response => {
-
+      console.log(response)
       if (response.status == "SUCCESS") {
         const data = response.response
-        console.log(data)
+        // console.log(data)
       }      
     })
   }

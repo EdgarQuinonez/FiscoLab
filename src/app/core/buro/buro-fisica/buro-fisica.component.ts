@@ -25,6 +25,14 @@ export class BuroFisicaComponent {
 
   constructor(private bcpfService: BuroFisicaService) {}
 
+  formId = "bcpfForm" // possibly retrieved from backend in production.
+
+  // options = {
+  //   formState: {
+  //     id: "bcpfForm"
+  //   }
+  // }
+
   queryBuroGroup = new FormGroup({
     encabezado: new FormGroup({
       productoRequerido: new FormControl('', [Validators.required]),
@@ -71,12 +79,10 @@ export class BuroFisicaComponent {
     if (!this.queryBuroGroup.valid) {
       console.error("All fields are required.")
       return
-    }
-
-    // console.log(this.queryBuroGroup.value)
+    }    
     
     this.bcpfService.queryBuroFisica(this.queryBuroGroup.value as RequestBody)
 
-    // this.queryBuroGroup.reset()
+    this.queryBuroGroup.reset()
   }
 }
