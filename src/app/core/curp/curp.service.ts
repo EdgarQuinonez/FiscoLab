@@ -18,18 +18,28 @@ export class CurpService {
   private endpoint = `${environment.apiUrl}/curp/validate?testCaseId=${this.params.testCaseId}`  
   constructor(private http: HttpClient, private router: Router, private storageService: StorageService) {}
 
-  validateCURP(curp: string) {
-    
-    this.http.post<Curp>(this.endpoint, { curp }).subscribe(response => {
+  validateCURP(curp: string) {    
+    this.http.post<Curp>(this.endpoint, { curp }).subscribe(curpResponse => {
+      if (curpResponse.status === "SUCCESS") {        
+        const data = curpResponse.response
 
-      if (response.status === "SUCCESS") {
-        const data = response.response
-        if (data.status === "FOUND") {
+        if (data.status === "FOUND") {          
+
           this.storageService.setItem("curp", data.curp)
+          // TODO: might store in db using curp as pk
+          this.storageService.setItem("personalData", JSON.stringify({
+            nombres: data.nombres,
+            apellidoPaterno: data.primerApellido,
+            apellidoMaterno: data.segundoApellido,
+            fechaNacimiento: data.fechaNacimiento
+          }))      
           // Redirect from home to dashboard
-          this.router.navigateByUrl("bc-pf")
+          this.router.navigateByUrl("dashboard")
         }
+      } else {
+        // display error msg and navigate back to curpComponent        
       }
-    })                
+      console.log(curpResponse)      
+    })    
   }
 }

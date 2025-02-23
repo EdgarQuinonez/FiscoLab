@@ -22,7 +22,8 @@
       "@environments/*" : ["environments/*"],
       "@core/*" : ["app/core/*"],
       "@shared/*" : ["app/shared/*"],
-      "@types": ["app/shared/types.ts"]
+      "@types": ["app/shared/types.ts"],
+      "@pages/*": ["app/pages/*"]
     }
   },
   "angularCompilerOptions": {
