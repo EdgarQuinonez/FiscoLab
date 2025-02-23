@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { environment } from '@environments/environment.development'
 import { Curp } from './curp.interface';
 import { StorageService } from '@shared/services/storage.service';
+import { lastValueFrom } from 'rxjs';
+import { response } from 'express';
 
 @Injectable({
   providedIn: 'root'
@@ -19,27 +21,6 @@ export class CurpService {
   constructor(private http: HttpClient, private router: Router, private storageService: StorageService) {}
 
   validateCURP(curp: string) {    
-    this.http.post<Curp>(this.endpoint, { curp }).subscribe(curpResponse => {
-      if (curpResponse.status === "SUCCESS") {        
-        const data = curpResponse.response
-
-        if (data.status === "FOUND") {          
-
-          this.storageService.setItem("curp", data.curp)
-          // TODO: might store in db using curp as pk
-          this.storageService.setItem("personalData", JSON.stringify({
-            nombres: data.nombres,
-            apellidoPaterno: data.primerApellido,
-            apellidoMaterno: data.segundoApellido,
-            fechaNacimiento: data.fechaNacimiento
-          }))      
-          // Redirect from home to dashboard
-          this.router.navigateByUrl("dashboard")
-        }
-      } else {
-        // display error msg and navigate back to curpComponent        
-      }
-      console.log(curpResponse)      
-    })    
+    return lastValueFrom(this.http.post<Curp>(this.endpoint, { curp }))
   }
 }

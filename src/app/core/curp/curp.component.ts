@@ -4,6 +4,8 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CurpService } from './curp.service';
 import { RequestBody } from './curp.interface';
+import { Router } from '@angular/router';
+import { StorageService } from '@shared/services/storage.service';
 
 @Component({
   selector: 'app-curp',
@@ -12,13 +14,13 @@ import { RequestBody } from './curp.interface';
   styleUrl: './curp.component.scss'
 })
 export class CurpComponent {
-  constructor(private curpService: CurpService) {}
+  constructor(private curpService: CurpService, private router: Router, private storageService: StorageService) {}
 
   curpForm = new FormGroup({
     curp: new FormControl('', [Validators.required])
   })
 
-  onSubmit() {    
+  async onSubmit() {    
     if (!this.curpForm.valid) {
       console.error("CURP field is required.")
       return
@@ -26,9 +28,21 @@ export class CurpComponent {
 
     const formValues = this.curpForm.value
     
-    this.curpService.validateCURP(formValues.curp as string)        
-    
-    this.curpForm.reset()
-  }
+    const response = await this.curpService.validateCURP(formValues.curp as string)        
+    if (response.status === "SUCCESS") {
+      if (response.response.status === "FOUND") {
+        this.router.navigateByUrl("dashboard")
+        
+        this.storageService.setItem("curp", response.response.curp)
+        this.storageService.setItem("personalData", JSON.stringify(this.storageService.setItem("personalData", JSON.stringify({
+          nombres: response.response.nombres,
+          apellidoPaterno: response.response.primerApellido,
+          apellidoMaterno: response.response.segundoApellido,
+          fechaNacimiento: response.response.fechaNacimiento
+        }))
+      ))}
 
+      this.curpForm.reset()
+    }    
+  }
 }
