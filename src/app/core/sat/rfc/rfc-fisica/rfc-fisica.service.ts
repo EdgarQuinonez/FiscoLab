@@ -25,8 +25,7 @@ export class RfcFisicaService {
     }
     
     const requestBody: GenerateRequestBody = JSON.parse(personalData)
-    return this.http.post<GenerateResponse>(endpoint, requestBody)
-    // return lastValueFrom(this.http.post<GenerateResponse>(endpoint, requestBody))
+    return this.http.post<GenerateResponse>(endpoint, requestBody)    
   }
 
   validateRFC(rfc: string) {
@@ -34,11 +33,11 @@ export class RfcFisicaService {
       testCase: 'valid'
     }
     const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCase=${params.testCase}`
-    return this.http.post<ValidateResponse>(endpoint, {rfcs: [{rfc: rfc}]})
-    // return lastValueFrom(this.http.post<ValidateResponse>(endpoint, {rfcs: [{rfc: rfc}]}))
+    return this.http.post<ValidateResponse>(endpoint, {rfcs: [{rfc: rfc}]})    
   }
 
   generateAndValidateRFC() {
+    // chain the observables from generateRFC and validateRFC to return rfc and result
     
   }
 

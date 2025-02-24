@@ -19,7 +19,6 @@ export class CurpService {
   constructor(private http: HttpClient, private router: Router, private storageService: StorageService) {}
 
   validateCURP(curp: string) {    
-    // return lastValueFrom(this.http.post<Curp>(this.endpoint, { curp }))
     return this.http.post<Curp>(this.endpoint, { curp })
   }
 }
