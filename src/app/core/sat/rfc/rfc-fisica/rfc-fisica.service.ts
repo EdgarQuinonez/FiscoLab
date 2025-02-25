@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development';
 import { StorageService } from '@shared/services/storage.service';
-import { GenerateRequestBody, GenerateResponse, ValidateResponse } from './rfc-fisica.interface';
+import { GenerateRequestBody, GenerateResponse, PFDataFromRFCRequestBody, PFDataFromRFCResponse, ValidateResponse } from './rfc-fisica.interface';
 import { CurpService } from '@core/curp/curp.service';
-import { lastValueFrom, Observable, switchMap, pipe } from 'rxjs';
+import { lastValueFrom, Observable, switchMap, pipe, first } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -37,14 +37,27 @@ export class RfcFisicaService {
     
   }
 
-  generateAndValidateRFC() {    
+  generateAndValidateRFC$() {    
     return this.generateRFC$().pipe(
       switchMap(value => this.validateRFC$(value.response.rfc)),
-      switchMap(value => value.response.rfcs)
+      first()
     )
   }
 
   personalDataFromRFC() {
+    const params = {
+      testCaseId: '663567bb713cf2110a1106d2' // SUCCESS
+    }
+    const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId?=${params.testCaseId}`
+    const rfc = this.storageService.getItem("rfc")
+    if (typeof rfc != "string" || rfc === "undefined") {
+      throw new Error("rfc item is not available on localStorage.")
+    }
 
+    const body: PFDataFromRFCRequestBody = {
+      rfc: rfc
+    }
+
+    return this.http.post<PFDataFromRFCResponse>(endpoint, body)
   }
 }

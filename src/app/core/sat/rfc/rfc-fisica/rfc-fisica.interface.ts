@@ -4,11 +4,13 @@ export interface ValidateRequestBody {
     rfcs: [{ rfc: string }]
 }
 
+export type ValidateRFCResult = "RFC válido, y susceptible de recibir facturas" | "RFC no registrado en el padrón de contribuyentes"
+
 export interface ValidateResponse extends KibanResponse {
     request: ValidateRequestBody
     response: {
         rfcs: [{
-                result: string,
+                result: ValidateRFCResult,
                 rfc: string
         }]
     }
@@ -25,5 +27,23 @@ export interface GenerateResponse extends KibanResponse {
     request: GenerateRequestBody,
     response: {
         rfc: string
+    }
+}
+
+export interface PFDataFromRFCRequestBody {
+    rfc: string
+}
+
+type Status = "FOUND" | "NOT FOUND"
+
+
+
+export interface PFDataFromRFCResponse extends KibanResponse {
+    request: PFDataFromRFCRequestBody,
+    response: {
+        curp: string,
+        email: string,
+        estatus: Status,
+        nombreCompleto: string
     }
 }
