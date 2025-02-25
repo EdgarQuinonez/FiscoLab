@@ -40,7 +40,7 @@ export class RfcFisicaService {
   generateAndValidateRFC() {    
     return this.generateRFC$().pipe(
       switchMap(value => this.validateRFC$(value.response.rfc)),
-      switchMap(value => value.response.rfcs[0].result)
+      switchMap(value => value.response.rfcs)
     )
   }
 

@@ -5,7 +5,7 @@ import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-rfc-fisica',
-  imports: [AsyncPipe],
+  imports: [],
   templateUrl: './rfc-fisica.component.html',
   styleUrl: './rfc-fisica.component.scss'
 })
