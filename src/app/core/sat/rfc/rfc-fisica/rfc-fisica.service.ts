@@ -4,7 +4,7 @@ import { environment } from '@environments/environment.development';
 import { StorageService } from '@shared/services/storage.service';
 import { GenerateRequestBody, GenerateResponse, ValidateResponse } from './rfc-fisica.interface';
 import { CurpService } from '@core/curp/curp.service';
-import { lastValueFrom, Observable, switchMap } from 'rxjs';
+import { lastValueFrom, Observable, switchMap, pipe } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +13,11 @@ export class RfcFisicaService {
 
   constructor(private http: HttpClient, private storageService: StorageService, private curpService: CurpService) {}
   
-  generateRFC() {
+  generateRFC$() {
     const params = {
       testCaseId: '664230608659f0c02fcd3f0c' // SUCCESS
     }      
-    const endpoint = `${environment.apiUrl}/api/v2/sat/rfc_pf?testCaseId=${params.testCaseId}`
+    const endpoint = `${environment.apiUrl}/sat/rfc_pf?testCaseId=${params.testCaseId}`
     const personalData = this.storageService.getItem("personalData")
 
     if (typeof personalData != "string") {
@@ -28,17 +28,20 @@ export class RfcFisicaService {
     return this.http.post<GenerateResponse>(endpoint, requestBody)    
   }
 
-  validateRFC(rfc: string) {
+  validateRFC$(rfc: string) {
     const params = {
-      testCase: 'valid'
+      testCaseId: '663567bb713cf2110a1106ce'
     }
-    const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCase=${params.testCase}`
-    return this.http.post<ValidateResponse>(endpoint, {rfcs: [{rfc: rfc}]})    
+    const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`
+    return this.http.post<ValidateResponse>(endpoint, { rfcs: [{rfc: rfc}]})
+    
   }
 
-  generateAndValidateRFC() {
-    // chain the observables from generateRFC and validateRFC to return rfc and result
-    
+  generateAndValidateRFC() {    
+    return this.generateRFC$().pipe(
+      switchMap(value => this.validateRFC$(value.response.rfc)),
+      switchMap(value => value.response.rfcs[0].result)
+    )
   }
 
   personalDataFromRFC() {

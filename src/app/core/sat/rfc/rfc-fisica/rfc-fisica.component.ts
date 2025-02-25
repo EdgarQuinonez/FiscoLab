@@ -9,9 +9,9 @@ import { AsyncPipe } from '@angular/common';
   templateUrl: './rfc-fisica.component.html',
   styleUrl: './rfc-fisica.component.scss'
 })
-export class RfcFisicaComponent {    
-
+export class RfcFisicaComponent {
   constructor(private rfcFisicaService: RfcFisicaService) {}
-  ngOnInit() {    
+  ngOnInit() {
+    this.rfcFisicaService.generateAndValidateRFC().subscribe(value => console.log(value))
   }
 }
