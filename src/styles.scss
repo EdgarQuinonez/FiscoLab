@@ -1,9 +1,8 @@
 @use "primeicons/primeicons.css";
 @use "tailwindcss";
 @plugin "tailwindcss-primeui";
-// @layer tailwind, primeng;
 
-// @layer tailwind {
-//     @import "tailwindcss";
-// }
-
+h1 {
+    font-size: x-large;
+    font-weight: bold;
+}

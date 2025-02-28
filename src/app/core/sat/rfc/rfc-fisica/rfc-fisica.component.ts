@@ -28,8 +28,6 @@ export class RfcFisicaComponent {
       if (response.result === "RFC válido, y susceptible de recibir facturas") {
         this.storageService.setItem("rfc", response.rfc)        
       }
-
-      
     })
   }
 
