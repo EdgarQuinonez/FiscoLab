@@ -4,3 +4,10 @@
 <p>
     Result: {{ result }}
 </p>
+
+<p-card styleClass="w-64">    
+    <p>
+        Haz click en el botón de abajo para encontrar la información personal de {{ nombres }}.
+    </p>
+    <p-button label="Información Personal" icon="pi pi-user" iconPos="bottom" (onClick)="getPersonalData()"/>
+</p-card>

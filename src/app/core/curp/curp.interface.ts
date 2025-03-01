@@ -8,35 +8,36 @@ export interface Response extends KibanResponse {}
 
 type CurpSuccessStatus = "FOUND" | "NOT_FOUND" | "NOT_VALID"
 
+export interface CurpResponseData {
+    claveEntidad: string,
+    curp: string,
+    datosDocProbatorio: {
+        anioReg: string,
+        claveEntidadRegistro: string,
+        claveMunicipioRegistro: string,
+        entidadRegistro: string,
+        municipioRegistro: string,
+        numActa: string
+    }
+    docProbatorio: number,
+    docProbatorioDescripcion: string,
+    entidad: string,
+    fechaNacimiento: Date,
+    nacionalidad: string,
+    nombres: string,
+    primerApellido: string,
+    segundoApellido: string,
+    sexo: "HOMBRE" | "MUJER",
+    status: "FOUND",
+    statusCurp: string,
+    statusCurpDescripcion: string
+}
+
 export interface Curp extends Response {
-    response: {
-        claveEntidad: string,
-        curp: string,
-        datosDocProbatorio: {
-            anioReg: string,
-            claveEntidadRegistro: string,
-            claveMunicipioRegistro: string,
-            entidadRegistro: string,
-            municipioRegistro: string,
-            numActa: string
-        }
-        docProbatorio: number,
-        docProbatorioDescripcion: string,
-        entidad: string,
-        fechaNacimiento: Date,
-        nacionalidad: string,
-        nombres: string,
-        primerApellido: string,
-        segundoApellido: string,
-        sexo: "HOMBRE" | "MUJER",
-        status: "FOUND",
-        statusCurp: string,
-        statusCurpDescripcion: string
-    },
+    response: CurpResponseData,
     request: {
         curp: string
     }
-
 }
 
 

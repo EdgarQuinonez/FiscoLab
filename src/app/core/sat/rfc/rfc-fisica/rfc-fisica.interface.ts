@@ -34,16 +34,17 @@ export interface PFDataFromRFCRequestBody {
     rfc: string
 }
 
-type Status = "FOUND" | "NOT FOUND"
+type Status = "FOUND" | "NOT_FOUND"
 
-
+export interface PersonalData {
+    curp: string,
+    email: string,
+    estatus: Status,
+    nombreCompleto: string
+}
 
 export interface PFDataFromRFCResponse extends KibanResponse {
     request: PFDataFromRFCRequestBody,
-    response: {
-        curp: string,
-        email: string,
-        estatus: Status,
-        nombreCompleto: string
-    }
+    response: PersonalData
 }
+

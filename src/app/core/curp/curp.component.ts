@@ -35,12 +35,7 @@ export class CurpComponent {
           this.router.navigateByUrl("dashboard")
           
           this.storageService.setItem("curp", response.curp)
-          this.storageService.setItem("personalData", JSON.stringify({
-            nombres: response.nombres,
-            apellidoPaterno: response.primerApellido,
-            apellidoMaterno: response.segundoApellido,
-            fechaNacimiento: response.fechaNacimiento
-          }))      
+          this.storageService.setItem("personalData", JSON.stringify(response))      
         }
   
         this.curpForm.reset()

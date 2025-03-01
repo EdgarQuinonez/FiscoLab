@@ -48,7 +48,7 @@ export class RfcFisicaService {
     const params = {
       testCaseId: '663567bb713cf2110a1106d2' // SUCCESS
     }
-    const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId?=${params.testCaseId}`
+    const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId=${params.testCaseId}`
     const rfc = this.storageService.getItem("rfc")
     if (typeof rfc != "string" || rfc === "undefined") {
       throw new Error("rfc item is not available on localStorage.")
