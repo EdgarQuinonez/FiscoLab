@@ -24,35 +24,28 @@ export class RfcFisicaComponent {
 
   constructor(private rfcFisicaService: RfcFisicaService, private storageService: StorageService) {}
   ngOnInit() {
-    // this.results$ = this.rfcFisicaService.generateAndValidateRFC$().pipe(
-    //   switchMapWithLoading<ValidateResponse>(value => of(value))
-    // )
-
     this.results$ = new Observable<any>(subscriber => subscriber.next()).pipe(
       switchMapWithLoading<ValidateResponse>(() => this.rfcFisicaService.generateAndValidateRFC$())
     )
+
+    this.results$.subscribe(value => {
+      if (value.data) {
+        const response = value.data.response.rfcs[0]
+        
+        const personalDataStr = this.storageService.getItem("personalData")
+
+        if (typeof personalDataStr === "string" && personalDataStr.length > 0) {
+          const personalData: CurpResponseData = JSON.parse(personalDataStr)        
+          this.nombres = personalData.nombres
+        } 
+        
+        if (response.result === "RFC válido, y susceptible de recibir facturas") {
+          this.storageService.setItem("rfc", response.rfc)        
+        }        
+      }
+    })    
   }
-  // ngOnInit() {
-  //   this.rfcFisicaService.generateAndValidateRFC$().subscribe(value => {
-  //     console.log(value)
-  //     const response = value.response.rfcs[0]
-  //     this.rfc = response.rfc
-  //     this.result = response.result
-
-  //     const personalDataStr = this.storageService.getItem("personalData")
-
-    
-  //     if (typeof personalDataStr === "string" && personalDataStr.length > 0) {
-  //       const personalData: CurpResponseData = JSON.parse(personalDataStr)        
-  //       this.nombres = personalData.nombres
-  //     } 
-      
-  //     if (response.result === "RFC válido, y susceptible de recibir facturas") {
-  //       this.storageService.setItem("rfc", response.rfc)        
-  //     }
-  //   })
-  // }
-
+  
   // getPersonalData() {
   //   this.rfcFisicaService.personalDataFromRFC$().subscribe(value => {
   //     const response = value.response
