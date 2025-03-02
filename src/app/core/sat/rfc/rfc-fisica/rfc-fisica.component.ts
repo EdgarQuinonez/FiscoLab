@@ -10,6 +10,7 @@ import { CurpResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
 
+
 @Component({
   selector: 'app-rfc-fisica',
   imports: [ButtonModule, CardModule, AsyncPipe],
@@ -23,8 +24,12 @@ export class RfcFisicaComponent {
 
   constructor(private rfcFisicaService: RfcFisicaService, private storageService: StorageService) {}
   ngOnInit() {
-    this.results$ = this.rfcFisicaService.generateAndValidateRFC$().pipe(
-      switchMapWithLoading<ValidateResponse>(value => of(value))
+    // this.results$ = this.rfcFisicaService.generateAndValidateRFC$().pipe(
+    //   switchMapWithLoading<ValidateResponse>(value => of(value))
+    // )
+
+    this.results$ = new Observable<any>(subscriber => subscriber.next()).pipe(
+      switchMapWithLoading<ValidateResponse>(() => this.rfcFisicaService.generateAndValidateRFC$())
     )
   }
   // ngOnInit() {
@@ -69,6 +74,4 @@ export class RfcFisicaComponent {
     // this.rfcFisicaService.personalDataFromRFC$().pipe()
     this.results$.subscribe(value => console.log(value))
   }
-
-
 }
