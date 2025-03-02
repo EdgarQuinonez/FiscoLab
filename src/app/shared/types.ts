@@ -9,3 +9,10 @@ export interface KibanResponse {
     response: Object,
     status: Status
 }
+
+export interface LoadingState<T = unknown> {
+    loading: boolean;
+    error?: Error | null;
+    data?: T;    
+}
+

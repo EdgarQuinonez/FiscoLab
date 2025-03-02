@@ -8,6 +8,7 @@ export class StorageService {
   constructor() { }
 
   getItem(itemKey: string){
+    
     return localStorage.getItem(itemKey)
   }
 

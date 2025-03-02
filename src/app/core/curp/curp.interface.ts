@@ -22,7 +22,7 @@ export interface CurpResponseData {
     docProbatorio: number,
     docProbatorioDescripcion: string,
     entidad: string,
-    fechaNacimiento: Date,
+    fechaNacimiento: string,
     nacionalidad: string,
     nombres: string,
     primerApellido: string,

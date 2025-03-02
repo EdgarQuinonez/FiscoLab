@@ -1,13 +1,43 @@
-<p>
-    RFC: {{ rfc }}
-</p>
-<p>
-    Result: {{ result }}
-</p>
 
-<p-card styleClass="w-64">    
-    <p>
-        Haz click en el botón de abajo para encontrar la información personal de {{ nombres }}.
-    </p>
-    <p-button label="Información Personal" icon="pi pi-user" iconPos="bottom" (onClick)="getPersonalData()"/>
-</p-card>
+@if(results$ | async; as results) {
+<div>
+        @if (results.loading) {
+            <p>
+                Loading...
+            </p>
+        }
+
+        @if (results.data; as data) {
+
+            <p>
+                RFC: {{ data.response.rfcs[0].rfc }}
+            </p>
+            <p>
+                Result: {{ data.response.rfcs[0].result }}
+            </p>
+        }
+
+        @if (results.error; as error;) {
+            <p>
+                {{ error }}
+            </p>
+        }        
+
+    </div>
+    
+    
+    <p-card styleClass="w-64">
+        @if (results.loading) {
+            <p>
+                Loading...
+            </p>
+        }    
+        @if (results.data) {
+            <p>
+                Haz click en el botón de abajo para encontrar la información personal de {{ nombres ?? results.data.response.rfcs[0].rfc }}.
+            </p>
+            <p-button label="Información Personal" icon="pi pi-user" iconPos="bottom" (onClick)="getPersonalData()" [disabled]="results.loading"/>
+        }
+    </p-card>
+    
+}
