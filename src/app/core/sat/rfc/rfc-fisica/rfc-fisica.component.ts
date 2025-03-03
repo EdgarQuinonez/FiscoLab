@@ -19,7 +19,7 @@ import { LoadingState } from '@shared/types';
 })
 export class RfcFisicaComponent {
   results$!: Observable<LoadingState<ValidateResponse>>;
-  personalData: PersonalData | null = null
+  personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null
   nombres: string | null = null
 
   constructor(private rfcFisicaService: RfcFisicaService, private storageService: StorageService) {}
@@ -63,8 +63,21 @@ export class RfcFisicaComponent {
   //     console.log(response)
   //   })
   // }
-  getPersonalData() {
-    // this.rfcFisicaService.personalDataFromRFC$().pipe()
-    this.results$.subscribe(value => console.log(value))
+  getPersonalDataOnClick() {
+    this.personalData$ = new Observable(subscriber => subscriber.next()).pipe(
+      switchMapWithLoading(() => this.rfcFisicaService.personalDataFromRFC$())
+    )
+    
+    this.personalData$.subscribe(value => {
+      if (value.data) {
+        const response = value.data.response;
+
+        this.storageService.setItem("rfcPfPersonalData", JSON.stringify({
+          curp: response.curp,
+          email: response.email,
+          nombreCompleto: response.nombreCompleto
+        }))
+      }
+    })
   }
 }
