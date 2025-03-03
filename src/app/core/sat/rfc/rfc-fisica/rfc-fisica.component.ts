@@ -6,7 +6,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { PersonalData, PFDataFromRFCResponse, ValidateResponse, ValidateRFCResult } from './rfc-fisica.interface'
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { CurpResponseData } from '@core/curp/curp.interface';
+import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
 
@@ -35,7 +35,7 @@ export class RfcFisicaComponent {
         const personalDataStr = this.storageService.getItem("personalData")
 
         if (typeof personalDataStr === "string" && personalDataStr.length > 0) {
-          const personalData: CurpResponseData = JSON.parse(personalDataStr)        
+          const personalData: CurpFoundResponseData = JSON.parse(personalDataStr)        
           this.nombres = personalData.nombres
         } 
         

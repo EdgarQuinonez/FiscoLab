@@ -1,4 +1,4 @@
-import { KibanResponse } from "@types"
+import { SuccessKibanResponse } from "@types"
 
 export interface ValidateRequestBody {
     rfcs: [{ rfc: string }]
@@ -6,7 +6,7 @@ export interface ValidateRequestBody {
 
 export type ValidateRFCResult = "RFC válido, y susceptible de recibir facturas" | "RFC no registrado en el padrón de contribuyentes"
 
-export interface ValidateResponse extends KibanResponse {
+export interface ValidateResponse extends SuccessKibanResponse {
     request: ValidateRequestBody
     response: {
         rfcs: [{
@@ -23,7 +23,7 @@ export interface GenerateRequestBody {
     fechaNacimiento: string // yyyy-mm-dd
 }
 
-export interface GenerateResponse extends KibanResponse {
+export interface GenerateResponse extends SuccessKibanResponse {
     request: GenerateRequestBody,
     response: {
         rfc: string
@@ -43,7 +43,7 @@ export interface PersonalData {
     nombreCompleto: string
 }
 
-export interface PFDataFromRFCResponse extends KibanResponse {
+export interface PFDataFromRFCResponse extends SuccessKibanResponse {
     request: PFDataFromRFCRequestBody,
     response: PersonalData
 }

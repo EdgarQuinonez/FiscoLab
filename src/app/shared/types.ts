@@ -1,13 +1,13 @@
 type Status = "SUCCESS" | "SERVICE_ERROR"
 
-export interface KibanResponse {
+export interface SuccessKibanResponse {
     id: string,
-    finishedAt: Date,
+    finishedAt: string,
     duration: number,
-    createdAt: Date,
+    createdAt: string,
     request: Object,
     response: Object,
-    status: Status
+    status: "SUCCESS"
 }
 
 export interface LoadingState<T = unknown> {
@@ -16,3 +16,12 @@ export interface LoadingState<T = unknown> {
     data?: T;    
 }
 
+export interface ServiceUnavailableResponse {
+    id: string,
+    finishedAt: string,
+    duration: number,
+    createdAt: string,
+    request: Object,    
+    errorMessage: string,
+    status: "SERVICE_ERROR"
+}

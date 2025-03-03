@@ -5,7 +5,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { GenerateRequestBody, GenerateResponse, PFDataFromRFCRequestBody, PFDataFromRFCResponse, ValidateResponse } from './rfc-fisica.interface';
 import { CurpService } from '@core/curp/curp.service';
 import { lastValueFrom, Observable, switchMap, pipe, first } from 'rxjs';
-import { CurpResponseData } from '@core/curp/curp.interface';
+import { CurpFoundResponseData } from '@core/curp/curp.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class RfcFisicaService {
       throw Error("personalData key not found.")
     }
     
-    const parsedPersonalData: CurpResponseData = JSON.parse(personalData)
+    const parsedPersonalData: CurpFoundResponseData = JSON.parse(personalData)
     const requestBody: GenerateRequestBody = {
       nombres: parsedPersonalData.nombres,
       apellidoPaterno: parsedPersonalData.primerApellido,

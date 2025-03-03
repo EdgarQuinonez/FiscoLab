@@ -1,4 +1,4 @@
-import { KibanResponse } from '@types';
+import { SuccessKibanResponse } from '@types';
 
 export interface RequestBody {
     encabezado: {
@@ -40,7 +40,7 @@ export interface apiData {
     }
 }
 
-interface Response extends KibanResponse {
+interface Response extends SuccessKibanResponse {
     apiData: apiData[],
     response: {
         consultasEfectudas: [{

@@ -21,15 +21,16 @@ export class CurpComponent {
   })
 
   onSubmit() {    
-    if (!this.curpForm.valid) {
-      console.error("CURP field is required.")
-      return
-    }
+    // if (!this.curpForm.valid) {
+    //   console.error("CURP field is required.")
+    //   return
+    // }
 
     const formValues = this.curpForm.value
     
     this.curpService.validateCURP(formValues.curp as string).subscribe(value => {
       const response = value.response
+      console.log(value)
       if (value.status === "SUCCESS") {
         if (response.status === "FOUND") {
           this.router.navigateByUrl("dashboard")

@@ -1,14 +1,17 @@
-import { KibanResponse } from '@types';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ServiceUnavailableResponse, SuccessKibanResponse } from '@types';
 
 export interface RequestBody {
     curp: string
 }
 
-export interface Response extends KibanResponse {}
+export interface SuccessResponse extends SuccessKibanResponse {
+    status: "SUCCESS"
+}
 
 type CurpSuccessStatus = "FOUND" | "NOT_FOUND" | "NOT_VALID"
 
-export interface CurpResponseData {
+export interface CurpFoundResponseData {
     claveEntidad: string,
     curp: string,
     datosDocProbatorio: {
@@ -18,7 +21,7 @@ export interface CurpResponseData {
         entidadRegistro: string,
         municipioRegistro: string,
         numActa: string
-    }
+    },
     docProbatorio: number,
     docProbatorioDescripcion: string,
     entidad: string,
@@ -33,37 +36,55 @@ export interface CurpResponseData {
     statusCurpDescripcion: string
 }
 
-export interface Curp extends Response {
-    response: CurpResponseData,
+export interface CurpNotFoundResponseData {
+    status: "NOT_FOUND"
+}
+
+export interface CurpNotValidResponseData {
+    claveEntidad: string,
+    curp: string,
+    datosDocProbatorio: {
+        folioRefugiado: string
+    } | {
+        anioReg: string,
+        claveEntidadRegistro: string,
+        claveMunicipioRegistro: string,
+        entidadRegistro: string,
+        municipioRegistro: string,
+        numActa: string
+    } | Object,
+    docProbatorio: number,
+    docProbatorioDescripcion: string,
+    entidad: string,
+    fechaNacimiento: string,
+    nacionalidad: string,
+    nombres: string,
+    primerApellido: string,
+    segundoApellido: string,
+    sexo: "HOMBRE" | "MUJER",
+    status: "NOT_VALID",
+    statusCurp: string,
+    statusCurpDescripcion: string
+}
+
+export interface Curp extends SuccessResponse {
+    response: CurpFoundResponseData | CurpNotFoundResponseData | CurpNotValidResponseData,
     request: {
         curp: string
     }
 }
 
-
-// TODO: Add interfaces to handle NOT_FOUND and NOT_VALID
 type CurpBadRequestCode = "REQUIRED_FIELD_ERROR" | "FORMAT_ERROR" | "EMPTY_ERROR"
 
-export interface CurpBadRequest {
+export interface CurpBadRequestResponse extends HttpErrorResponse {
     error: [ {
         code: CurpBadRequestCode,
         field: string,
         message: string,
     } ],
-    headers: Object,
-    message: string,
-    name: string,
-    ok: boolean,
-    status: 400,
-    statusText: string,
-    type: unknown,
-    url: string    
 }
 
-
-export interface CurpServiceUnavailable extends KibanResponse {
-    status: "SERVICE_ERROR",
-    errorMessage: string,
+export interface CurpServiceUnavailable extends ServiceUnavailableResponse {    
     request: {
         curp: string
     }
