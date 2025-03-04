@@ -1,5 +1,5 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { Curp } from './curp.interface';
+import { Curp, CurpBadRequestResponse } from './curp.interface';
 
 export function curpFoundValidator(curpResponse: Curp): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
@@ -18,8 +18,8 @@ export function curpFoundValidator(curpResponse: Curp): ValidatorFn {
         };
       }
       // Validating http errors
-    } else {
-      return { curpFound: curpResponse.error[0].message };
     }
+    // Casting because there SERVICE_ERROR and SUCCESS cases are already handled. Leaving only the number (http codes).
+    return { curpFound: (curpResponse as CurpBadRequestResponse).error[0].message };
   };
 }

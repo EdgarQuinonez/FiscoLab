@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CurpService } from './curp.service';
-import { Curp, CurpBadRequestResponse, CurpServiceUnavailable, RequestBody } from './curp.interface';
+import { Curp, RequestBody } from './curp.interface';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { Observable } from 'rxjs';
@@ -20,10 +20,10 @@ import { LoadingState } from '@types';
 export class CurpComponent {
   constructor(private curpService: CurpService, private router: Router, private storageService: StorageService) {}
 
-  curpResponse$!: Observable<LoadingState<Curp | CurpBadRequestResponse | CurpServiceUnavailable>>
+  curpResponse$!: Observable<LoadingState<Curp>>
 
   curpForm = new FormGroup({
-    curp: new FormControl('', [Validators.required])
+    curp: new FormControl('', [Validators.required, ])
   })
 
 
@@ -34,6 +34,21 @@ export class CurpComponent {
     this.curpResponse$ = new Observable(subscriber => subscriber.next()).pipe(
       switchMapWithLoading(() => this.curpService.validateCURP$(formValues.curp))
     )
+
+    this.curpResponse$.subscribe(value => {
+      const data = value.data
+      if (data?.status === "SUCCESS") {
+        const response = data.response
+        if (response.status === "FOUND") {
+          this.router.navigateByUrl("dashboard")
+
+          this.storageService.setItem("curp", response.curp)
+          this.storageService.setItem("personalData", JSON.stringify(response))
+
+          this.curpForm.reset()
+        }
+      }
+    })
   //   this.curpService.validateCURP(formValues.curp as string).subscribe(value => {
   //     const response = value.response      
   //     if (value.status === "SUCCESS") {
