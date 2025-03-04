@@ -9,6 +9,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { Observable } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@types';
+import { curpFoundValidator } from './curp.validator';
 
 
 @Component({
@@ -23,7 +24,7 @@ export class CurpComponent {
   curpResponse$!: Observable<LoadingState<Curp>>
 
   curpForm = new FormGroup({
-    curp: new FormControl('', [Validators.required, ])
+    curp: new FormControl('', [Validators.required])
   })
 
 
