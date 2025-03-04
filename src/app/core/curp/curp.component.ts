@@ -3,9 +3,13 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CurpService } from './curp.service';
-import { RequestBody } from './curp.interface';
+import { Curp, CurpBadRequestResponse, CurpServiceUnavailable, RequestBody } from './curp.interface';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
+import { Observable } from 'rxjs';
+import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
+import { LoadingState } from '@types';
+
 
 @Component({
   selector: 'app-curp',
@@ -16,31 +20,32 @@ import { StorageService } from '@shared/services/storage.service';
 export class CurpComponent {
   constructor(private curpService: CurpService, private router: Router, private storageService: StorageService) {}
 
+  curpResponse$!: Observable<LoadingState<Curp | CurpBadRequestResponse | CurpServiceUnavailable>>
+
   curpForm = new FormGroup({
     curp: new FormControl('', [Validators.required])
   })
 
-  onSubmit() {    
-    // if (!this.curpForm.valid) {
-    //   console.error("CURP field is required.")
-    //   return
-    // }
 
-    const formValues = this.curpForm.value
-    
-    this.curpService.validateCURP(formValues.curp as string).subscribe(value => {
-      const response = value.response
-      console.log(value)
-      if (value.status === "SUCCESS") {
-        if (response.status === "FOUND") {
-          this.router.navigateByUrl("dashboard")
+
+  onSubmit() {    
+    const formValues = this.curpForm.value as RequestBody
+
+    this.curpResponse$ = new Observable(subscriber => subscriber.next()).pipe(
+      switchMapWithLoading(() => this.curpService.validateCURP$(formValues.curp))
+    )
+  //   this.curpService.validateCURP(formValues.curp as string).subscribe(value => {
+  //     const response = value.response      
+  //     if (value.status === "SUCCESS") {
+  //       if (response.status === "FOUND") {
+  //         this.router.navigateByUrl("dashboard")
           
-          this.storageService.setItem("curp", response.curp)
-          this.storageService.setItem("personalData", JSON.stringify(response))      
-        }
+  //         this.storageService.setItem("curp", response.curp)
+  //         this.storageService.setItem("personalData", JSON.stringify(response))      
+  //       }
   
-        this.curpForm.reset()
-      }    
-    })
+  //       this.curpForm.reset()
+  //     }    
+  //   })
   }
 }

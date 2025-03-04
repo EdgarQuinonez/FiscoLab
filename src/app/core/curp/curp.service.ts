@@ -22,7 +22,7 @@ export class CurpService {
   private endpoint = `${environment.apiUrl}/curp/validate?testCaseId=${this.params.testCaseId}`  
   constructor(private http: HttpClient, private router: Router, private storageService: StorageService) {}
 
-  validateCURP(curp: string) {    
+  validateCURP$(curp: string) {    
     return this.http.post<Curp>(this.endpoint, { curp })
   }
 }
