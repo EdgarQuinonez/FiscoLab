@@ -52,6 +52,17 @@ export class CurpComponent {
   }
 
   formSubmitSubject() {
+    console.log('Submit btn clicked.');
+    console.log('form status: ', this.curpForm.status);
+    console.log(
+      'Sync validation :',
+      this.curpForm.controls['curp'].hasError('required')
+    );
+    console.log(
+      'Async validation :',
+      this.curpForm.controls['curp'].getError('curpFoundAndValid')
+    );
+
     return new Subject()
       .pipe(
         tap(() => this.curpForm.markAsDirty()),
@@ -62,19 +73,14 @@ export class CurpComponent {
             take(1)
           )
         ),
-        filter((status) => status === 'VALID')
+        filter((status) => status === 'VALID' || status === 'INVALID')
       )
       .subscribe((validationSuccesful) => this.onSubmit());
   }
 
   onSubmit() {
-    console.log('form status: ', this.curpForm.status);
-    console.log('submitted: ');
-
-    if (this.curpForm.invalid) {
-      return;
-    }
-
+    console.log('submitted.');
+    console.log(this.curpForm.controls['curp'].getError('curpFoundAndValid'));
     this.curpResponse = this.curpService.getCurpResponse();
     if (this.curpResponse) {
       console.log(this.curpResponse);

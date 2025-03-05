@@ -4,7 +4,11 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import { Curp, CurpBadRequestResponse } from './curp.interface';
+import {
+  Curp,
+  CurpBadRequestResponse,
+  CurpServiceUnavailableResponse,
+} from './curp.interface';
 import { Injectable } from '@angular/core';
 import { CurpService } from './curp.service';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
@@ -17,10 +21,17 @@ export class CurpFoundAndValidValidator implements AsyncValidator {
     {
       return this.curpService.validateCURP$(control.value).pipe(
         switchMap((value) => {
-          this.curpService.setCurpResponse(value); // Cache the response on the CurpService public var
-          return of(getCurpValidationError(value));
+          this.curpService.setCurpResponse(value); // Share the response on the CurpService public var
+          return of(getCurpValidationError(value)); // On SUCCESS, handle NOT_FOUND or NOT_VALID cases
         }),
-        catchError(() => of(null))
+        catchError(
+          (err: CurpBadRequestResponse | CurpServiceUnavailableResponse) => {
+            // Emit HTTP errors or SERVICE_ERROR
+
+            console.log('Backend error: ', err);
+            return of({ curpValidAndFound: err });
+          }
+        )
       );
     }
   }
@@ -29,25 +40,42 @@ export class CurpFoundAndValidValidator implements AsyncValidator {
 function getCurpValidationError(
   curpResponse: Curp
 ): { curpFoundAndValid: string } | null {
-  if (curpResponse.status === 'SERVICE_ERROR') {
-    return { curpFoundAndValid: curpResponse.errorMessage };
-  } else if (curpResponse.status === 'SUCCESS') {
-    if (curpResponse.response.status === 'FOUND') {
-      return null;
-    } else if (curpResponse.response.status === 'NOT_FOUND') {
+  if (curpResponse.status === 'SUCCESS') {
+    if (curpResponse.response.status === 'NOT_FOUND') {
       return {
         curpFoundAndValid:
           'La CURP introducida no está registrada en la RENAPO.',
       };
-    } else if (curpResponse.response.status === 'NOT_VALID') {
+    }
+    if (curpResponse.response.status === 'NOT_VALID') {
       return {
         curpFoundAndValid: `La CURP introducida no es válida. Código: ${curpResponse.response.statusCurp}`,
       };
     }
   }
-  // Validating http errors
-  return {
-    curpFoundAndValid: (curpResponse as CurpBadRequestResponse).error[0]
-      .message,
-  };
+
+  return null;
 }
+
+// function getCurpValidationError(
+//   curpResponse: Curp
+// ): { curpFoundAndValid: string } | null {
+//   if (curpResponse.status === 'SERVICE_ERROR') {
+//     return { curpFoundAndValid: curpResponse.errorMessage };
+//   } else if (curpResponse.status === 'SUCCESS') {
+//     if (curpResponse.response.status === 'FOUND') {
+//       return null;
+//     } else if (curpResponse.response.status === 'NOT_FOUND') {
+//       return {
+//         curpFoundAndValid:
+//           'La CURP introducida no está registrada en la RENAPO.',
+//       };
+//     } else if (curpResponse.response.status === 'NOT_VALID') {
+//       return {
+//         curpFoundAndValid: `La CURP introducida no es válida. Código: ${curpResponse.response.statusCurp}`,
+//       };
+//     }
+//   }
+
+//   return null
+// }
