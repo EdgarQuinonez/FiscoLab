@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ServiceUnavailableResponse, SuccessKibanResponse } from '@types';
 
-export interface RequestBody {
+export interface CurpRequestBody {
   curp: string;
 }
 
