@@ -1,7 +1,13 @@
-<form [formGroup]="curpForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject()">
     <label>
         <h2>CURP:</h2>
         <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText/>
+
+        @if (curpForm.hasError('curpFoundAndValid')) {
+            <p>
+                {{curpForm.getError('curpFoundAndValid')}}
+            </p>
+        }
     </label>
     <p-button icon="pi pi-search" aria-label="Search" type="submit" />
 </form>

@@ -11,7 +11,15 @@ import { CurpService } from './curp.service';
 import { Curp, CurpRequestBody, CurpResponse } from './curp.interface';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
-import { Observable } from 'rxjs';
+import {
+  filter,
+  Observable,
+  startWith,
+  Subject,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@types';
 import { CurpFoundAndValidValidator } from './curp.validator';
@@ -43,7 +51,26 @@ export class CurpComponent {
     });
   }
 
+  formSubmitSubject() {
+    return new Subject()
+      .pipe(
+        tap(() => this.curpForm.markAsDirty()),
+        switchMap(() =>
+          this.curpForm.statusChanges.pipe(
+            startWith(this.curpForm.status),
+            filter((status) => status !== 'PENDING'),
+            take(1)
+          )
+        ),
+        filter((status) => status === 'VALID')
+      )
+      .subscribe((validationSuccesful) => this.onSubmit());
+  }
+
   onSubmit() {
+    console.log('form status: ', this.curpForm.status);
+    console.log('submitted: ');
+
     if (this.curpForm.invalid) {
       return;
     }
