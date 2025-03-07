@@ -7,6 +7,9 @@ import {
 } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+
 import { CurpService } from './curp.service';
 import { Curp, CurpRequestBody, CurpResponse } from './curp.interface';
 import { Router } from '@angular/router';
@@ -26,7 +29,13 @@ import { CurpFoundAndValidValidator } from './curp.validator';
 
 @Component({
   selector: 'app-curp',
-  imports: [InputTextModule, ReactiveFormsModule, ButtonModule],
+  imports: [
+    InputTextModule,
+    ReactiveFormsModule,
+    ButtonModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+  ],
   templateUrl: './curp.component.html',
   styleUrl: './curp.component.scss',
 })
@@ -61,13 +70,13 @@ export class CurpComponent {
             take(1)
           )
         ),
-        filter((status) => status === 'VALID')
+        filter((status) => status === 'VALID' || status === 'INVALID')
       )
       .subscribe((validationSuccesful) => this.onSubmit());
   }
 
   onSubmit() {
-    // console.log(this.curpForm.get('curp')?.getError('curp'));
+    console.log(this.curpForm.status);
     this.curpResponse = this.curpService.getCurpResponse();
     if (this.curpResponse) {
       if (this.curpResponse.status === 'SUCCESS') {

@@ -12,6 +12,7 @@ import {
 import { Injectable } from '@angular/core';
 import { CurpService } from './curp.service';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
+import { error } from 'console';
 
 @Injectable({ providedIn: 'root' })
 export class CurpFoundAndValidValidator implements AsyncValidator {
@@ -34,6 +35,10 @@ export class CurpFoundAndValidValidator implements AsyncValidator {
                   err.status === 'SERVICE_ERROR'
                     ? err.errorMessage
                     : err.error[0].message,
+                code:
+                  err.status === 'SERVICE_ERROR'
+                    ? undefined
+                    : err.error[0].code,
               },
             });
           }
@@ -45,7 +50,7 @@ export class CurpFoundAndValidValidator implements AsyncValidator {
 
 function getCurpValidationError(
   curpResponse: Curp
-): { curp: { message: string } } | null {
+): { curp: { message: string; code?: string } } | null {
   if (curpResponse.status === 'SUCCESS') {
     if (curpResponse.response.status === 'NOT_FOUND') {
       return {
