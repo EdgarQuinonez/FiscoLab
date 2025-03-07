@@ -47,6 +47,7 @@ export class CurpComponent {
     private storageService: StorageService
   ) {}
   curpForm!: FormGroup;
+  loading: boolean = false;
   formSubmitSubject$ = new Subject();
   // curpResponse$!: Observable<LoadingState<Curp>>;
   curpResponse: Curp | null = null;
@@ -66,17 +67,20 @@ export class CurpComponent {
         switchMap(() =>
           this.curpForm.statusChanges.pipe(
             startWith(this.curpForm.status),
-            filter((status) => status !== 'PENDING'),
+            filter((status) => {
+              this.loading = status === 'PENDING';
+              return status !== 'PENDING';
+            }),
             take(1)
           )
         ),
-        filter((status) => status === 'VALID' || status === 'INVALID')
+        filter((status) => status === 'VALID')
       )
       .subscribe((validationSuccesful) => this.onSubmit());
   }
 
   onSubmit() {
-    console.log(this.curpForm.status);
+    this.loading = false;
     this.curpResponse = this.curpService.getCurpResponse();
     if (this.curpResponse) {
       if (this.curpResponse.status === 'SUCCESS') {

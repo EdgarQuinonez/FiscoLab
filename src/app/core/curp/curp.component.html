@@ -3,9 +3,9 @@
         <label class="flex items-start justify-center flex-col">
             <span>CURP</span>
             <p-inputgroup>
-                <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" class="p-[14px]!" pInputText />
+                <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText />
                 <p-inputgroup-addon>
-                    <p-button icon="pi pi-search" aria-label="Search" type="submit" />
+                    <p-button icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
                 </p-inputgroup-addon>
             </p-inputgroup>
             
