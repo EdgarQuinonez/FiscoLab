@@ -80,7 +80,7 @@ export class CurpComponent {
   }
 
   onSubmit() {
-    this.loading = false;
+    // this.loading = false;
     this.curpResponse = this.curpService.getCurpResponse();
     if (this.curpResponse) {
       if (this.curpResponse.status === 'SUCCESS') {
