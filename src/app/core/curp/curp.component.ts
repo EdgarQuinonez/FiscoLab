@@ -38,6 +38,7 @@ export class CurpComponent {
     private storageService: StorageService
   ) {}
   curpForm!: FormGroup;
+  formSubmitSubject$ = new Subject();
   // curpResponse$!: Observable<LoadingState<Curp>>;
   curpResponse: Curp | null = null;
 
@@ -49,21 +50,8 @@ export class CurpComponent {
         updateOn: 'submit',
       }),
     });
-  }
 
-  formSubmitSubject() {
-    console.log('Submit btn clicked.');
-    console.log('form status: ', this.curpForm.status);
-    console.log(
-      'Sync validation :',
-      this.curpForm.controls['curp'].hasError('required')
-    );
-    console.log(
-      'Async validation :',
-      this.curpForm.controls['curp'].getError('curpFoundAndValid')
-    );
-
-    return new Subject()
+    this.formSubmitSubject$
       .pipe(
         tap(() => this.curpForm.markAsDirty()),
         switchMap(() =>
@@ -73,17 +61,15 @@ export class CurpComponent {
             take(1)
           )
         ),
-        filter((status) => status === 'VALID' || status === 'INVALID')
+        filter((status) => status === 'VALID')
       )
       .subscribe((validationSuccesful) => this.onSubmit());
   }
 
   onSubmit() {
-    console.log('submitted.');
-    console.log(this.curpForm.controls['curp'].getError('curpFoundAndValid'));
+    // console.log(this.curpForm.get('curp')?.getError('curp'));
     this.curpResponse = this.curpService.getCurpResponse();
     if (this.curpResponse) {
-      console.log(this.curpResponse);
       if (this.curpResponse.status === 'SUCCESS') {
         if (this.curpResponse.response.status === 'FOUND') {
           this.router.navigateByUrl('dashboard');

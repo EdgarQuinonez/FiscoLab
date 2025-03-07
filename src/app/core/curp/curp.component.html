@@ -1,11 +1,11 @@
-<form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject()">
+<form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject$.next(0)">
     <label>
         <h2>CURP:</h2>
         <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText/>
 
-        @if (curpForm.hasError('curpFoundAndValid')) {
+        @if (curpForm.get('curp')?.hasError("curp")) {
             <p>
-                {{curpForm.getError('curpFoundAndValid')}}
+                {{curpForm.get('curp')?.getError("curp").message}}
             </p>
         }
     </label>
