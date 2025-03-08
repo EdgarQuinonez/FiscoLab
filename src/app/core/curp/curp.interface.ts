@@ -64,7 +64,7 @@ export interface CurpNotValidResponseData {
   nombres: string;
   primerApellido: string;
   segundoApellido: string;
-  sexo: 'HOMBRE' | 'MUJER';
+  sexo: 'HOMBRE' | 'MUJER' | 'NO BINARIO';
   status: 'NOT_VALID';
   statusCurp: string;
   statusCurpDescripcion: string;

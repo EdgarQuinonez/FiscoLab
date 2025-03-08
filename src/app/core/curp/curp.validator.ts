@@ -12,7 +12,6 @@ import {
 import { Injectable } from '@angular/core';
 import { CurpService } from './curp.service';
 import { catchError, map, Observable, of, switchMap } from 'rxjs';
-import { error } from 'console';
 
 @Injectable({ providedIn: 'root' })
 export class CurpFoundAndValidValidator implements AsyncValidator {

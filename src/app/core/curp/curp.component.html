@@ -1,35 +1,48 @@
-<form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject$.next(0)">
-    <div class="flex items-center justify-center">
-        <label class="flex items-start justify-center flex-col">
-            <span>CURP</span>
-            <p-inputgroup>
-                <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText />
-                <p-inputgroup-addon>
-                    <p-button icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
-                </p-inputgroup-addon>
-            </p-inputgroup>
-            
-    
-            @if (curpForm.get('curp')?.hasError("curp")) {
-                @if (curpForm.get('curp')?.getError('curp').code) {
-                    @if (curpForm.get('curp')?.getError('curp').code === "FORMAT_ERROR") {
-                        <small class="ng-invalid">
-                            El formato de la CURP introducida es inválido.
-                        </small>
-                    }                                  
-                } @else {
-                    <!-- SUCCESS errors e.g. NOT_FOUND or NOT_VALID -->
-                    <small class="ng-invalid">
-                        {{curpForm.get('curp')?.getError("curp").message}}
-                    </small>
-                }
-            }
-    
-            @if (curpForm.get('curp')?.hasError("required") && (curpForm.get('curp')?.dirty || curpForm.get('curp')?.touched)) {
-                <small class="ng-invalid">
-                    El campo es requerido.
-                </small>
-            }
-        </label>
-    </div>
-</form>
+<p-tabs value="0">
+    <p-tablist>
+        <p-tab value="0">CURP</p-tab>
+        <p-tab value="1">Datos</p-tab>
+    </p-tablist>
+    <p-tabpanels>
+        <p-tabpanel value="0">
+            <form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject$.next(0)">
+                <div class="flex items-center justify-center">
+                    <label class="flex items-start justify-center flex-col">
+                        <span>CURP</span>
+                        <p-inputgroup>
+                            <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText />
+                            <p-inputgroup-addon>
+                                <p-button icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
+                            </p-inputgroup-addon>
+                        </p-inputgroup>
+                        
+                
+                        @if (curpForm.get('curp')?.hasError("curp")) {
+                            @if (curpForm.get('curp')?.getError('curp').code) {
+                                @if (curpForm.get('curp')?.getError('curp').code === "FORMAT_ERROR") {
+                                    <small class="ng-invalid">
+                                        El formato de la CURP introducida es inválido.
+                                    </small>
+                                }                                  
+                            } @else {
+                                <!-- SUCCESS errors e.g. NOT_FOUND or NOT_VALID -->
+                                <small class="ng-invalid">
+                                    {{curpForm.get('curp')?.getError("curp").message}}
+                                </small>
+                            }
+                        }
+                
+                        @if (curpForm.get('curp')?.hasError("required") && (curpForm.get('curp')?.dirty || curpForm.get('curp')?.touched)) {
+                            <small class="ng-invalid">
+                                El campo es requerido.
+                            </small>
+                        }
+                    </label>
+                </div>
+            </form>
+        </p-tabpanel>
+        <p-tabpanel value="1">            
+            <app-curp-by-data></app-curp-by-data>
+        </p-tabpanel>
+    </p-tabpanels>
+</p-tabs>

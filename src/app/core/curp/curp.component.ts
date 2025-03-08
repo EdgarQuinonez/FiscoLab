@@ -26,6 +26,8 @@ import {
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@types';
 import { CurpFoundAndValidValidator } from './curp.validator';
+import { CurpByDataComponent } from './curp-by-data/curp-by-data.component';
+import { TabsModule } from 'primeng/tabs';
 
 @Component({
   selector: 'app-curp',
@@ -35,6 +37,8 @@ import { CurpFoundAndValidValidator } from './curp.validator';
     ButtonModule,
     InputGroupModule,
     InputGroupAddonModule,
+    CurpByDataComponent,
+    TabsModule,
   ],
   templateUrl: './curp.component.html',
   styleUrl: './curp.component.scss',

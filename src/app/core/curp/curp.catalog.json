@@ -38,5 +38,17 @@
         "H": "HOMBRE",
         "M": "MUJER",
         "X": "NO BINARIO"
-    }
+    },
+    "NOT_VALID": {
+        "AN": "Alta Normal",
+        "AH": "Alta con homonimia",
+        "RCC": "Registro de cambio afectando a CURP",
+        "RCN": "Registro de cambio no afectando a CURP",
+        "BAP": "Baja por documento apócrifo",
+        "BSU": "Baja sin uso",
+        "BD": "Baja por defunción",
+        "BDM": "Baja administrativa",
+        "BDP": "Baja por adopción",
+        "BJD": "Baja Judicial"
+      }
 }
