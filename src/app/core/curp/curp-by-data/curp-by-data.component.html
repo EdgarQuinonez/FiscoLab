@@ -18,11 +18,15 @@
     </div>
     <label>
         <span>Fecha de nacimiento: </span>
-        <input type="date" name="" id="">
+        <p-datepicker dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'"/>
     </label>
     <label>
         <span>Sexo: </span>
-        Dropdown
+        <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" />
+    </label>
+    <label>
+        Estado de nacimiento:
+        <p-autocomplete [forceSelection]="true" [suggestions]="states" optionLabel="name"/>        
     </label>
 
 </form>

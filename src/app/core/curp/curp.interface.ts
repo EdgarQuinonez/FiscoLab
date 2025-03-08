@@ -11,6 +11,8 @@ export interface SuccessResponse extends SuccessKibanResponse {
 
 type CurpSuccessStatus = 'FOUND' | 'NOT_FOUND' | 'NOT_VALID';
 
+export type Gender = 'HOMBRE' | 'MUJER' | 'NO BINARIO';
+
 export interface CurpFoundResponseData {
   claveEntidad: string;
   curp: string;
@@ -30,7 +32,7 @@ export interface CurpFoundResponseData {
   nombres: string;
   primerApellido: string;
   segundoApellido: string;
-  sexo: 'HOMBRE' | 'MUJER' | 'NO BINARIO';
+  sexo: Gender;
   status: 'FOUND';
   statusCurp: string;
   statusCurpDescripcion: string;
@@ -64,7 +66,7 @@ export interface CurpNotValidResponseData {
   nombres: string;
   primerApellido: string;
   segundoApellido: string;
-  sexo: 'HOMBRE' | 'MUJER' | 'NO BINARIO';
+  sexo: Gender;
   status: 'NOT_VALID';
   statusCurp: string;
   statusCurpDescripcion: string;
@@ -103,13 +105,15 @@ export type Curp =
   | CurpBadRequestResponse
   | CurpServiceUnavailableResponse;
 
+export type GenderCode = 'H' | 'M' | 'X';
+
 export interface CurpValidateByDataRequest {
   claveEntidad: string;
   fechaNacimiento: string;
   nombres: string;
   primerApellido: string;
   segundoApellido: string;
-  sexo: 'H' | 'M' | 'X';
+  sexo: GenderCode;
 }
 
 export interface CurpValidateByDataResponse
