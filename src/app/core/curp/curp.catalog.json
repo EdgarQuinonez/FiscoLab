@@ -1,0 +1,42 @@
+{
+    "STATES": {
+        "AS": "AGUASCALIENTES",
+        "BC": "BAJA CALIFORNIA",
+        "BS": "BAJA CALIFORNIA SUR",
+        "CC": "CAMPECHE",
+        "CL": "COAHUILA",
+        "CM": "COLIMA",
+        "CS": "CHIAPAS",
+        "CH": "CHIHUAHUA",
+        "DF": "CIUDAD DE MÉXICO",
+        "DG": "DURANGO",
+        "GT": "GUANAJUATO",
+        "GR": "GUERRERO",
+        "HG": "HIDALGO",
+        "JC": "JALISCO",
+        "MC": "ESTADO DE MÉXICO",
+        "MN": "MICHOACÁN",
+        "MS": "MORELOS",
+        "NT": "NAYARIT",
+        "NL": "NUEVO LEÓN",
+        "OC": "OAXACA",
+        "PL": "PUEBLA",
+        "QT": "QUERÉTARO",
+        "QR": "QUINTANA ROO",
+        "SP": "SAN LUIS POTOSÍ",
+        "SL": "SINALOA",
+        "SR": "SONORA",
+        "TC": "TABASCO",
+        "TS": "TAMAULIPAS",
+        "TL": "TLAXCALA",
+        "VZ": "VERACRUZ",
+        "YN": "YUCATÁN",
+        "ZS": "ZACATECAS",
+        "NE": "NACIDO EN EL EXTRANJERO"
+      },
+    "GENDER": {
+        "H": "HOMBRE",
+        "M": "MUJER",
+        "X": "NO BINARIO"
+    }
+}

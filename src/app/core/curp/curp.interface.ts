@@ -30,7 +30,7 @@ export interface CurpFoundResponseData {
   nombres: string;
   primerApellido: string;
   segundoApellido: string;
-  sexo: 'HOMBRE' | 'MUJER';
+  sexo: 'HOMBRE' | 'MUJER' | 'NO BINARIO';
   status: 'FOUND';
   statusCurp: string;
   statusCurpDescripcion: string;
@@ -75,9 +75,7 @@ export interface CurpResponse extends SuccessResponse {
     | CurpFoundResponseData
     | CurpNotFoundResponseData
     | CurpNotValidResponseData;
-  request: {
-    curp: string;
-  };
+  request: CurpRequestBody;
 }
 
 type CurpBadRequestCode =
@@ -97,12 +95,34 @@ export interface CurpBadRequestResponse extends HttpErrorResponse {
 
 export interface CurpServiceUnavailableResponse
   extends ServiceUnavailableResponse {
-  request: {
-    curp: string;
-  };
+  request: CurpRequestBody;
 }
 
 export type Curp =
   | CurpResponse
   | CurpBadRequestResponse
   | CurpServiceUnavailableResponse;
+
+export interface CurpValidateByDataRequest {
+  claveEntidad: string;
+  fechaNacimiento: string;
+  nombres: string;
+  primerApellido: string;
+  segundoApellido: string;
+  sexo: 'H' | 'M' | 'X';
+}
+
+export interface CurpValidateByDataResponse
+  extends Omit<CurpResponse, 'request'> {
+  request: CurpValidateByDataRequest;
+}
+
+export interface CurpValidateByDataServiceUnavailableResponse
+  extends Omit<CurpServiceUnavailableResponse, 'request'> {
+  request: CurpValidateByDataRequest;
+}
+
+export type CurpByData =
+  | CurpValidateByDataResponse
+  | CurpBadRequestResponse
+  | CurpValidateByDataServiceUnavailableResponse;
