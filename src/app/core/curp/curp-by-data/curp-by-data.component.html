@@ -3,17 +3,47 @@
         <label>
             <span>Primer apellido: </span>
             <input class="w-full" type="text" formControlName="primerApellido" pInputText>
+
+            @if (dataForm.get('primerApellido')?.hasError('required') && (dataForm.get('primerApellido')?.touched || dataForm.get('primerApellido')?.dirty)) {
+                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+            } 
+
+            @if (dataForm.get('primerApellido')?.hasError('primerApellido')) {
+                <p-message severity="error" variant="simple" size="small">
+                    {{ dataForm.get('primerApellido')?.getError('primerApellido')}}
+                </p-message>    
+            }
         </label>        
         <label>
             <!-- NOT REQUIRED -->
             <span>Segundo apellido: </span>
             <input class="w-full" type="text" formControlName="segundoApellido" pInputText>
+
+            @if (dataForm.get('segundoApellido')?.hasError('required') && (dataForm.get('segundoApellido')?.touched || dataForm.get('segundoApellido')?.dirty)) {
+                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+            } 
+
+            @if (dataForm.get('segundoApellido')?.hasError('segundoApellido')) {
+                <p-message severity="error" variant="simple" size="small">
+                    {{ dataForm.get('segundoApellido')?.getError('segundoApellido')}}
+                </p-message>    
+            }
         </label>        
     </div>
     
         <label class="">
             <span>Nombre(s): </span>
             <input type="text" class="w-full" formControlName="nombres" pInputText>
+
+            @if (dataForm.get('nombres')?.hasError('required') && (dataForm.get('nombres')?.touched || dataForm.get('nombres')?.dirty)) {
+                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+            } 
+
+            @if (dataForm.get('nombres')?.hasError('nombres')) {
+                <p-message severity="error" variant="simple" size="small">
+                    {{ dataForm.get('nombres')?.getError('nombres')}}
+                </p-message>    
+            }
         </label>        
     
     <label class="flex self-end items-center justify-center">
@@ -32,3 +62,9 @@
     <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4"/>
 
 </form>
+
+@if (responseError) {
+    <p-message severity="error">
+        {{ responseError }}
+    </p-message>
+}

@@ -35,9 +35,9 @@ export class CurpService {
       // FOUND
       testCaseId: '663567bb713cf2110a1106b3',
       // NOT_FOUND
-      // testCaseId: '663567bb713cf2110a1106b4'
+      // testCaseId: '663567bb713cf2110a1106b4',
       // INVALID_CURP
-      // testCaseId: '663567bb713cf2110a1106b5'
+      // testCaseId: '663567bb713cf2110a1106b5',
     };
     const endpoint = `${environment.apiUrl}/curp/validateData?testCaseId=${params.testCaseId}`;
     return this.http.post<CurpByData>(endpoint, personalData);
