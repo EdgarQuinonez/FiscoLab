@@ -17,11 +17,7 @@
         <label>
             <!-- NOT REQUIRED -->
             <span>Segundo apellido: </span>
-            <input class="w-full" type="text" formControlName="segundoApellido" pInputText>
-
-            @if (dataForm.get('segundoApellido')?.hasError('required') && (dataForm.get('segundoApellido')?.touched || dataForm.get('segundoApellido')?.dirty)) {
-                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
-            } 
+            <input class="w-full" type="text" formControlName="segundoApellido" pInputText>        
 
             @if (dataForm.get('segundoApellido')?.hasError('segundoApellido')) {
                 <p-message severity="error" variant="simple" size="small">
@@ -49,14 +45,25 @@
     <label class="flex self-end items-center justify-center">
         <span class="mr-2">Fecha de nacimiento: </span>
         <p-datepicker dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" />
+
+        @if (dataForm.get('fechaNacimiento')?.hasError('required') && (dataForm.get('fechaNacimiento')?.touched || dataForm.get('fechaNacimiento')?.dirty)) {
+            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+        }
     </label>
     <label class="flex self-end items-center justify-center">
         <span class="mr-2">Sexo: </span>
-        <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" formControlName="sexo" />
+        <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" (completeMethod)="searchGender($event)" formControlName="sexo" />
+
+        @if (dataForm.get('sexo')?.hasError('required') && (dataForm.get('sexo')?.touched || dataForm.get('sexo')?.dirty)) {
+            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+        }
     </label>    
     <label class="flex self-end items-center justify-center">
         <span class="mr-2">Estado de nacimiento:</span>
-        <p-autocomplete class=""  [forceSelection]="true" [suggestions]="states" optionLabel="name" formControlName="claveEntidad" />        
+        <p-autocomplete class=""  [forceSelection]="true" [suggestions]="states" optionLabel="name" (completeMethod)="searchEntidad($event)" formControlName="claveEntidad" />        
+        @if (dataForm.get('claveEntidad')?.hasError('required') && (dataForm.get('claveEntidad')?.touched || dataForm.get('claveEntidad')?.dirty)) {
+            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+        }
     </label>
 
     <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4"/>

@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { InputText } from 'primeng/inputtext';
 import { DatePickerModule } from 'primeng/datepicker';
-import { AutoCompleteModule } from 'primeng/autocomplete';
+import {
+  AutoCompleteCompleteEvent,
+  AutoCompleteModule,
+} from 'primeng/autocomplete';
 import curpCatalog from '@core/curp/curp.catalog.json';
 import { format } from 'date-fns';
 
@@ -116,7 +119,6 @@ export class CurpByDataComponent {
     );
 
     this.validateCurpResponse$.subscribe((value) => {
-      console.log(value);
       if (value.data) {
         if (value.data.status === 'SUCCESS') {
           const response = value.data.response;
@@ -153,16 +155,31 @@ export class CurpByDataComponent {
 
         // BAD REQUEST
         error.error.forEach((error) => {
-          this.dataForm
-            .get(error.field)
-            ?.setErrors({
-              [error.field]:
-                error.code === 'FORMAT_ERROR'
-                  ? 'No utilices caracteres especiales ni números.'
-                  : 'El campo es requerido.',
-            });
+          this.dataForm.get(error.field)?.setErrors({
+            [error.field]:
+              error.code === 'FORMAT_ERROR'
+                ? 'No utilices caracteres especiales ni números.'
+                : 'El campo es requerido.',
+          });
         });
       }
     });
+  }
+
+  searchGender(e: AutoCompleteCompleteEvent) {
+    const filtered: { name: string; code: string }[] = [];
+    const query = e.query.toLowerCase();
+
+    this.gender = this.gender.filter(
+      (gender) => gender.name.toLowerCase().indexOf(query) === 0
+    );
+  }
+
+  searchEntidad(e: AutoCompleteCompleteEvent) {
+    const query = e.query.toLowerCase();
+
+    this.states = this.states.filter(
+      (state) => state.name.toLowerCase().indexOf(query) === 0
+    );
   }
 }
