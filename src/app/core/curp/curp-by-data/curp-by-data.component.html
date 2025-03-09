@@ -23,10 +23,12 @@
     <label>
         <span>Sexo: </span>
         <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" />
-    </label>
+    </label>    
     <label>
         Estado de nacimiento:
         <p-autocomplete [forceSelection]="true" [suggestions]="states" optionLabel="name"/>        
     </label>
+
+    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right"/>
 
 </form>

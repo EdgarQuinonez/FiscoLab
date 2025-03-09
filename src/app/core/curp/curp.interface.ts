@@ -109,7 +109,7 @@ export type GenderCode = 'H' | 'M' | 'X';
 
 export interface CurpValidateByDataRequest {
   claveEntidad: string;
-  fechaNacimiento: string;
+  fechaNacimiento: string; // yyyy-MM-dd format
   nombres: string;
   primerApellido: string;
   segundoApellido: string;

@@ -4,10 +4,12 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import curpCatalog from '@core/curp/curp.catalog.json';
 import { Gender, GenderCode } from '../curp.interface';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-curp-by-data',
-  imports: [InputText, DatePickerModule, AutoCompleteModule],
+  imports: [InputText, DatePickerModule, AutoCompleteModule, ButtonModule],
   templateUrl: './curp-by-data.component.html',
   styleUrl: './curp-by-data.component.scss',
 })
@@ -21,6 +23,17 @@ export class CurpByDataComponent {
     name: string;
     code: string;
   }[] = [];
+
+  // TODO: 'Complete' method for gender and states items
+
+  dataForm = new FormGroup({
+    primerApellido: new FormControl('', Validators.required),
+    segundoApellido: new FormControl(''),
+    nombres: new FormControl('', Validators.required),
+    fechaNacimiento: new FormControl('', Validators.required),
+    sexo: new FormControl('', Validators.required),
+    claveEntidad: new FormControl('', Validators.required),
+  });
 
   ngOnInit() {
     // init gender
@@ -38,8 +51,9 @@ export class CurpByDataComponent {
         code,
       });
     }
+  }
 
-    console.log(this.gender);
-    console.log(this.states);
+  onSubmit() {
+    console.log(this.dataForm.value);
   }
 }
