@@ -1,34 +1,34 @@
-<form>
-    <div>
+<form [formGroup]="dataForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2">
+    <div class="flex gap-1">
         <label>
             <span>Primer apellido: </span>
-            <input type="text" pInputText>
+            <input class="w-full" type="text" formControlName="primerApellido" pInputText>
         </label>        
         <label>
             <!-- NOT REQUIRED -->
             <span>Segundo apellido: </span>
-            <input type="text" pInputText>
+            <input class="w-full" type="text" formControlName="segundoApellido" pInputText>
         </label>        
     </div>
-    <div>
-        <label>
+    
+        <label class="">
             <span>Nombre(s): </span>
-            <input type="text" pInputText>
+            <input type="text" class="w-full" formControlName="nombres" pInputText>
         </label>        
-    </div>
-    <label>
-        <span>Fecha de nacimiento: </span>
-        <p-datepicker dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'"/>
+    
+    <label class="flex self-end items-center justify-center">
+        <span class="mr-2">Fecha de nacimiento: </span>
+        <p-datepicker dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" />
     </label>
-    <label>
-        <span>Sexo: </span>
-        <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" />
+    <label class="flex self-end items-center justify-center">
+        <span class="mr-2">Sexo: </span>
+        <p-autocomplete [forceSelection]="true" [suggestions]="gender" optionLabel="name" formControlName="sexo" />
     </label>    
-    <label>
-        Estado de nacimiento:
-        <p-autocomplete [forceSelection]="true" [suggestions]="states" optionLabel="name"/>        
+    <label class="flex self-end items-center justify-center">
+        <span class="mr-2">Estado de nacimiento:</span>
+        <p-autocomplete class=""  [forceSelection]="true" [suggestions]="states" optionLabel="name" formControlName="claveEntidad" />        
     </label>
 
-    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right"/>
+    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4"/>
 
 </form>

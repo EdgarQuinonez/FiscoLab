@@ -112,8 +112,8 @@ export interface CurpValidateByDataRequest {
   fechaNacimiento: string; // yyyy-MM-dd format
   nombres: string;
   primerApellido: string;
-  segundoApellido: string;
-  sexo: GenderCode;
+  segundoApellido?: string | null;
+  sexo: string; // H, M, X;
 }
 
 export interface CurpValidateByDataResponse
