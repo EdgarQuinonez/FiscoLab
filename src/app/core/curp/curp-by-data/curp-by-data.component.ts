@@ -58,12 +58,21 @@ export class CurpByDataComponent {
     name: string;
     code: string;
   }[] = [];
+  
+  genderSuggestions: {
+    name: string;
+    code: string;
+  }[] = [];
 
   states: {
     name: string;
     code: string;
   }[] = [];
-
+  
+  statesSuggestions: {
+    name: string;
+    code: string;
+  }[] = [];
   // TODO: 'Complete' method for gender and states items
 
   dataForm = new FormGroup({
@@ -167,10 +176,9 @@ export class CurpByDataComponent {
   }
 
   searchGender(e: AutoCompleteCompleteEvent) {
-    const filtered: { name: string; code: string }[] = [];
     const query = e.query.toLowerCase();
 
-    this.gender = this.gender.filter(
+    this.genderSuggestions = this.gender.filter(
       (gender) => gender.name.toLowerCase().indexOf(query) === 0
     );
   }
@@ -178,7 +186,7 @@ export class CurpByDataComponent {
   searchEntidad(e: AutoCompleteCompleteEvent) {
     const query = e.query.toLowerCase();
 
-    this.states = this.states.filter(
+    this.statesSuggestions = this.states.filter(
       (state) => state.name.toLowerCase().indexOf(query) === 0
     );
   }
