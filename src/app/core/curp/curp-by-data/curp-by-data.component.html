@@ -51,7 +51,7 @@
         }
     </label>
     <div class="flex items-center justify-start gap-1">
-        <label class="flex flex-col items-start justify-center">
+        <label class="flex flex-col items-start justify-center flex-1">
             <span class="mr-2">Sexo: </span>
             <p-autocomplete class="w-full" [forceSelection]="true" [suggestions]="genderSuggestions" optionLabel="name" (completeMethod)="searchGender($event)" formControlName="sexo" />
     
@@ -59,7 +59,7 @@
                 <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
             }
         </label>    
-        <label class="flex flex-col items-start justify-center">
+        <label class="flex flex-col items-start justify-center flex-1">
             <span class="mr-2">Estado de nacimiento:</span>
             <p-autocomplete class="w-full"  [forceSelection]="true" [suggestions]="statesSuggestions" optionLabel="name" (completeMethod)="searchEntidad($event)" formControlName="claveEntidad" />        
             @if (dataForm.get('claveEntidad')?.hasError('required') && (dataForm.get('claveEntidad')?.touched || dataForm.get('claveEntidad')?.dirty)) {
@@ -68,7 +68,7 @@
         </label>
     </div>
 
-    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4"/>
+    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4" [loading]="loading"/>
 
 </form>
 

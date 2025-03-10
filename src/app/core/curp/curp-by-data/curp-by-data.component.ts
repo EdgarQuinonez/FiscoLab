@@ -53,6 +53,7 @@ export class CurpByDataComponent {
 
   validateCurpResponse$: Observable<LoadingState<CurpByData>> | null = null;
   responseError: string | null = null;
+  loading: boolean = false
 
   gender: {
     name: string;
@@ -106,6 +107,8 @@ export class CurpByDataComponent {
     if (this.dataForm.invalid) {
       return;
     }
+
+    this.loading = true;
     this.responseError = null;
 
     const data = this.dataForm.value;
@@ -128,8 +131,10 @@ export class CurpByDataComponent {
     );
 
     this.validateCurpResponse$.subscribe((value) => {
+      this.loading = false
       if (value.data) {
         if (value.data.status === 'SUCCESS') {
+          
           const response = value.data.response;
           if (response.status === 'FOUND') {
             this.router.navigateByUrl('dashboard');
