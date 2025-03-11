@@ -28,6 +28,7 @@ import { LoadingState } from '@types';
 import { CurpFoundAndValidValidator } from './curp.validator';
 import { CurpByDataComponent } from './curp-by-data/curp-by-data.component';
 import { TabsModule } from 'primeng/tabs';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-curp',
@@ -39,6 +40,7 @@ import { TabsModule } from 'primeng/tabs';
     InputGroupAddonModule,
     CurpByDataComponent,
     TabsModule,
+    MessageModule,
   ],
   templateUrl: './curp.component.html',
   styleUrl: './curp.component.scss',

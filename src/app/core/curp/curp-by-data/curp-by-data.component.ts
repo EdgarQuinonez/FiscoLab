@@ -30,7 +30,7 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
-
+import { SelectModule } from 'primeng/select';
 @Component({
   selector: 'app-curp-by-data',
   imports: [
@@ -40,6 +40,7 @@ import { MessageModule } from 'primeng/message';
     ButtonModule,
     ReactiveFormsModule,
     MessageModule,
+    SelectModule,
   ],
   templateUrl: './curp-by-data.component.html',
   styleUrl: './curp-by-data.component.scss',
@@ -53,14 +54,9 @@ export class CurpByDataComponent {
 
   validateCurpResponse$: Observable<LoadingState<CurpByData>> | null = null;
   responseError: string | null = null;
-  loading: boolean = false
+  loading: boolean = false;
 
   gender: {
-    name: string;
-    code: string;
-  }[] = [];
-  
-  genderSuggestions: {
     name: string;
     code: string;
   }[] = [];
@@ -69,12 +65,11 @@ export class CurpByDataComponent {
     name: string;
     code: string;
   }[] = [];
-  
+
   statesSuggestions: {
     name: string;
     code: string;
   }[] = [];
-  // TODO: 'Complete' method for gender and states items
 
   dataForm = new FormGroup({
     primerApellido: new FormControl('', Validators.required),
@@ -131,10 +126,9 @@ export class CurpByDataComponent {
     );
 
     this.validateCurpResponse$.subscribe((value) => {
-      this.loading = false
+      this.loading = false;
       if (value.data) {
         if (value.data.status === 'SUCCESS') {
-          
           const response = value.data.response;
           if (response.status === 'FOUND') {
             this.router.navigateByUrl('dashboard');
@@ -178,14 +172,6 @@ export class CurpByDataComponent {
         });
       }
     });
-  }
-
-  searchGender(e: AutoCompleteCompleteEvent) {
-    const query = e.query.toLowerCase();
-
-    this.genderSuggestions = this.gender.filter(
-      (gender) => gender.name.toLowerCase().indexOf(query) === 0
-    );
   }
 
   searchEntidad(e: AutoCompleteCompleteEvent) {

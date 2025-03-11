@@ -12,7 +12,7 @@
                         <p-inputgroup>
                             <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText />
                             <p-inputgroup-addon>
-                                <p-button icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
+                                <p-button class="w-full h-full" icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
                             </p-inputgroup-addon>
                         </p-inputgroup>
                         
@@ -20,22 +20,22 @@
                         @if (curpForm.get('curp')?.hasError("curp")) {
                             @if (curpForm.get('curp')?.getError('curp').code) {
                                 @if (curpForm.get('curp')?.getError('curp').code === "FORMAT_ERROR") {
-                                    <small class="ng-invalid">
+                                    <p-message severity="error" variant="simple" size="small" >
                                         El formato de la CURP introducida es inválido.
-                                    </small>
+                                    </p-message>
                                 }                                  
                             } @else {
                                 <!-- SUCCESS errors e.g. NOT_FOUND or NOT_VALID -->
-                                <small class="ng-invalid">
+                                <p-message severity="error" variant="simple" size="small" >
                                     {{curpForm.get('curp')?.getError("curp").message}}
-                                </small>
+                                </p-message>
                             }
                         }
                 
                         @if (curpForm.get('curp')?.hasError("required") && (curpForm.get('curp')?.dirty || curpForm.get('curp')?.touched)) {
-                            <small class="ng-invalid">
+                            <p-message severity="error" variant="simple" size="small" >
                                 El campo es requerido.
-                            </small>
+                            </p-message>
                         }
                     </label>
                 </div>
