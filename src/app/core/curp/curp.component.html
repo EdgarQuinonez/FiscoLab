@@ -1,14 +1,16 @@
-<p-tabs value="0">
-    <p-tablist>
-        <p-tab value="0">CURP</p-tab>
-        <p-tab value="1">Datos</p-tab>
-    </p-tablist>
-    <p-tabpanels>
-        <p-tabpanel value="0">
-            <form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject$.next(0)">
-                <div class="flex items-center justify-center">
-                    <label class="flex items-start justify-center flex-col">
-                        <span>CURP</span>
+<p-card>    
+    <p-tabs value="0">
+        <p-tablist>
+            <p-tab value="0">CURP</p-tab>
+            <p-tab value="1">Datos</p-tab>
+        </p-tablist>
+        <p-tabpanels>
+            <!-- <p-tabpanel value="0" class="flex justify-center items-center h-full w-full"> -->
+            <p-tabpanel value="0">
+                <form [formGroup]="curpForm" (ngSubmit)="formSubmitSubject$.next(0)" class="flex items-center justify-center h-[24.375rem] w-[42.125rem]">
+                    
+                    <label class="flex items-center justify-center flex-col gap-3 w-full">
+                        <span class="text-2xl font-bold text-center">Ingresa una CURP</span>
                         <p-inputgroup>
                             <input type="text" formControlName="curp" placeholder="ej. QURE021108HCHXMDA9" pInputText />
                             <p-inputgroup-addon>
@@ -38,11 +40,13 @@
                             </p-message>
                         }
                     </label>
-                </div>
-            </form>
-        </p-tabpanel>
-        <p-tabpanel value="1">            
-            <app-curp-by-data></app-curp-by-data>
-        </p-tabpanel>
-    </p-tabpanels>
-</p-tabs>
+                    
+                </form>
+            </p-tabpanel>
+            <p-tabpanel value="1">            
+            <!-- <p-tabpanel value="1" class="flex justify-center items-center h-full w-full">             -->
+                <app-curp-by-data></app-curp-by-data>
+            </p-tabpanel>
+        </p-tabpanels>
+    </p-tabs>
+</p-card>

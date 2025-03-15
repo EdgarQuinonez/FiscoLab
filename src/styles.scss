@@ -4,6 +4,7 @@
 
 html {
     box-sizing: border-box;
+    font-size: 16px;
   }
   *, *:before, *:after {
     box-sizing: inherit;
@@ -14,9 +15,4 @@ h1 {
     font-size: x-large;
     font-weight: bold;
     text-align: center;
-}
-
-
-.content-container {
-  // @apply w-
 }

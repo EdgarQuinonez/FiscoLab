@@ -53,7 +53,7 @@
     <div class="flex items-center justify-start gap-1">
         <label class="flex flex-col items-start justify-center flex-1">
             <span class="mr-2">Sexo: </span>
-            <p-select [options]="gender" formControlName="sexo" optionLabel="name" placeholder="Selecciona un sexo..." class="w-full"></p-select>            
+            <p-select [options]="gender" formControlName="sexo" optionLabel="name" placeholder="Selecciona una opción" class="w-full"></p-select>            
     
             @if (dataForm.get('sexo')?.hasError('required') && (dataForm.get('sexo')?.touched || dataForm.get('sexo')?.dirty)) {
                 <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
