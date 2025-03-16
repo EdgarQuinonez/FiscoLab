@@ -19,6 +19,7 @@ import { RfcService } from '@shared/services/rfc.service';
 import { LoadingState, ValidateRFCResponse } from '@shared/types';
 import { Observable, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-rfc-form',
@@ -46,7 +47,7 @@ export class RfcFormComponent {
 
   rfcFormResponse$: Observable<LoadingState<ValidateRFCResponse>> | null = null;
 
-  constructor(private rfcService: RfcService) {}
+  constructor(private rfcService: RfcService, private router: Router) {}
 
   tipoSujetoOptions = [
     {
@@ -85,8 +86,13 @@ export class RfcFormComponent {
       ),
       tap((value) => {
         this.loading = value.loading; // false
+        console.log(value);
         // TODO: redirect to dashboard, set tipoSujeto in localStorage, set RFC storage key
+        if (value.data) {
+        }
       })
     );
+
+    this.rfcFormResponse$.subscribe();
   }
 }

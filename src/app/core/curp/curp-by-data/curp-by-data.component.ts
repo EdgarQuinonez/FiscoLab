@@ -117,14 +117,14 @@ export class CurpByDataComponent {
       sexo: (data.sexo as { name: string; code: string }).code,
     };
 
-    this.validateCurpResponse$ = new Observable((subscriber) =>
-      subscriber.next()
-    ).pipe(
+    this.validateCurpResponse$ = new Observable((subscriber) => {
+      subscriber.next();
+    }).pipe(
       switchMapWithLoading<CurpByData>(() =>
         this.curpService.validateCurpByData$(requestBody)
       ),
       tap((value) => {
-        this.loading = false;
+        this.loading = value.loading;
         if (value.data) {
           if (value.data.status === 'SUCCESS') {
             const response = value.data.response;
@@ -171,6 +171,8 @@ export class CurpByDataComponent {
         }
       })
     );
+
+    this.validateCurpResponse$.subscribe();
   }
 
   searchEntidad(e: AutoCompleteCompleteEvent) {
