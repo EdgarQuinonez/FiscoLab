@@ -1,83 +1,81 @@
 import { Component } from '@angular/core';
 import { RfcFisicaService } from './rfc-fisica.service';
-import { from, Observable, of, switchMap } from 'rxjs'
+import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { StorageService } from '@shared/services/storage.service';
-import { PersonalData, PFDataFromRFCResponse, ValidateResponse, ValidateRFCResult } from './rfc-fisica.interface'
+import {
+  PersonalData,
+  PFDataFromRFCResponse,
+  ValidateResponse,
+  ValidateRFCResult,
+} from './rfc-fisica.interface';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
 
-
 @Component({
   selector: 'app-rfc-fisica',
   imports: [ButtonModule, CardModule, AsyncPipe],
   templateUrl: './rfc-fisica.component.html',
-  styleUrl: './rfc-fisica.component.scss'
+  styleUrl: './rfc-fisica.component.scss',
 })
 export class RfcFisicaComponent {
   results$!: Observable<LoadingState<ValidateResponse>>;
-  personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null
-  nombres: string | null = null
+  personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null;
+  nombres: string | null = null;
 
-  constructor(private rfcFisicaService: RfcFisicaService, private storageService: StorageService) {}
+  constructor(
+    private rfcFisicaService: RfcFisicaService,
+    private storageService: StorageService
+  ) {}
   ngOnInit() {
-    this.results$ = new Observable<any>(subscriber => subscriber.next()).pipe(
-      switchMapWithLoading<ValidateResponse>(() => this.rfcFisicaService.generateAndValidateRFC$())
-    )
+    this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
+      switchMapWithLoading<ValidateResponse>(() =>
+        this.rfcFisicaService.generateAndValidateRFC$()
+      ),
+      tap((value) => {
+        if (value.data) {
+          const response = value.data.response.rfcs[0];
+          const personalDataStr = this.storageService.getItem('personalData');
 
-    this.results$.subscribe(value => {
-      if (value.data) {
-        const response = value.data.response.rfcs[0]
-        
-        const personalDataStr = this.storageService.getItem("personalData")
+          if (
+            typeof personalDataStr === 'string' &&
+            personalDataStr.length > 0
+          ) {
+            const personalData: CurpFoundResponseData =
+              JSON.parse(personalDataStr);
+            this.nombres = personalData.nombres;
+          }
 
-        if (typeof personalDataStr === "string" && personalDataStr.length > 0) {
-          const personalData: CurpFoundResponseData = JSON.parse(personalDataStr)        
-          this.nombres = personalData.nombres
-        } 
-        
-        if (response.result === "RFC válido, y susceptible de recibir facturas") {
-          this.storageService.setItem("rfc", response.rfc)        
-        }        
-      }
-    })    
+          if (
+            response.result === 'RFC válido, y susceptible de recibir facturas'
+          ) {
+            this.storageService.setItem('rfc', response.rfc);
+          }
+        }
+      })
+    );
   }
-  
-  // getPersonalData() {
-  //   this.rfcFisicaService.personalDataFromRFC$().subscribe(value => {
-  //     const response = value.response
 
-  //     if (value.status != "SUCCESS") {
-  //       throw new Error("Hubo un error al recuperar la información personal usando RFC.")        
-  //     }
-
-  //     if (response.estatus === "NOT_FOUND") {
-  //       throw new Error("No se encontró información personal con el RFC.")
-  //     }
-      
-
-  //     this.personalData = response
-  //     console.log(response)
-  //   })
-  // }
   getPersonalDataOnClick() {
-    this.personalData$ = new Observable(subscriber => subscriber.next()).pipe(
-      switchMapWithLoading(() => this.rfcFisicaService.personalDataFromRFC$())
-    )
-    
-    this.personalData$.subscribe(value => {
-      if (value.data) {
-        const response = value.data.response;
+    this.personalData$ = new Observable((subscriber) => subscriber.next()).pipe(
+      switchMapWithLoading(() => this.rfcFisicaService.personalDataFromRFC$()),
+      tap((value) => {
+        if (value.data) {
+          const response = value.data.response;
 
-        this.storageService.setItem("rfcPfPersonalData", JSON.stringify({
-          curp: response.curp,
-          email: response.email,
-          nombreCompleto: response.nombreCompleto
-        }))
-      }
-    })
+          this.storageService.setItem(
+            'rfcPfPersonalData',
+            JSON.stringify({
+              curp: response.curp,
+              email: response.email,
+              nombreCompleto: response.nombreCompleto,
+            })
+          );
+        }
+      })
+    );
   }
 }

@@ -1,22 +1,25 @@
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StorageService {
   // TODO: Use DB in Backend instead on production
-  constructor() { }
+  constructor() {}
 
-  getItem(itemKey: string){
-    
-    return localStorage.getItem(itemKey)
+  getItem(itemKey: string) {
+    return localStorage.getItem(itemKey);
   }
 
   setItem(key: string, value: string) {
-    localStorage.setItem(key, value)    
+    localStorage.setItem(key, value);
   }
 
   removeItem(key: string) {
-    localStorage.removeItem(key)
+    localStorage.removeItem(key);
+  }
+
+  clear() {
+    localStorage.clear();
   }
 }

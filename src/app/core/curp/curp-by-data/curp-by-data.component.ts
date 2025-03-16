@@ -26,7 +26,7 @@ import { ButtonModule } from 'primeng/button';
 import { CurpService } from '@core/curp/curp.service';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
@@ -122,56 +122,55 @@ export class CurpByDataComponent {
     ).pipe(
       switchMapWithLoading<CurpByData>(() =>
         this.curpService.validateCurpByData$(requestBody)
-      )
-    );
+      ),
+      tap((value) => {
+        this.loading = false;
+        if (value.data) {
+          if (value.data.status === 'SUCCESS') {
+            const response = value.data.response;
+            if (response.status === 'FOUND') {
+              this.router.navigateByUrl('dashboard');
 
-    this.validateCurpResponse$.subscribe((value) => {
-      this.loading = false;
-      if (value.data) {
-        if (value.data.status === 'SUCCESS') {
-          const response = value.data.response;
-          if (response.status === 'FOUND') {
-            this.router.navigateByUrl('dashboard');
+              this.storageService.setItem('curp', response.curp);
+              this.storageService.setItem(
+                'personalData',
+                JSON.stringify(response)
+              );
+            }
+            // TODO: Handle NOT_VALID, NOT_FOUND
+            if (response.status === 'NOT_FOUND') {
+              this.responseError =
+                'No se pudo encontrar una CURP asociada en el sistema de la RENAPO.';
+            }
 
-            this.storageService.setItem('curp', response.curp);
-            this.storageService.setItem(
-              'personalData',
-              JSON.stringify(response)
-            );
+            if (response.status === 'NOT_VALID') {
+              this.responseError = `La CURP asociada es inválida. Código: ${response.statusCurp}.`;
+            }
           }
-          // TODO: Handle NOT_VALID, NOT_FOUND
-          if (response.status === 'NOT_FOUND') {
+        }
+
+        if (value.error) {
+          const error = value.error as
+            | CurpBadRequestResponse
+            | CurpValidateByDataServiceUnavailableResponse;
+          if (error.status === 'SERVICE_ERROR') {
             this.responseError =
-              'No se pudo encontrar una CURP asociada en el sistema de la RENAPO.';
+              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+            return;
           }
 
-          if (response.status === 'NOT_VALID') {
-            this.responseError = `La CURP asociada es inválida. Código: ${response.statusCurp}.`;
-          }
-        }
-      }
-
-      if (value.error) {
-        const error = value.error as
-          | CurpBadRequestResponse
-          | CurpValidateByDataServiceUnavailableResponse;
-        if (error.status === 'SERVICE_ERROR') {
-          this.responseError =
-            'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-          return;
-        }
-
-        // BAD REQUEST
-        error.error.forEach((error) => {
-          this.dataForm.get(error.field)?.setErrors({
-            [error.field]:
-              error.code === 'FORMAT_ERROR'
-                ? 'No utilices caracteres especiales ni números.'
-                : 'El campo es requerido.',
+          // BAD REQUEST
+          error.error.forEach((error) => {
+            this.dataForm.get(error.field)?.setErrors({
+              [error.field]:
+                error.code === 'FORMAT_ERROR'
+                  ? 'No utilices caracteres especiales ni números.'
+                  : 'El campo es requerido.',
+            });
           });
-        });
-      }
-    });
+        }
+      })
+    );
   }
 
   searchEntidad(e: AutoCompleteCompleteEvent) {
