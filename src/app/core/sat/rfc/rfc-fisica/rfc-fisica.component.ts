@@ -3,17 +3,12 @@ import { RfcFisicaService } from './rfc-fisica.service';
 import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { StorageService } from '@shared/services/storage.service';
-import {
-  PersonalData,
-  PFDataFromRFCResponse,
-  ValidateResponse,
-  ValidateRFCResult,
-} from './rfc-fisica.interface';
+import { PFDataFromRFCResponse } from './rfc-fisica.interface';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import { LoadingState } from '@shared/types';
+import { LoadingState, ValidateRFCResponse } from '@shared/types';
 
 @Component({
   selector: 'app-rfc-fisica',
@@ -22,7 +17,7 @@ import { LoadingState } from '@shared/types';
   styleUrl: './rfc-fisica.component.scss',
 })
 export class RfcFisicaComponent {
-  results$!: Observable<LoadingState<ValidateResponse>>;
+  results$!: Observable<LoadingState<ValidateRFCResponse>>;
   personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null;
   nombres: string | null = null;
 
@@ -32,7 +27,7 @@ export class RfcFisicaComponent {
   ) {}
   ngOnInit() {
     this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
-      switchMapWithLoading<ValidateResponse>(() =>
+      switchMapWithLoading<ValidateRFCResponse>(() =>
         this.rfcFisicaService.generateAndValidateRFC$()
       ),
       tap((value) => {

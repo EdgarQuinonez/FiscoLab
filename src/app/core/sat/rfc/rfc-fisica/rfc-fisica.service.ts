@@ -7,11 +7,11 @@ import {
   GenerateResponse,
   PFDataFromRFCRequestBody,
   PFDataFromRFCResponse,
-  ValidateResponse,
 } from './rfc-fisica.interface';
 import { CurpService } from '@core/curp/curp.service';
 import { lastValueFrom, Observable, switchMap, pipe, first } from 'rxjs';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
+import { RfcService } from '@shared/services/rfc.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +20,8 @@ export class RfcFisicaService {
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
-    private curpService: CurpService
+    private curpService: CurpService,
+    private rfcService: RfcService
   ) {}
 
   generateRFC$() {
@@ -44,17 +45,9 @@ export class RfcFisicaService {
     return this.http.post<GenerateResponse>(endpoint, requestBody);
   }
 
-  validateRFC$(rfc: string) {
-    const params = {
-      testCaseId: '663567bb713cf2110a1106ce',
-    };
-    const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`;
-    return this.http.post<ValidateResponse>(endpoint, { rfcs: [{ rfc: rfc }] });
-  }
-
   generateAndValidateRFC$() {
     return this.generateRFC$().pipe(
-      switchMap((value) => this.validateRFC$(value.response.rfc)),
+      switchMap((value) => this.rfcService.validateRFC$(value.response.rfc)),
       first()
     );
   }

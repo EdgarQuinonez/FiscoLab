@@ -42,7 +42,6 @@ import { CardModule } from 'primeng/card';
     CurpByDataComponent,
     TabsModule,
     MessageModule,
-    CardModule,
   ],
   templateUrl: './curp.component.html',
   styleUrl: './curp.component.scss',

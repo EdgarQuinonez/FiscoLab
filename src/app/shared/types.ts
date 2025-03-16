@@ -23,3 +23,23 @@ export interface ServiceUnavailableResponse {
   errorMessage: string;
   status: 'SERVICE_ERROR';
 }
+
+export interface ValidateRFCRequestBody {
+  rfcs: [{ rfc: string }];
+}
+
+export type ValidateRFCResult =
+  | 'RFC válido, y susceptible de recibir facturas'
+  | 'RFC no registrado en el padrón de contribuyentes';
+
+export interface ValidateRFCResponse extends SuccessKibanResponse {
+  request: ValidateRFCRequestBody;
+  response: {
+    rfcs: [
+      {
+        result: ValidateRFCResult;
+        rfc: string;
+      }
+    ];
+  };
+}
