@@ -71,6 +71,7 @@ export class RfcFormComponent {
       return;
     }
 
+    this.loading = true;
     const rfcFormValue = this.rfcForm.value as { rfc: string };
     const tipoSujetoFormValue = this.tipoSujetoForm.value as {
       tipoSujeto: string;
@@ -82,7 +83,10 @@ export class RfcFormComponent {
       switchMapWithLoading<ValidateRFCResponse>(() =>
         this.rfcService.validateRFC$(rfcFormValue.rfc)
       ),
-      tap((value) => console.log(value))
+      tap((value) => {
+        this.loading = value.loading; // false
+        // TODO: redirect to dashboard, set tipoSujeto in localStorage, set RFC storage key
+      })
     );
   }
 }
