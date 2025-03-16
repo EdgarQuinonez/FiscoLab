@@ -1,5 +1,10 @@
 import { Component } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputGroup, InputGroupModule } from 'primeng/inputgroup';
 import {
@@ -10,6 +15,10 @@ import { InputText, InputTextModule } from 'primeng/inputtext';
 import { TabPanel, TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { RfcService } from '@shared/services/rfc.service';
+import { LoadingState, ValidateRFCResponse } from '@shared/types';
+import { Observable, tap } from 'rxjs';
+import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 
 @Component({
   selector: 'app-rfc-form',
@@ -28,12 +37,16 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 })
 export class RfcFormComponent {
   tipoSujetoForm = new FormGroup({
-    tipoSujeto: new FormControl(''),
+    tipoSujeto: new FormControl('', Validators.required),
   });
 
   rfcForm = new FormGroup({
-    rfc: new FormControl(''),
+    rfc: new FormControl('', Validators.required),
   });
+
+  rfcFormResponse$: Observable<LoadingState<ValidateRFCResponse>> | null = null;
+
+  constructor(private rfcService: RfcService) {}
 
   tipoSujetoOptions = [
     {
@@ -52,5 +65,24 @@ export class RfcFormComponent {
 
   ngOnInit() {}
 
-  onSubmit() {}
+  onSubmit() {
+    if (this.rfcForm.invalid || this.tipoSujetoForm.invalid) {
+      console.log('invalid');
+      return;
+    }
+
+    const rfcFormValue = this.rfcForm.value as { rfc: string };
+    const tipoSujetoFormValue = this.tipoSujetoForm.value as {
+      tipoSujeto: string;
+    };
+
+    this.rfcFormResponse$ = new Observable((subscriber) =>
+      subscriber.next()
+    ).pipe(
+      switchMapWithLoading<ValidateRFCResponse>(() =>
+        this.rfcService.validateRFC$(rfcFormValue.rfc)
+      ),
+      tap((value) => console.log(value))
+    );
+  }
 }
