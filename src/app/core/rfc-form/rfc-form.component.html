@@ -22,18 +22,11 @@
                 </form>
                 <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
                     <!-- <div class="w-full h-full"> -->
-                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex items-center justify-center w-full h-full">
-                            
-                            <label class="flex items-center justify-center flex-col gap-3 w-full">
-                                <span class="text-2xl font-bold text-center">Ingresa un RFC</span>
-                                <p-inputgroup>
-                                    <input type="text" formControlName="rfc" placeholder="ej. MAMA900119U24" pInputText />
-                                    <p-inputgroup-addon>
-                                        <p-button class="w-full h-full" icon="pi pi-search" aria-label="Search" type="submit" [loading]="loading" />
-                                    </p-inputgroup-addon>
-                                </p-inputgroup>
-                                
-                        
+                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center w-full h-full">                            
+                            <!-- <span class="text-2xl font-bold text-center">Ingresa un RFC</span> -->
+                            <label class="flex flex-col w-full">
+                                <span>RFC: </span>                                                                                                                                                                              
+                                <input type="text" formControlName="rfc" placeholder="ej. MAMA900119U24" pInputText />
                                 <!-- Validation errors -->
                                 @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
                                     <p-message severity="error" variant="simple" size="small" >
@@ -46,9 +39,62 @@
                                         El campo es requerido.
                                     </p-message>
                                 }
-        
-                                
+                            </label>                             
+                            <label class="flex flex-col w-full">
+                                <span>Código Postal: </span>                                                                                                                                                                              
+                                <input type="text" formControlName="rfc" placeholder="(Opcional)" pInputText />
+                                <!-- Validation errors -->
+                                <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                    <p-message severity="error" variant="simple" size="small" >
+                                        {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                    </p-message>                                                                                    
+                                } -->
+                        
+                                <!-- @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                    <p-message severity="error" variant="simple" size="small" >
+                                        El campo es requerido.
+                                    </p-message>
+                                } -->
                             </label>
+                            <div class="flex w-full gap-1">
+
+                                <label class="flex flex-col w-full">
+                                    <span>Nombre(s):</span>                                                                                                                                                                              
+                                    <input type="text" formControlName="rfc" placeholder="(Opcional)" pInputText />
+                                    <!-- Validation errors -->
+                                    <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                        <p-message severity="error" variant="simple" size="small" >
+                                            {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                        </p-message>                                                                                    
+                                    }
+                            
+                                    @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                        <p-message severity="error" variant="simple" size="small" >
+                                            El campo es requerido.
+                                        </p-message>
+                                    } -->
+                                </label>                             
+                                <label class="flex flex-col w-full">
+                                    <span>Primer apellido:</span>                                                                                                                                                                              
+                                    <input type="text" formControlName="rfc" placeholder="(Opcional)" pInputText />
+                                    <!-- Validation errors -->
+                                    <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                        <p-message severity="error" variant="simple" size="small" >
+                                            {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                        </p-message>                                                                                    
+                                    }
+                            
+                                    @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                        <p-message severity="error" variant="simple" size="small" >
+                                            El campo es requerido.
+                                        </p-message>
+                                    } -->
+                                </label>                             
+                            </div>                             
+                            
+
+                            <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
+
                             
                         </form>
                     <!-- </div> -->

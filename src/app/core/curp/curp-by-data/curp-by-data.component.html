@@ -25,31 +25,34 @@
                 </p-message>    
             }
         </label>        
-    </div>
-    
-        <label class="">
-            <span>Nombre(s): </span>
-            <input type="text" class="w-full" formControlName="nombres" pInputText>
+    </div>    
+    <label>
+        <span>Nombre(s): </span>
+        <input type="text" class="w-full" formControlName="nombres" pInputText>
 
-            @if (dataForm.get('nombres')?.hasError('required') && (dataForm.get('nombres')?.touched || dataForm.get('nombres')?.dirty)) {
-                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
-            } 
-
-            @if (dataForm.get('nombres')?.hasError('nombres')) {
-                <p-message severity="error" variant="simple" size="small">
-                    {{ dataForm.get('nombres')?.getError('nombres')}}
-                </p-message>    
-            }
-        </label>        
-    
-    <label class="flex flex-col self-start items-start justify-center">
-        <span class="mr-2">Fecha de nacimiento: </span>
-        <p-datepicker dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" />
-
-        @if (dataForm.get('fechaNacimiento')?.hasError('required') && (dataForm.get('fechaNacimiento')?.touched || dataForm.get('fechaNacimiento')?.dirty)) {
+        @if (dataForm.get('nombres')?.hasError('required') && (dataForm.get('nombres')?.touched || dataForm.get('nombres')?.dirty)) {
             <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+        } 
+
+        @if (dataForm.get('nombres')?.hasError('nombres')) {
+            <p-message severity="error" variant="simple" size="small">
+                {{ dataForm.get('nombres')?.getError('nombres')}}
+            </p-message>    
         }
-    </label>
+    </label>        
+    <div class="flex gap-1">
+        <label class="flex flex-col self-start items-start justify-center w-full">
+            <span class="mr-2">Fecha de nacimiento: </span>
+            <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
+    
+            @if (dataForm.get('fechaNacimiento')?.hasError('required') && (dataForm.get('fechaNacimiento')?.touched || dataForm.get('fechaNacimiento')?.dirty)) {
+                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+            }
+        </label>
+        <div class="w-full">
+
+        </div>
+    </div>
     <div class="flex items-center justify-start gap-1">
         <label class="flex flex-col items-start justify-center flex-1">
             <span class="mr-2">Sexo: </span>

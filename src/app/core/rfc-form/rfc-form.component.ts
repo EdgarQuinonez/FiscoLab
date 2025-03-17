@@ -27,7 +27,7 @@ import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
-
+import { IftaLabelModule } from 'primeng/iftalabel';
 @Component({
   selector: 'app-rfc-form',
   imports: [
@@ -40,6 +40,7 @@ import { MessageModule } from 'primeng/message';
     RadioButtonModule,
     SelectButtonModule,
     MessageModule,
+    IftaLabelModule,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
