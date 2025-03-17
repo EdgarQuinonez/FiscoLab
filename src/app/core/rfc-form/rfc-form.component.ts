@@ -80,7 +80,7 @@ export class RfcFormComponent {
 
   onSubmit() {
     if (this.rfcForm.invalid || this.tipoSujetoForm.invalid) {
-      console.log('invalid');
+      this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty();
       return;
     }
 
@@ -97,6 +97,7 @@ export class RfcFormComponent {
         this.rfcService.validateRFC$(rfcFormValue.rfc)
       ),
       tap((value) => {
+        console.log(value);
         this.loading = value.loading;
 
         if (value.data) {
@@ -108,7 +109,7 @@ export class RfcFormComponent {
           this.storageService.setItem('rfc', response.rfcs[0].rfc);
           this.storageService.setItem('rfcResult', response.rfcs[0].result);
 
-          this.router.navigateByUrl('/');
+          this.router.navigateByUrl('/dashboard');
         }
 
         if (value.error) {

@@ -7,7 +7,7 @@
             </p>
         }
 
-        @if (results.data; as data) {
+        @if ((results.data | cast : SuccessInterface); as data) {
 
             <p>
                 RFC: {{ data.response.rfcs[0].rfc }}
@@ -17,7 +17,7 @@
             </p>
         }
 
-        @if (results.error; as error;) {
+        @if (results.error | cast : BadRequestInterface; as error;) {
             <p>
                 {{ error }}
             </p>
@@ -33,9 +33,9 @@
                     Loading...
                 </p>
             }    
-            @if (results.data) {
+            @if (results.data | cast : SuccessInterface; as data) {
                 <p>
-                    Haz click en el botón de abajo para encontrar la información personal de {{ nombres ?? results.data.response.rfcs[0].rfc }}.
+                    Haz click en el botón de abajo para encontrar la información personal de {{ nombres ?? data.response.rfcs[0].rfc }}.
                 </p>        
             }
         }

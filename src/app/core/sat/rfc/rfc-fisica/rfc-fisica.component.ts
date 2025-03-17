@@ -8,11 +8,17 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import { LoadingState, RFC, ValidateRFCSuccessResponse } from '@shared/types';
+import {
+  LoadingState,
+  RFC,
+  ValidateRFCBadRequestResponse,
+  ValidateRFCSuccessResponse,
+} from '@shared/types';
+import { CastPipe } from '@shared/pipes/cast.pipe';
 
 @Component({
   selector: 'app-rfc-fisica',
-  imports: [ButtonModule, CardModule, AsyncPipe],
+  imports: [ButtonModule, CardModule, AsyncPipe, CastPipe],
   templateUrl: './rfc-fisica.component.html',
   styleUrl: './rfc-fisica.component.scss',
 })
@@ -20,6 +26,9 @@ export class RfcFisicaComponent {
   results$!: Observable<LoadingState<RFC>>;
   personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null;
   nombres: string | null = null;
+
+  SuccessInterface!: ValidateRFCSuccessResponse;
+  BadRequestInterface!: ValidateRFCBadRequestResponse;
 
   constructor(
     private rfcFisicaService: RfcFisicaService,

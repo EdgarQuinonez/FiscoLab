@@ -94,6 +94,7 @@ export class CurpComponent {
         if (this.curpResponse.response.status === 'FOUND') {
           this.router.navigateByUrl('dashboard');
 
+          this.storageService.setItem('tipoSujeto', 'PF'); // Only PF have curps.
           this.storageService.setItem('curp', this.curpResponse.response.curp);
           this.storageService.setItem(
             'personalData',
