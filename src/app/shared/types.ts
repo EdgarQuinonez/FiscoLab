@@ -1,3 +1,5 @@
+import { HttpErrorResponse } from '@angular/common/http';
+
 export interface SuccessKibanResponse {
   id: string;
   finishedAt: string;
@@ -32,7 +34,7 @@ export type ValidateRFCResult =
   | 'RFC válido, y susceptible de recibir facturas'
   | 'RFC no registrado en el padrón de contribuyentes';
 
-export interface ValidateRFCResponse extends SuccessKibanResponse {
+export interface ValidateRFCSuccessResponse extends SuccessKibanResponse {
   request: ValidateRFCRequestBody;
   response: {
     rfcs: [
@@ -43,3 +45,28 @@ export interface ValidateRFCResponse extends SuccessKibanResponse {
     ];
   };
 }
+
+type ValidateRFCBadRequestCode =
+  | 'REQUIRED_FIELD_ERROR'
+  | 'FORMAT_ERROR'
+  | 'EMPTY_ERROR';
+
+export interface ValidateRFCBadRequestResponse extends HttpErrorResponse {
+  error: [
+    {
+      code: ValidateRFCBadRequestCode;
+      field: string;
+      message: string;
+    }
+  ];
+}
+
+export interface ValidateRFCServiceUnavailableResponse
+  extends ServiceUnavailableResponse {
+  request: ValidateRFCRequestBody;
+}
+
+export type RFC =
+  | ValidateRFCSuccessResponse
+  | ValidateRFCBadRequestResponse
+  | ValidateRFCServiceUnavailableResponse;

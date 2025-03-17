@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development';
-import { ValidateRFCResponse } from '@shared/types';
+import { RFC } from '@shared/types';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ export class RfcService {
       testCaseId: '663567bb713cf2110a1106ce',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`;
-    return this.http.post<ValidateRFCResponse>(endpoint, {
+    return this.http.post<RFC>(endpoint, {
       rfcs: [{ rfc: rfc }],
     });
   }

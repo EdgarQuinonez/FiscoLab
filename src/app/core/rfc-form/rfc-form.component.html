@@ -33,28 +33,28 @@
                                     </p-inputgroup-addon>
                                 </p-inputgroup>
                                 
-        <!--                 
-                                Validation errors
-                                @if (curpForm.get('curp')?.hasError("curp")) {
-                                    @if (curpForm.get('curp')?.getError('curp').code) {
-                                        @if (curpForm.get('curp')?.getError('curp').code === "FORMAT_ERROR") {
+                        
+                                <!-- Validation errors -->
+                                @if (rfcForm.get('rfc')?.hasError("rfc")) {
+                                    @if (rfcForm.get('rfc')?.getError('rfc').code) {
+                                        @if (rfcForm.get('rfc')?.getError('rfc').code === "FORMAT_ERROR") {
                                             <p-message severity="error" variant="simple" size="small" >
                                                 El formato de la CURP introducida es inválido.
                                             </p-message>
                                         }                                  
                                     } @else {
-                                        SUCCESS errors e.g. NOT_FOUND or NOT_VALID
+                                        <!-- SUCCESS errors e.g. NOT_FOUND or NOT_VALID -->
                                         <p-message severity="error" variant="simple" size="small" >
-                                            {{curpForm.get('curp')?.getError("curp").message}}
+                                            {{rfcForm.get('rfc')?.getError("rfc").message}}
                                         </p-message>
                                     }
                                 }
                         
-                                @if (curpForm.get('curp')?.hasError("required") && (curpForm.get('curp')?.dirty || curpForm.get('curp')?.touched)) {
+                                @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
                                     <p-message severity="error" variant="simple" size="small" >
                                         El campo es requerido.
                                     </p-message>
-                                } -->
+                                }
         
                                 
                             </label>

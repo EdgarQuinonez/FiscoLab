@@ -16,10 +16,17 @@ import { TabPanel, TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RfcService } from '@shared/services/rfc.service';
-import { LoadingState, ValidateRFCResponse } from '@shared/types';
+import {
+  LoadingState,
+  RFC,
+  ValidateRFCBadRequestResponse,
+  ValidateRFCSuccessResponse,
+} from '@shared/types';
 import { Observable, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
+import { StorageService } from '@shared/services/storage.service';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-rfc-form',
@@ -32,6 +39,7 @@ import { Router } from '@angular/router';
     InputGroupAddonModule,
     RadioButtonModule,
     SelectButtonModule,
+    MessageModule,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
@@ -45,9 +53,13 @@ export class RfcFormComponent {
     rfc: new FormControl('', Validators.required),
   });
 
-  rfcFormResponse$: Observable<LoadingState<ValidateRFCResponse>> | null = null;
+  rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
 
-  constructor(private rfcService: RfcService, private router: Router) {}
+  constructor(
+    private rfcService: RfcService,
+    private router: Router,
+    private storageService: StorageService
+  ) {}
 
   tipoSujetoOptions = [
     {
@@ -81,14 +93,32 @@ export class RfcFormComponent {
     this.rfcFormResponse$ = new Observable((subscriber) =>
       subscriber.next()
     ).pipe(
-      switchMapWithLoading<ValidateRFCResponse>(() =>
+      switchMapWithLoading<RFC>(() =>
         this.rfcService.validateRFC$(rfcFormValue.rfc)
       ),
       tap((value) => {
-        this.loading = value.loading; // false
-        console.log(value);
-        // TODO: redirect to dashboard, set tipoSujeto in localStorage, set RFC storage key
+        this.loading = value.loading;
+
         if (value.data) {
+          const response = (value.data as ValidateRFCSuccessResponse).response;
+          this.storageService.setItem(
+            'tipoSujeto',
+            tipoSujetoFormValue.tipoSujeto
+          );
+          this.storageService.setItem('rfc', response.rfcs[0].rfc);
+          this.storageService.setItem('rfcResult', response.rfcs[0].result);
+
+          this.router.navigateByUrl('/');
+        }
+
+        if (value.error) {
+          const error = (value.error as ValidateRFCBadRequestResponse).error;
+          this.rfcForm.get('rfc')?.setErrors({
+            rfc:
+              error[0].code === 'FORMAT_ERROR'
+                ? 'Ingresa un RFC válido con homoclave.'
+                : '',
+          });
         }
       })
     );

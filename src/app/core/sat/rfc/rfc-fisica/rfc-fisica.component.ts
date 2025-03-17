@@ -8,7 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import { LoadingState, ValidateRFCResponse } from '@shared/types';
+import { LoadingState, RFC, ValidateRFCSuccessResponse } from '@shared/types';
 
 @Component({
   selector: 'app-rfc-fisica',
@@ -17,7 +17,7 @@ import { LoadingState, ValidateRFCResponse } from '@shared/types';
   styleUrl: './rfc-fisica.component.scss',
 })
 export class RfcFisicaComponent {
-  results$!: Observable<LoadingState<ValidateRFCResponse>>;
+  results$!: Observable<LoadingState<RFC>>;
   personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null;
   nombres: string | null = null;
 
@@ -27,12 +27,13 @@ export class RfcFisicaComponent {
   ) {}
   ngOnInit() {
     this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
-      switchMapWithLoading<ValidateRFCResponse>(() =>
+      switchMapWithLoading<RFC>(() =>
         this.rfcFisicaService.generateAndValidateRFC$()
       ),
       tap((value) => {
         if (value.data) {
-          const response = value.data.response.rfcs[0];
+          const response = (value.data as ValidateRFCSuccessResponse).response
+            .rfcs[0];
           const personalDataStr = this.storageService.getItem('personalData');
 
           if (
