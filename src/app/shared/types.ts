@@ -70,3 +70,10 @@ export type RFC =
   | ValidateRFCSuccessResponse
   | ValidateRFCBadRequestResponse
   | ValidateRFCServiceUnavailableResponse;
+
+export type ValidateRFCWithDataResult =
+  | ValidateRFCResult
+  | 'El nombre, denominación o razón social no coincide con el registrado en el RFC'
+  | 'El Código Postal no coincide con el registrado en el RFC';
+
+// export type RFCWithData =

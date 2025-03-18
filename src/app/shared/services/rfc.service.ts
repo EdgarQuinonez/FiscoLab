@@ -18,4 +18,16 @@ export class RfcService {
       rfcs: [{ rfc: rfc }],
     });
   }
+
+  validateRFCWithData$(rfc: string) {
+    const params = {
+      // SUCCESS
+      testCaseId: '663567a9713cf2110a110673',
+    };
+    const endpoint = `${environment.apiUrl}/sat/rfc_validate_from_data?testCaseId=${params.testCaseId}`;
+
+    return this.http.post;
+  }
+
+  // TODO: Match RFC with CP and nombres in a single request
 }

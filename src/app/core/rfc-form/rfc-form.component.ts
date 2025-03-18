@@ -52,6 +52,9 @@ export class RfcFormComponent {
 
   rfcForm = new FormGroup({
     rfc: new FormControl('', Validators.required),
+    cp: new FormControl(''),
+    nombre: new FormControl(''),
+    apellido: new FormControl(''),
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
