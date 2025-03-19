@@ -99,3 +99,5 @@ export interface ValidateRFCWithDataBadRequestResponse
   extends HttpErrorResponse {}
 
 export type RFCWithData = ValidateRFCWithDataSuccessResponse;
+
+export type TipoSujetoCode = 'PM' | 'PF';

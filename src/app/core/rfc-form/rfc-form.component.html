@@ -5,7 +5,7 @@
             <p-tab value="1">Datos</p-tab>
         </p-tablist>
         <p-tabpanels>
-            <div class="flex flex-col items-center justify-center h-[24.375rem] w-[42.125rem]">
+            <div class="flex flex-col items-center justify-center h-[28rem] w-[43rem]">
                 <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
                     <!-- <div class="w-full h-full"> -->
                         <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center w-full h-full">                            
@@ -80,7 +80,7 @@
                                     </label>                             
                                 </div>                             
                             </ng-container>                             
-                            
+                            <app-tipo-sujeto-form (valueChanged)="setTipoSujetoFormValues($event)" class="mt-6" />
 
                             <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
 

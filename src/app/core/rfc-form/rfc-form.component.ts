@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {
   FormControl,
+  FormControlStatus,
   FormGroup,
   ReactiveFormsModule,
   Validators,
@@ -19,6 +20,7 @@ import { RfcService } from '@shared/services/rfc.service';
 import {
   LoadingState,
   RFC,
+  TipoSujetoCode,
   ValidateRFCBadRequestResponse,
   ValidateRFCSuccessResponse,
 } from '@shared/types';
@@ -28,6 +30,7 @@ import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { IftaLabelModule } from 'primeng/iftalabel';
+import { TipoSujetoFormComponent } from './tipo-sujeto-form/tipo-sujeto-form.component';
 @Component({
   selector: 'app-rfc-form',
   imports: [
@@ -41,6 +44,7 @@ import { IftaLabelModule } from 'primeng/iftalabel';
     SelectButtonModule,
     MessageModule,
     IftaLabelModule,
+    TipoSujetoFormComponent,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
@@ -57,6 +61,11 @@ export class RfcFormComponent {
 
   rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
 
+  tipoSujetoFormValue: {
+    tipoSujeto: TipoSujetoCode | null | undefined;
+  } | null = null;
+  tipoSujetoFormStatus: FormControlStatus = 'INVALID';
+
   constructor(
     private rfcService: RfcService,
     private router: Router,
@@ -68,8 +77,8 @@ export class RfcFormComponent {
   // ngOnInit() {}
 
   onSubmit() {
-    if (this.rfcForm.invalid || this.tipoSujetoForm.invalid) {
-      this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty(); // if user tries to submit ignoring the tipoSujetoForm mark as dirty to grab its attention.
+    if (this.rfcForm.invalid || this.tipoSujetoFormStatus === 'INVALID') {
+      // this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty(); // if user tries to submit ignoring the tipoSujetoForm mark as dirty to grab its attention.
       return;
     }
 
@@ -96,9 +105,6 @@ export class RfcFormComponent {
 
   validateRFC() {
     const rfcFormValue = this.rfcForm.value as { rfc: string };
-    const tipoSujetoFormValue = this.tipoSujetoForm.value as {
-      tipoSujeto: string;
-    };
 
     this.rfcFormResponse$ = new Observable((subscriber) =>
       subscriber.next()
@@ -113,7 +119,8 @@ export class RfcFormComponent {
           const response = (value.data as ValidateRFCSuccessResponse).response;
           this.storageService.setItem(
             'tipoSujeto',
-            tipoSujetoFormValue.tipoSujeto
+            (this.tipoSujetoFormValue as { tipoSujeto: TipoSujetoCode })
+              .tipoSujeto
           );
           this.storageService.setItem('rfc', response.rfcs[0].rfc);
           this.storageService.setItem('rfcResult', response.rfcs[0].result);
@@ -132,6 +139,22 @@ export class RfcFormComponent {
         }
       })
     );
+  }
+
+  setTipoSujetoFormValues(
+    data:
+      | {
+          formValue: TipoSujetoCode | undefined | null;
+          formStatus: FormControlStatus;
+        }
+      | null
+      | undefined
+  ) {
+    console.log('updated.', data);
+    if (data) {
+      this.tipoSujetoFormValue = { tipoSujeto: data.formValue };
+      this.tipoSujetoFormStatus = data.formStatus;
+    }
   }
 
   validateRFCWithData() {}
