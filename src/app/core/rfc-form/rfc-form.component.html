@@ -6,20 +6,6 @@
         </p-tablist>
         <p-tabpanels>
             <div class="flex flex-col items-center justify-center h-[24.375rem] w-[42.125rem]">
-
-                <form [formGroup]="tipoSujetoForm" class="self-center pt-12">
-                    <p-selectbutton [options]="tipoSujetoOptions" optionLabel="name" formControlName="tipoSujeto" optionValue="code">
-                        <ng-template #item let-item>
-                            <div class="flex gap-2 flex-col items-center justify-center">                            
-                                <span>
-                                    {{ item.name }}
-                                </span>
-                                <i [class]="item.icon"></i>
-                            </div>
-                        </ng-template>
-                    </p-selectbutton>
-                    
-                </form>
                 <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
                     <!-- <div class="w-full h-full"> -->
                         <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center w-full h-full">                            
@@ -39,58 +25,61 @@
                                         El campo es requerido.
                                     </p-message>
                                 }
-                            </label>                             
-                            <label class="flex flex-col w-full">
-                                <span>Código Postal: </span>                                                                                                                                                                              
-                                <input type="text" formControlName="cp" placeholder="(Opcional)" pInputText />
-                                <!-- Validation errors -->
-                                <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
-                                    <p-message severity="error" variant="simple" size="small" >
-                                        {{ rfcForm.get('rfc')?.getError("rfc")}}
-                                    </p-message>                                                                                    
-                                } -->
-                        
-                                <!-- @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
-                                    <p-message severity="error" variant="simple" size="small" >
-                                        El campo es requerido.
-                                    </p-message>
-                                } -->
                             </label>
-                            <div class="flex w-full gap-1">
+                            <ng-container formGroupName="data">
 
                                 <label class="flex flex-col w-full">
-                                    <span>Nombre(s):</span>                                                                                                                                                                              
-                                    <input type="text" formControlName="nombre" placeholder="(Opcional)" pInputText />
+                                    <span>Código Postal: </span>                                                                                                                                                                              
+                                    <input type="text" formControlName="cp" placeholder="(Opcional)" pInputText />
                                     <!-- Validation errors -->
                                     <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
                                         <p-message severity="error" variant="simple" size="small" >
                                             {{ rfcForm.get('rfc')?.getError("rfc")}}
                                         </p-message>                                                                                    
-                                    }
+                                    } -->
                             
-                                    @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                    <!-- @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
                                         <p-message severity="error" variant="simple" size="small" >
                                             El campo es requerido.
                                         </p-message>
                                     } -->
-                                </label>                             
-                                <label class="flex flex-col w-full">
-                                    <span>Apellido:</span>                                                                                                                                                                              
-                                    <input type="text" formControlName="apellido" placeholder="(Opcional)" pInputText />
-                                    <!-- Validation errors -->
-                                    <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
-                                        <p-message severity="error" variant="simple" size="small" >
-                                            {{ rfcForm.get('rfc')?.getError("rfc")}}
-                                        </p-message>                                                                                    
-                                    }
-                            
-                                    @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
-                                        <p-message severity="error" variant="simple" size="small" >
-                                            El campo es requerido.
-                                        </p-message>
-                                    } -->
-                                </label>                             
-                            </div>                             
+                                </label>
+                                <div class="flex w-full gap-1">
+    
+                                    <label class="flex flex-col w-full">
+                                        <span>Nombre(s):</span>                                                                                                                                                                              
+                                        <input type="text" formControlName="nombre" placeholder="(Opcional)" pInputText />
+                                        <!-- Validation errors -->
+                                        <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                            <p-message severity="error" variant="simple" size="small" >
+                                                {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                            </p-message>                                                                                    
+                                        }
+                                
+                                        @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                            <p-message severity="error" variant="simple" size="small" >
+                                                El campo es requerido.
+                                            </p-message>
+                                        } -->
+                                    </label>                             
+                                    <label class="flex flex-col w-full">
+                                        <span>Apellido:</span>                                                                                                                                                                              
+                                        <input type="text" formControlName="apellido" placeholder="(Opcional)" pInputText />
+                                        <!-- Validation errors -->
+                                        <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                            <p-message severity="error" variant="simple" size="small" >
+                                                {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                            </p-message>                                                                                    
+                                        }
+                                
+                                        @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                            <p-message severity="error" variant="simple" size="small" >
+                                                El campo es requerido.
+                                            </p-message>
+                                        } -->
+                                    </label>                             
+                                </div>                             
+                            </ng-container>                             
                             
 
                             <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
@@ -104,6 +93,7 @@
                     Panel de datos
                     <!-- <app-curp-by-data></app-curp-by-data> -->
                 </p-tabpanel>
+                
             </div>
         </p-tabpanels>
     </p-tabs>

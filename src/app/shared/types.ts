@@ -76,4 +76,26 @@ export type ValidateRFCWithDataResult =
   | 'El nombre, denominación o razón social no coincide con el registrado en el RFC'
   | 'El Código Postal no coincide con el registrado en el RFC';
 
-// export type RFCWithData =
+export interface ValidateRFCWithDataRequest {
+  rfcs: [{ rfc: string; cp: string; nombre: string }];
+}
+
+export interface ValidateRFCWithDataSuccessResponse
+  extends SuccessKibanResponse {
+  request: ValidateRFCWithDataRequest;
+  response: {
+    rfcs: [
+      {
+        cp: string;
+        nombre: string;
+        result: ValidateRFCWithDataResult;
+        rfc: string;
+      }
+    ];
+  };
+}
+
+export interface ValidateRFCWithDataBadRequestResponse
+  extends HttpErrorResponse {}
+
+export type RFCWithData = ValidateRFCWithDataSuccessResponse;

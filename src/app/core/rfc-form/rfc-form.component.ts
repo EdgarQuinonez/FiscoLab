@@ -46,15 +46,13 @@ import { IftaLabelModule } from 'primeng/iftalabel';
   styleUrl: './rfc-form.component.scss',
 })
 export class RfcFormComponent {
-  tipoSujetoForm = new FormGroup({
-    tipoSujeto: new FormControl('', Validators.required),
-  });
-
   rfcForm = new FormGroup({
     rfc: new FormControl('', Validators.required),
-    cp: new FormControl(''),
-    nombre: new FormControl(''),
-    apellido: new FormControl(''),
+    data: new FormGroup({
+      cp: new FormControl(''),
+      nombre: new FormControl(''),
+      apellido: new FormControl(''),
+    }),
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
@@ -65,30 +63,38 @@ export class RfcFormComponent {
     private storageService: StorageService
   ) {}
 
-  tipoSujetoOptions = [
-    {
-      name: 'Persona Física',
-      code: 'PF',
-      icon: 'pi pi-user',
-    },
-    {
-      name: 'Persona Moral',
-      code: 'PM',
-      icon: 'pi pi-users',
-    },
-  ];
-
   loading = false;
 
-  ngOnInit() {}
+  // ngOnInit() {}
 
   onSubmit() {
     if (this.rfcForm.invalid || this.tipoSujetoForm.invalid) {
-      this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty();
+      this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty(); // if user tries to submit ignoring the tipoSujetoForm mark as dirty to grab its attention.
       return;
     }
 
     this.loading = true;
+    const cp = this.rfcForm.get(['data', 'cp'] as const);
+    const nombre = this.rfcForm.get(['data', 'nombre'] as const);
+    const apellido = this.rfcForm.get(['data', 'apellido'] as const);
+
+    // if any optional field is filled then we add required validators.
+    if (cp?.value || nombre?.value || apellido?.value) {
+      const dataGroup = this.rfcForm.get('data');
+      dataGroup?.addValidators(Validators.required);
+
+      console.log(cp?.value, dataGroup?.invalid);
+      this.loading = false;
+    } else {
+      // this.validateRFC();
+      console.log('is empty');
+      this.loading = false;
+    }
+
+    // this.rfcFormResponse$.subscribe();
+  }
+
+  validateRFC() {
     const rfcFormValue = this.rfcForm.value as { rfc: string };
     const tipoSujetoFormValue = this.tipoSujetoForm.value as {
       tipoSujeto: string;
@@ -101,7 +107,6 @@ export class RfcFormComponent {
         this.rfcService.validateRFC$(rfcFormValue.rfc)
       ),
       tap((value) => {
-        console.log(value);
         this.loading = value.loading;
 
         if (value.data) {
@@ -127,7 +132,7 @@ export class RfcFormComponent {
         }
       })
     );
-
-    this.rfcFormResponse$.subscribe();
   }
+
+  validateRFCWithData() {}
 }
