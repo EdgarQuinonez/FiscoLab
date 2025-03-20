@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormGroup,
@@ -24,6 +24,17 @@ export class TipoSujetoFormComponent {
     | null
     | undefined
   >();
+
+  parentFormSubmitted = input(false);
+
+  ngOnChanges() {
+    const submitted = computed(() => this.parentFormSubmitted());
+    console.log(submitted);
+
+    if (submitted()) {
+      this.tipoSujetoForm.markAsDirty();
+    }
+  }
 
   tipoSujetoForm = new FormGroup({
     tipoSujeto: new FormControl('', Validators.required),

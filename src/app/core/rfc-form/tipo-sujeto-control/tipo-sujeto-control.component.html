@@ -1,0 +1,11 @@
+
+<p-selectbutton [options]="tipoSujetoOptions" optionLabel="name" optionValue="code" (onChange)="updateTipoSujetoValue($event)">
+    <ng-template #item let-item>
+        <div class="flex gap-2 items-center justify-center">                            
+            <span>
+                {{ item.name }}
+            </span>
+            <i [class]="item.icon"></i>
+        </div>
+    </ng-template>
+</p-selectbutton>                    

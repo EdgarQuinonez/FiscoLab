@@ -30,7 +30,7 @@ import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { IftaLabelModule } from 'primeng/iftalabel';
-import { TipoSujetoFormComponent } from './tipo-sujeto-form/tipo-sujeto-form.component';
+import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 @Component({
   selector: 'app-rfc-form',
   imports: [
@@ -44,7 +44,7 @@ import { TipoSujetoFormComponent } from './tipo-sujeto-form/tipo-sujeto-form.com
     SelectButtonModule,
     MessageModule,
     IftaLabelModule,
-    TipoSujetoFormComponent,
+    TipoSujetoControlComponent,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
@@ -52,6 +52,7 @@ import { TipoSujetoFormComponent } from './tipo-sujeto-form/tipo-sujeto-form.com
 export class RfcFormComponent {
   rfcForm = new FormGroup({
     rfc: new FormControl('', Validators.required),
+    tipoSujeto: new FormControl('', Validators.required),
     data: new FormGroup({
       cp: new FormControl(''),
       nombre: new FormControl(''),
@@ -60,11 +61,6 @@ export class RfcFormComponent {
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
-
-  tipoSujetoFormValue: {
-    tipoSujeto: TipoSujetoCode | null | undefined;
-  } | null = null;
-  tipoSujetoFormStatus: FormControlStatus = 'INVALID';
 
   constructor(
     private rfcService: RfcService,
@@ -77,7 +73,9 @@ export class RfcFormComponent {
   // ngOnInit() {}
 
   onSubmit() {
-    if (this.rfcForm.invalid || this.tipoSujetoFormStatus === 'INVALID') {
+    if (this.rfcForm.invalid) {
+      console.log(this.rfcForm.status);
+      this.rfcForm.markAllAsTouched();
       return;
     }
 
@@ -89,12 +87,16 @@ export class RfcFormComponent {
     // if any optional field is filled then we add required validators.
     if (cp?.value || nombre?.value || apellido?.value) {
       const dataGroup = this.rfcForm.get('data');
-      dataGroup?.addValidators(Validators.required);
+      console.log(dataGroup);
+      // cp?.addValidators(Validators.required);
+      // nombre?.addValidators(Validators.required);
+      // apellido?.addValidators(Validators.required);
 
-      console.log(cp?.value, dataGroup?.invalid);
       this.loading = false;
     } else {
-      this.validateRFC();
+      console.log(this.rfcForm.value);
+      // this.validateRFC();
+      this.loading = false;
     }
   }
 
@@ -115,8 +117,7 @@ export class RfcFormComponent {
           const response = (value.data as ValidateRFCSuccessResponse).response;
           this.storageService.setItem(
             'tipoSujeto',
-            (this.tipoSujetoFormValue as { tipoSujeto: TipoSujetoCode })
-              .tipoSujeto
+            this.rfcForm.get('tipoSujeto')?.value as string
           );
           this.storageService.setItem('rfc', response.rfcs[0].rfc);
           this.storageService.setItem('rfcResult', response.rfcs[0].result);
@@ -140,19 +141,4 @@ export class RfcFormComponent {
   }
 
   validateRFCWithData() {}
-
-  setTipoSujetoFormValues(
-    data:
-      | {
-          formValue: TipoSujetoCode | undefined | null;
-          formStatus: FormControlStatus;
-        }
-      | null
-      | undefined
-  ) {
-    if (data) {
-      this.tipoSujetoFormValue = { tipoSujeto: data.formValue };
-      this.tipoSujetoFormStatus = data.formStatus;
-    }
-  }
 }

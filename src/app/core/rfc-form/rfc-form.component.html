@@ -80,7 +80,7 @@
                                     </label>                             
                                 </div>                             
                             </ng-container>                             
-                            <app-tipo-sujeto-form (valueChanged)="setTipoSujetoFormValues($event)" class="mt-6" />
+                            <app-tipo-sujeto-control class="mt-6" formControlName="tipoSujeto" />
 
                             <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
 
