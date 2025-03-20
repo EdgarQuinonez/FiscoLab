@@ -78,7 +78,6 @@ export class RfcFormComponent {
 
   onSubmit() {
     if (this.rfcForm.invalid || this.tipoSujetoFormStatus === 'INVALID') {
-      // this.tipoSujetoForm.get('tipoSujeto')?.markAsDirty(); // if user tries to submit ignoring the tipoSujetoForm mark as dirty to grab its attention.
       return;
     }
 
@@ -95,16 +94,13 @@ export class RfcFormComponent {
       console.log(cp?.value, dataGroup?.invalid);
       this.loading = false;
     } else {
-      // this.validateRFC();
-      console.log('is empty');
-      this.loading = false;
+      this.validateRFC();
     }
-
-    // this.rfcFormResponse$.subscribe();
   }
 
   validateRFC() {
     const rfcFormValue = this.rfcForm.value as { rfc: string };
+    console.log('validate rfc ');
 
     this.rfcFormResponse$ = new Observable((subscriber) =>
       subscriber.next()
@@ -139,7 +135,11 @@ export class RfcFormComponent {
         }
       })
     );
+
+    this.rfcFormResponse$.subscribe();
   }
+
+  validateRFCWithData() {}
 
   setTipoSujetoFormValues(
     data:
@@ -150,12 +150,9 @@ export class RfcFormComponent {
       | null
       | undefined
   ) {
-    console.log('updated.', data);
     if (data) {
       this.tipoSujetoFormValue = { tipoSujeto: data.formValue };
       this.tipoSujetoFormStatus = data.formStatus;
     }
   }
-
-  validateRFCWithData() {}
 }

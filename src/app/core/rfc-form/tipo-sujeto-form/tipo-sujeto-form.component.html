@@ -1,7 +1,7 @@
 <form [formGroup]="tipoSujetoForm" class="self-center">
     <p-selectbutton [options]="tipoSujetoOptions" optionLabel="name" formControlName="tipoSujeto" optionValue="code" (onChange)="updateTipoSujetoValue()">
         <ng-template #item let-item>
-            <div class="flex gap-2 flex-col items-center justify-center">                            
+            <div class="flex gap-2 items-center justify-center">                            
                 <span>
                     {{ item.name }}
                 </span>
