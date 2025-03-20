@@ -60,6 +60,19 @@ export class RfcFormComponent {
     }),
   });
 
+  tipoSujetoOptions = [
+    {
+      name: 'Persona Física',
+      code: 'PF',
+      icon: 'pi pi-user',
+    },
+    {
+      name: 'Persona Moral',
+      code: 'PM',
+      icon: 'pi pi-users',
+    },
+  ];
+
   rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
 
   constructor(
@@ -74,8 +87,7 @@ export class RfcFormComponent {
 
   onSubmit() {
     if (this.rfcForm.invalid) {
-      console.log(this.rfcForm.status);
-      this.rfcForm.markAllAsTouched();
+      this.rfcForm.get('tipoSujeto')?.markAsDirty();
       return;
     }
 

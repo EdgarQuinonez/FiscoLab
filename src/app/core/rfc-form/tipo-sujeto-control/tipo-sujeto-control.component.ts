@@ -5,26 +5,26 @@ import {
   FormControl,
   Validators,
   NG_VALUE_ACCESSOR,
+  AbstractControl,
+  ReactiveFormsModule,
 } from '@angular/forms';
 import { NoopValueAccessorDirective } from '@shared/directives/noop-value-accessor.directive';
 import { TipoSujetoCode } from '@shared/types';
 import { injectNgControl } from '@shared/utils/injectNgControl';
-import { SelectButtonModule } from 'primeng/selectbutton';
+import {
+  SelectButtonChangeEvent,
+  SelectButtonModule,
+} from 'primeng/selectbutton';
 
 @Component({
   selector: 'app-tipo-sujeto-control',
-  imports: [SelectButtonModule],
+  hostDirectives: [NoopValueAccessorDirective],
+  imports: [SelectButtonModule, ReactiveFormsModule],
   templateUrl: './tipo-sujeto-control.component.html',
   styleUrl: './tipo-sujeto-control.component.scss',
-  hostDirectives: [NoopValueAccessorDirective],
 })
 export class TipoSujetoControlComponent {
   ngControl = injectNgControl();
-
-  updateTipoSujetoValue(value: any) {
-    console.log(value);
-    console.log(this.ngControl.value);
-  }
 
   tipoSujetoOptions = [
     {

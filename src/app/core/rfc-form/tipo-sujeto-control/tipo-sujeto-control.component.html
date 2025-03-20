@@ -1,5 +1,4 @@
-
-<p-selectbutton [options]="tipoSujetoOptions" optionLabel="name" optionValue="code" (onChange)="updateTipoSujetoValue($event)">
+<p-selectbutton [options]="tipoSujetoOptions" optionLabel="name" optionValue="code" [formControl]="ngControl.control">
     <ng-template #item let-item>
         <div class="flex gap-2 items-center justify-center">                            
             <span>
@@ -8,4 +7,4 @@
             <i [class]="item.icon"></i>
         </div>
     </ng-template>
-</p-selectbutton>                    
+</p-selectbutton>         
