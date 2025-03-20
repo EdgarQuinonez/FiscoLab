@@ -19,10 +19,10 @@ export class RfcService {
     });
   }
 
-  validateRFCWithData$(rfcObj: ValidateRFCWithDataRequest) {
+  validateRFCWithData$(rfcObj: { rfc: string; cp: string; nombre: string }) {
     const params = {
-      // SUCCESS
-      testCaseId: '663567a9713cf2110a110673',
+      // SUCCESS - INVALID
+      testCaseId: '663567bb713cf2110a1106d0',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate_from_data?testCaseId=${params.testCaseId}`;
 

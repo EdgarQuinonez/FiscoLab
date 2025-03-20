@@ -20,9 +20,12 @@ import { RfcService } from '@shared/services/rfc.service';
 import {
   LoadingState,
   RFC,
+  RFCWithData,
   TipoSujetoCode,
   ValidateRFCBadRequestResponse,
   ValidateRFCSuccessResponse,
+  ValidateRFCWithDataBadRequestResponse,
+  ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/types';
 import { Observable, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
@@ -31,6 +34,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
+import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
 @Component({
   selector: 'app-rfc-form',
   imports: [
@@ -73,7 +77,8 @@ export class RfcFormComponent {
     },
   ];
 
-  rfcFormResponse$: Observable<LoadingState<RFC>> | null = null;
+  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  responseError: string | null = null;
 
   constructor(
     private rfcService: RfcService,
@@ -87,6 +92,7 @@ export class RfcFormComponent {
 
   onSubmit() {
     if (this.rfcForm.invalid) {
+      this.rfcForm.get('rfc')?.markAsDirty();
       this.rfcForm.get('tipoSujeto')?.markAsDirty();
       return;
     }
@@ -98,23 +104,110 @@ export class RfcFormComponent {
 
     // if any optional field is filled then we add required validators.
     if (cp?.value || nombre?.value || apellido?.value) {
-      const dataGroup = this.rfcForm.get('data');
-      console.log(dataGroup);
+      // const dataGroup = this.rfcForm.get('data');
+      // console.log(dataGroup);
       // cp?.addValidators(Validators.required);
       // nombre?.addValidators(Validators.required);
       // apellido?.addValidators(Validators.required);
 
-      this.loading = false;
+      // assuming we have validations to ensure the fields are filled.
+      const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
+      const rfcWithDataReqBody = {
+        rfc: rfcFormValue.rfc,
+        cp: rfcFormValue.data.cp,
+        nombre: `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
+      };
+
+      this.rfcFormResponse$ = new Observable((subscriber) =>
+        subscriber.next()
+      ).pipe(
+        switchMapWithLoading<RFCWithData>(() =>
+          this.rfcService.validateRFCWithData$(rfcWithDataReqBody)
+        ),
+        tap((value) => {
+          if (value.data) {
+            // TODO: handle SUCCESS responses NO REGISTRADO, INVALID NAME, INVALID CP.
+          }
+
+          if (value.error) {
+            const error = value.error as
+              | ValidateRFCWithDataBadRequestResponse
+              | ValidateRFCWithDataServiceUnavailableResponse;
+
+            if (error.status === 'SERVICE_ERROR') {
+              this.responseError =
+                'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+              return;
+            }
+
+            // BAD REQUEST
+            error.error.forEach((err) => {
+              const field = err.field.slice(0, -3); // strip down index from field
+              console.log(field);
+              const code = err.code;
+
+              if (field === 'rfc') {
+                const rfcControl = this.rfcForm.get('rfc');
+                if (code === 'FORMAT_ERROR') {
+                  rfcControl?.setErrors({
+                    rfc: 'Ingresa un RFC válido con homoclave.',
+                  });
+                }
+
+                if (code === 'EMPTY_ERROR') {
+                  rfcControl?.setErrors({
+                    rfc: 'El campo RFC no puede estar vacío.',
+                  });
+                }
+
+                if (code === 'REQUIRED_FIELD_ERROR') {
+                  rfcControl?.setErrors({
+                    rfc: 'El campo RFC no puede estar vacío.',
+                  });
+                }
+              }
+
+              if (field === 'cp') {
+              }
+
+              if (field === 'nombre') {
+              }
+              // switch (field) {
+              //   case 'rfc':
+              //     switch (code) {
+              //       case 'FORMAT_ERROR':
+              //         this.rfcForm.get('rfc')?.setErrors({
+              //           rfc: 'Ingresa un RFC válido con homoclave.',
+              //         });
+              //         break;
+
+              //       default:
+              //         break;
+              //     }
+
+              //     break;
+
+              //   default:
+              //     break;
+              // }
+            });
+
+            // TODO: handle BAD REQUEST responses RFC format error, CP FORMAT ERROR, EMPTY FIELDS.
+          }
+          console.log(value);
+          this.loading = false;
+        })
+      );
+
+      this.rfcFormResponse$.subscribe();
     } else {
-      console.log(this.rfcForm.value);
-      // this.validateRFC();
-      this.loading = false;
+      this.validateRFC();
+      // this.loading = false;
     }
   }
 
   validateRFC() {
-    const rfcFormValue = this.rfcForm.value as { rfc: string };
-    console.log('validate rfc ');
+    const rfcFormValue = this.rfcForm.value as RfcFormValue;
 
     this.rfcFormResponse$ = new Observable((subscriber) =>
       subscriber.next()
@@ -127,10 +220,7 @@ export class RfcFormComponent {
 
         if (value.data) {
           const response = (value.data as ValidateRFCSuccessResponse).response;
-          this.storageService.setItem(
-            'tipoSujeto',
-            this.rfcForm.get('tipoSujeto')?.value as string
-          );
+          this.storageService.setItem('tipoSujeto', rfcFormValue.tipoSujeto);
           this.storageService.setItem('rfc', response.rfcs[0].rfc);
           this.storageService.setItem('rfcResult', response.rfcs[0].result);
 

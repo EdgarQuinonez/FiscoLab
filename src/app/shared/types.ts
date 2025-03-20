@@ -96,8 +96,24 @@ export interface ValidateRFCWithDataSuccessResponse
 }
 
 export interface ValidateRFCWithDataBadRequestResponse
-  extends HttpErrorResponse {}
+  extends HttpErrorResponse {
+  error: [
+    {
+      code: ValidateRFCBadRequestCode;
+      field: string;
+      message: string;
+    }
+  ];
+}
 
-export type RFCWithData = ValidateRFCWithDataSuccessResponse;
+export interface ValidateRFCWithDataServiceUnavailableResponse
+  extends ServiceUnavailableResponse {
+  request: ValidateRFCWithDataRequest;
+}
+
+export type RFCWithData =
+  | ValidateRFCWithDataSuccessResponse
+  | ValidateRFCBadRequestResponse
+  | ValidateRFCWithDataServiceUnavailableResponse;
 
 export type TipoSujetoCode = 'PM' | 'PF';
