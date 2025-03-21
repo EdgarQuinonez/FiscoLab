@@ -26,11 +26,11 @@
                                     </p-message>
                                 }
                             </label>
-                            <ng-container formGroupName="data">
+                            <ng-container formGroupName="data" >
 
                                 <label class="flex flex-col w-full">
                                     <span>Código Postal: </span>                                                                                                                                                                              
-                                    <input type="text" formControlName="cp" placeholder="(Opcional)" pInputText />
+                                    <input type="text" formControlName="cp" [placeholder]="cpIsRequired ? '' : '(Opcional)'" pInputText />
                                     <!-- Validation errors -->
                                     @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
                                         <p-message severity="error" variant="simple" size="small" >
@@ -48,7 +48,7 @@
     
                                     <label class="flex flex-col w-full">
                                         <span>Nombre(s):</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="nombre" placeholder="(Opcional)" pInputText />                                    
+                                        <input type="text" formControlName="nombre" [placeholder]="nombreIsRequired ? '' : '(Opcional)'"  pInputText />                                    
                                 
                                         @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
                                             <p-message severity="error" variant="simple" size="small" >
@@ -58,7 +58,7 @@
                                     </label>                             
                                     <label class="flex flex-col w-full">
                                         <span>Apellido:</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="apellido" placeholder="(Opcional)" pInputText />                                     
+                                        <input type="text" formControlName="apellido" [placeholder]="apellidoIsRequired ? '' : '(Opcional)'" pInputText />                                     
                                 
                                         @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
                                             <p-message severity="error" variant="simple" size="small" >

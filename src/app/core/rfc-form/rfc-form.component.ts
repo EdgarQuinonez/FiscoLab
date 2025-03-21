@@ -27,7 +27,7 @@ import {
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/types';
-import { Observable, tap } from 'rxjs';
+import { Observable, of, switchMap, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
@@ -35,6 +35,8 @@ import { MessageModule } from 'primeng/message';
 import { IftaLabelModule } from 'primeng/iftalabel';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
+import { CastPipe } from '@shared/pipes/cast.pipe';
+
 @Component({
   selector: 'app-rfc-form',
   imports: [
@@ -88,7 +90,41 @@ export class RfcFormComponent {
 
   loading = false;
 
-  // ngOnInit() {}
+  cpIsRequired = this.rfcForm
+    .get(['data', 'apellido'])
+    ?.hasValidator(Validators.required);
+  nombreIsRequired = this.rfcForm
+    .get(['data', 'apellido'])
+    ?.hasValidator(Validators.required);
+  apellidoIsRequired = this.rfcForm
+    .get(['data', 'apellido'])
+    ?.hasValidator(Validators.required);
+
+  ngOnInit() {
+    const dataGroup = this.rfcForm.get('data');
+    dataGroup?.valueChanges
+      .pipe(
+        switchMap((value) => of(value)),
+        tap((value) => {
+          Object.values(value).forEach((value) => {
+            if (value) {
+              dataGroup.addValidators(Validators.required);
+              dataGroup.updateValueAndValidity();
+              return;
+            }
+          });
+
+          console.log('reached. no values detected');
+          dataGroup.removeValidators(Validators.required);
+        })
+      )
+      .subscribe();
+  }
+  dataOnChange() {
+    const dataGroup = this.rfcForm.get('data');
+
+    console.log(dataGroup);
+  }
 
   onSubmit() {
     if (this.rfcForm.invalid) {
