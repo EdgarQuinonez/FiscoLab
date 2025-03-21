@@ -1,19 +1,15 @@
 import { Component } from '@angular/core';
 import {
   FormControl,
-  FormControlStatus,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { InputGroup, InputGroupModule } from 'primeng/inputgroup';
-import {
-  InputGroupAddon,
-  InputGroupAddonModule,
-} from 'primeng/inputgroupaddon';
-import { InputText, InputTextModule } from 'primeng/inputtext';
-import { TabPanel, TabsModule } from 'primeng/tabs';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+import { TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RfcService } from '@shared/services/rfc.service';
@@ -21,21 +17,19 @@ import {
   LoadingState,
   RFC,
   RFCWithData,
-  TipoSujetoCode,
   ValidateRFCBadRequestResponse,
   ValidateRFCSuccessResponse,
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/types';
-import { Observable, of, switchMap, tap } from 'rxjs';
+import { debounceTime, map, Observable, startWith, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
-import { IftaLabelModule } from 'primeng/iftalabel';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
-import { CastPipe } from '@shared/pipes/cast.pipe';
+import { updateTreeValidity } from '@shared/utils/updateTreeValidity';
 
 @Component({
   selector: 'app-rfc-form',
@@ -49,7 +43,6 @@ import { CastPipe } from '@shared/pipes/cast.pipe';
     RadioButtonModule,
     SelectButtonModule,
     MessageModule,
-    IftaLabelModule,
     TipoSujetoControlComponent,
   ],
   templateUrl: './rfc-form.component.html',
@@ -80,6 +73,7 @@ export class RfcFormComponent {
   ];
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
 
   constructor(
@@ -90,46 +84,43 @@ export class RfcFormComponent {
 
   loading = false;
 
-  cpIsRequired = this.rfcForm
-    .get(['data', 'apellido'])
-    ?.hasValidator(Validators.required);
-  nombreIsRequired = this.rfcForm
-    .get(['data', 'apellido'])
-    ?.hasValidator(Validators.required);
-  apellidoIsRequired = this.rfcForm
-    .get(['data', 'apellido'])
-    ?.hasValidator(Validators.required);
-
   ngOnInit() {
     const dataGroup = this.rfcForm.get('data');
     dataGroup?.valueChanges
       .pipe(
-        switchMap((value) => of(value)),
-        tap((value) => {
-          Object.values(value).forEach((value) => {
-            if (value) {
+        debounceTime(200),
+        map((value) => {
+          for (let fieldValue of Object.values(value)) {
+            if (fieldValue) {
               dataGroup.addValidators(Validators.required);
-              dataGroup.updateValueAndValidity();
-              return;
+              return { dataIsRequired: true };
             }
-          });
-
-          console.log('reached. no values detected');
+          }
           dataGroup.removeValidators(Validators.required);
-        })
+          return { dataIsRequired: false };
+        }),
+        startWith({ dataIsRequired: false })
       )
-      .subscribe();
-  }
-  dataOnChange() {
-    const dataGroup = this.rfcForm.get('data');
+      .subscribe((value) => {
+        const dataGroup = this.rfcForm.get('data') as FormGroup;
+        this.dataStatus = value;
+        if (this.dataStatus.dataIsRequired) {
+          Object.keys(dataGroup.controls).forEach((name) => {
+            dataGroup.get(name)?.addValidators(Validators.required);
+          });
+        } else {
+          Object.keys(dataGroup.controls).forEach((name) => {
+            dataGroup.get(name)?.removeValidators(Validators.required);
+          });
+        }
 
-    console.log(dataGroup);
+        updateTreeValidity(this.rfcForm, { emitEvent: false });
+      });
   }
 
   onSubmit() {
     if (this.rfcForm.invalid) {
-      this.rfcForm.get('rfc')?.markAsDirty();
-      this.rfcForm.get('tipoSujeto')?.markAsDirty();
+      this.rfcForm.markAllAsTouched();
       return;
     }
 
@@ -138,15 +129,7 @@ export class RfcFormComponent {
     const nombreControl = this.rfcForm.get(['data', 'nombre'] as const);
     const apellidoControl = this.rfcForm.get(['data', 'apellido'] as const);
 
-    // if any optional field is filled then we add required validators.
-    if (cpControl?.value || nombreControl?.value || apellidoControl?.value) {
-      // const dataGroup = this.rfcForm.get('data');
-      // console.log(dataGroup);
-      // cp?.addValidators(Validators.required);
-      // nombre?.addValidators(Validators.required);
-      // apellido?.addValidators(Validators.required);
-
-      // assuming we have validations to ensure the fields are filled.
+    if (this.dataStatus.dataIsRequired) {
       const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
       const rfcWithDataReqBody = {
         rfc: rfcFormValue.rfc,

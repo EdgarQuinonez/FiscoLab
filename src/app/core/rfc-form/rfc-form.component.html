@@ -26,49 +26,49 @@
                                     </p-message>
                                 }
                             </label>
-                            <ng-container formGroupName="data" >
-
-                                <label class="flex flex-col w-full">
-                                    <span>Código Postal: </span>                                                                                                                                                                              
-                                    <input type="text" formControlName="cp" [placeholder]="cpIsRequired ? '' : '(Opcional)'" pInputText />
-                                    <!-- Validation errors -->
-                                    @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
-                                        <p-message severity="error" variant="simple" size="small" >
-                                            {{ rfcForm.get(['data', 'cp'])?.getError('cp')}}
-                                        </p-message>                                                                                    
-                                    }
                             
-                                    @if (rfcForm.get(['data', 'cp'])?.hasError("required") && (rfcForm.get(['data', 'cp'])?.dirty || rfcForm.get(['data', 'cp'])?.touched)) {
-                                        <p-message severity="error" variant="simple" size="small" >
-                                            El campo es requerido.
-                                        </p-message>
-                                    } 
-                                </label>
-                                <div class="flex w-full gap-1">
+                            <ng-container formGroupName="data" >
     
                                     <label class="flex flex-col w-full">
-                                        <span>Nombre(s):</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="nombre" [placeholder]="nombreIsRequired ? '' : '(Opcional)'"  pInputText />                                    
+                                        <span>Código Postal: </span>                                                                                                                                                                              
+                                        <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
+                                        <!-- Validation errors -->
+                                        @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
+                                            <p-message severity="error" variant="simple" size="small" >
+                                                {{ rfcForm.get(['data', 'cp'])?.getError('cp')}}
+                                            </p-message>                                                                                    
+                                        }
                                 
-                                        @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
+                                        @if (rfcForm.get(['data', 'cp'])?.hasError("required") && (rfcForm.get(['data', 'cp'])?.dirty || rfcForm.get(['data', 'cp'])?.touched)) {
                                             <p-message severity="error" variant="simple" size="small" >
                                                 El campo es requerido.
                                             </p-message>
                                         } 
-                                    </label>                             
-                                    <label class="flex flex-col w-full">
-                                        <span>Apellido:</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="apellido" [placeholder]="apellidoIsRequired ? '' : '(Opcional)'" pInputText />                                     
-                                
-                                        @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
-                                            <p-message severity="error" variant="simple" size="small" >
-                                                El campo es requerido.
-                                            </p-message>
-                                        }
-                                    </label>                             
-                                </div>                             
-                            </ng-container>                             
-                            
+                                    </label>
+                                    <div class="flex w-full gap-1">
+        
+                                        <label class="flex flex-col w-full">
+                                            <span>Nombre(s):</span>                                                                                                                                                                              
+                                            <input type="text" formControlName="nombre" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'"  pInputText />                                    
+                                    
+                                            @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
+                                                <p-message severity="error" variant="simple" size="small" >
+                                                    El campo es requerido.
+                                                </p-message>
+                                            } 
+                                        </label>                             
+                                        <label class="flex flex-col w-full">
+                                            <span>Apellido:</span>                                                                                                                                                                              
+                                            <input type="text" formControlName="apellido" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />                                     
+                                    
+                                            @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
+                                                <p-message severity="error" variant="simple" size="small" >
+                                                    El campo es requerido.
+                                                </p-message>
+                                            }
+                                        </label>                             
+                                    </div>                             
+                                </ng-container>                                                             
                             <app-tipo-sujeto-control formControlName="tipoSujeto" />
 
                             <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
