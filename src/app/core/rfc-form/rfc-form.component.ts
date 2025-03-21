@@ -98,12 +98,12 @@ export class RfcFormComponent {
     }
 
     this.loading = true;
-    const cp = this.rfcForm.get(['data', 'cp'] as const);
-    const nombre = this.rfcForm.get(['data', 'nombre'] as const);
-    const apellido = this.rfcForm.get(['data', 'apellido'] as const);
+    const cpControl = this.rfcForm.get(['data', 'cp'] as const);
+    const nombreControl = this.rfcForm.get(['data', 'nombre'] as const);
+    const apellidoControl = this.rfcForm.get(['data', 'apellido'] as const);
 
     // if any optional field is filled then we add required validators.
-    if (cp?.value || nombre?.value || apellido?.value) {
+    if (cpControl?.value || nombreControl?.value || apellidoControl?.value) {
       // const dataGroup = this.rfcForm.get('data');
       // console.log(dataGroup);
       // cp?.addValidators(Validators.required);
@@ -143,7 +143,6 @@ export class RfcFormComponent {
             // BAD REQUEST
             error.error.forEach((err) => {
               const field = err.field.slice(0, -3); // strip down index from field
-              console.log(field);
               const code = err.code;
 
               if (field === 'rfc') {
@@ -168,33 +167,46 @@ export class RfcFormComponent {
               }
 
               if (field === 'cp') {
+                if (code === 'FORMAT_ERROR') {
+                  cpControl?.setErrors({
+                    cp: 'Ingresa un código postal válido.',
+                  });
+                }
+
+                if (code === 'EMPTY_ERROR') {
+                  cpControl?.setErrors({
+                    cp: 'El campo Código Postal no puede estar vacío.',
+                  });
+                }
+
+                if (code === 'REQUIRED_FIELD_ERROR') {
+                  cpControl?.setErrors({
+                    cp: 'El campo Código Postal no puede estar vacío.',
+                  });
+                }
               }
 
               if (field === 'nombre') {
+                if (code === 'EMPTY_ERROR') {
+                  nombreControl?.setErrors({
+                    nombre: 'El campo Nombre(s) no puede estar vacío.',
+                  });
+                  apellidoControl?.setErrors({
+                    apellido: 'El campo Apellido no puede estar vacío.',
+                  });
+                }
+
+                if (code === 'REQUIRED_FIELD_ERROR') {
+                  nombreControl?.setErrors({
+                    nombre: 'El campo Nombre(s) no puede estar vacío.',
+                  });
+                  apellidoControl?.setErrors({
+                    apellido: 'El campo Apellido no puede estar vacío.',
+                  });
+                }
               }
-              // switch (field) {
-              //   case 'rfc':
-              //     switch (code) {
-              //       case 'FORMAT_ERROR':
-              //         this.rfcForm.get('rfc')?.setErrors({
-              //           rfc: 'Ingresa un RFC válido con homoclave.',
-              //         });
-              //         break;
-
-              //       default:
-              //         break;
-              //     }
-
-              //     break;
-
-              //   default:
-              //     break;
-              // }
             });
-
-            // TODO: handle BAD REQUEST responses RFC format error, CP FORMAT ERROR, EMPTY FIELDS.
           }
-          console.log(value);
           this.loading = false;
         })
       );

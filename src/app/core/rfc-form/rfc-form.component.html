@@ -32,51 +32,39 @@
                                     <span>Código Postal: </span>                                                                                                                                                                              
                                     <input type="text" formControlName="cp" placeholder="(Opcional)" pInputText />
                                     <!-- Validation errors -->
-                                    <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
+                                    @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
                                         <p-message severity="error" variant="simple" size="small" >
-                                            {{ rfcForm.get('rfc')?.getError("rfc")}}
+                                            {{ rfcForm.get(['data', 'cp'])?.getError('cp')}}
                                         </p-message>                                                                                    
-                                    } -->
+                                    }
                             
-                                    <!-- @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                    @if (rfcForm.get(['data', 'cp'])?.hasError("required") && (rfcForm.get(['data', 'cp'])?.dirty || rfcForm.get(['data', 'cp'])?.touched)) {
                                         <p-message severity="error" variant="simple" size="small" >
                                             El campo es requerido.
                                         </p-message>
-                                    } -->
+                                    } 
                                 </label>
                                 <div class="flex w-full gap-1">
     
                                     <label class="flex flex-col w-full">
                                         <span>Nombre(s):</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="nombre" placeholder="(Opcional)" pInputText />
-                                        <!-- Validation errors -->
-                                        <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
-                                            <p-message severity="error" variant="simple" size="small" >
-                                                {{ rfcForm.get('rfc')?.getError("rfc")}}
-                                            </p-message>                                                                                    
-                                        }
+                                        <input type="text" formControlName="nombre" placeholder="(Opcional)" pInputText />                                    
                                 
-                                        @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                        @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
                                             <p-message severity="error" variant="simple" size="small" >
                                                 El campo es requerido.
                                             </p-message>
-                                        } -->
+                                        } 
                                     </label>                             
                                     <label class="flex flex-col w-full">
                                         <span>Apellido:</span>                                                                                                                                                                              
-                                        <input type="text" formControlName="apellido" placeholder="(Opcional)" pInputText />
-                                        <!-- Validation errors -->
-                                        <!-- @if (rfcForm.get('rfc')?.hasError("rfc")) {                            
-                                            <p-message severity="error" variant="simple" size="small" >
-                                                {{ rfcForm.get('rfc')?.getError("rfc")}}
-                                            </p-message>                                                                                    
-                                        }
+                                        <input type="text" formControlName="apellido" placeholder="(Opcional)" pInputText />                                     
                                 
-                                        @if (rfcForm.get('rfc')?.hasError("required") && (rfcForm.get('rfc')?.dirty || rfcForm.get('rfc')?.touched)) {
+                                        @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
                                             <p-message severity="error" variant="simple" size="small" >
                                                 El campo es requerido.
                                             </p-message>
-                                        } -->
+                                        }
                                     </label>                             
                                 </div>                             
                             </ng-container>                             
