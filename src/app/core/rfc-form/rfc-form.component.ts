@@ -13,16 +13,7 @@ import { TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RfcService } from '@shared/services/rfc.service';
-import {
-  LoadingState,
-  RFC,
-  RFCWithData,
-  TipoSujetoCode,
-  ValidateRFCBadRequestResponse,
-  ValidateRFCSuccessResponse,
-  ValidateRFCWithDataBadRequestResponse,
-  ValidateRFCWithDataServiceUnavailableResponse,
-} from '@shared/types';
+import { LoadingState, TipoSujetoCode } from '@shared/types';
 import { debounceTime, map, Observable, startWith, tap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
@@ -31,6 +22,15 @@ import { MessageModule } from 'primeng/message';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
 import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
+import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
+import {
+  RFC,
+  RFCWithData,
+  ValidateRFCSuccessResponse,
+  ValidateRFCBadRequestResponse,
+  ValidateRFCWithDataBadRequestResponse,
+  ValidateRFCWithDataServiceUnavailableResponse,
+} from '@shared/services/rfc.service.interface';
 
 @Component({
   selector: 'app-rfc-form',
@@ -45,6 +45,7 @@ import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
     SelectButtonModule,
     MessageModule,
     TipoSujetoControlComponent,
+    RfcDataFormComponent,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',

@@ -1,7 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development';
-import { RFC, RFCWithData, ValidateRFCWithDataRequest } from '@shared/types';
+import {
+  GenerateRfcPfRequest,
+  GenerateRfcPfSuccessResponse,
+  ObtainPersonalDataPfRFC,
+  ObtainPersonalDataPfRFCSuccessResponse,
+  RFC,
+  RFCWithData,
+} from './rfc.service.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +36,24 @@ export class RfcService {
     return this.http.post<RFCWithData>(endpoint, {
       rfcs: [rfcObj],
     });
+  }
+
+  generateRfcPF$(personalData: GenerateRfcPfRequest) {
+    const params = {
+      testCaseId: '664230608659f0c02fcd3f0c', // SUCCESS
+    };
+    const endpoint = `${environment.apiUrl}/sat/rfc_pf?testCaseId=${params.testCaseId}`;
+
+    return this.http.post<GenerateRfcPfSuccessResponse>(endpoint, personalData);
+  }
+
+  obtainPersonalDataRfcPF$(rfc: string) {
+    const params = {
+      testCaseId: '663567bb713cf2110a1106d2', // SUCCESS
+    };
+    const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId=${params.testCaseId}`;
+
+    return this.http.post<ObtainPersonalDataPfRFC>(endpoint, { rfc: rfc });
   }
 
   // TODO: Match RFC with CP and nombres in a single request

@@ -3,18 +3,20 @@ import { RfcFisicaService } from './rfc-fisica.service';
 import { from, Observable, of, switchMap, tap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { StorageService } from '@shared/services/storage.service';
-import { PFDataFromRFCResponse } from './rfc-fisica.interface';
+
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import {
-  LoadingState,
-  RFC,
-  ValidateRFCBadRequestResponse,
-  ValidateRFCSuccessResponse,
-} from '@shared/types';
+import { LoadingState } from '@shared/types';
 import { CastPipe } from '@shared/pipes/cast.pipe';
+import {
+  RFC,
+  ValidateRFCSuccessResponse,
+  ValidateRFCBadRequestResponse,
+  ObtainPersonalDataPfRFCSuccessResponse,
+} from '@shared/services/rfc.service.interface';
+import { RfcService } from '@shared/services/rfc.service';
 
 @Component({
   selector: 'app-rfc-fisica',
@@ -24,21 +26,36 @@ import { CastPipe } from '@shared/pipes/cast.pipe';
 })
 export class RfcFisicaComponent {
   results$!: Observable<LoadingState<RFC>>;
-  personalData$: Observable<LoadingState<PFDataFromRFCResponse>> | null = null;
+  personalData$: Observable<
+    LoadingState<ObtainPersonalDataPfRFCSuccessResponse>
+  > | null = null;
   nombres: string | null = null;
 
   SuccessInterface!: ValidateRFCSuccessResponse;
   BadRequestInterface!: ValidateRFCBadRequestResponse;
 
   constructor(
+    private rfcService: RfcService,
     private rfcFisicaService: RfcFisicaService,
     private storageService: StorageService
   ) {}
   ngOnInit() {
     this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
-      switchMapWithLoading<RFC>(() =>
-        this.rfcFisicaService.generateAndValidateRFC$()
-      ),
+      switchMapWithLoading<RFC>(() => {
+        const dataJson = this.storageService.getItem('personalData');
+        if (!dataJson) {
+          throw new Error('Missing personalData key in local storage.');
+        }
+        const curpData = JSON.parse(dataJson) as CurpFoundResponseData;
+        const personalData = {
+          nombres: curpData.nombres,
+          apellidoPaterno: curpData.primerApellido,
+          apellidoMaterno: curpData.segundoApellido,
+          fechaNacimiento: curpData.fechaNacimiento,
+        };
+
+        return this.rfcFisicaService.generateAndValidateRFC$(personalData);
+      }),
       tap((value) => {
         if (value.data) {
           const response = (value.data as ValidateRFCSuccessResponse).response
@@ -66,7 +83,13 @@ export class RfcFisicaComponent {
 
   getPersonalDataOnClick() {
     this.personalData$ = new Observable((subscriber) => subscriber.next()).pipe(
-      switchMapWithLoading(() => this.rfcFisicaService.personalDataFromRFC$()),
+      switchMapWithLoading(() => {
+        const rfc = this.storageService.getItem('rfc');
+        if (typeof rfc != 'string' || rfc === 'undefined') {
+          throw new Error('rfc item is not available on localStorage.');
+        }
+        return this.rfcService.obtainPersonalDataRfcPF$(rfc);
+      }),
       tap((value) => {
         if (value.data) {
           const response = value.data.response;
