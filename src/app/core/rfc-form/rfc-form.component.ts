@@ -17,6 +17,7 @@ import {
   LoadingState,
   RFC,
   RFCWithData,
+  TipoSujetoCode,
   ValidateRFCBadRequestResponse,
   ValidateRFCSuccessResponse,
   ValidateRFCWithDataBadRequestResponse,
@@ -29,7 +30,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
-import { updateTreeValidity } from '@shared/utils/updateTreeValidity';
+import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
 
 @Component({
   selector: 'app-rfc-form',
@@ -56,25 +57,14 @@ export class RfcFormComponent {
       cp: new FormControl(''),
       nombre: new FormControl(''),
       apellido: new FormControl(''),
+      razonSocial: new FormControl(''),
     }),
   });
-
-  tipoSujetoOptions = [
-    {
-      name: 'Persona Física',
-      code: 'PF',
-      icon: 'pi pi-user',
-    },
-    {
-      name: 'Persona Moral',
-      code: 'PM',
-      icon: 'pi pi-users',
-    },
-  ];
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
   dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
+  tipoSujeto: TipoSujetoCode | null = null;
 
   constructor(
     private rfcService: RfcService,
@@ -85,24 +75,24 @@ export class RfcFormComponent {
   loading = false;
 
   ngOnInit() {
-    const dataGroup = this.rfcForm.get('data');
+    const dataGroup = this.rfcForm.get('data') as FormGroup;
     dataGroup?.valueChanges
       .pipe(
         debounceTime(200),
         map((value) => {
           for (let fieldValue of Object.values(value)) {
             if (fieldValue) {
-              dataGroup.addValidators(Validators.required);
+              // dataGroup.addValidators(Validators.required);
               return { dataIsRequired: true };
             }
           }
-          dataGroup.removeValidators(Validators.required);
+          // dataGroup.removeValidators(Validators.required);
           return { dataIsRequired: false };
         }),
         startWith({ dataIsRequired: false })
       )
       .subscribe((value) => {
-        const dataGroup = this.rfcForm.get('data') as FormGroup;
+        // const dataGroup = this.rfcForm.get('data') as FormGroup;
         this.dataStatus = value;
         if (this.dataStatus.dataIsRequired) {
           Object.keys(dataGroup.controls).forEach((name) => {
@@ -111,129 +101,42 @@ export class RfcFormComponent {
         } else {
           Object.keys(dataGroup.controls).forEach((name) => {
             dataGroup.get(name)?.removeValidators(Validators.required);
+            dataGroup.get(name)?.markAsPristine();
           });
         }
 
         updateTreeValidity(this.rfcForm, { emitEvent: false });
       });
+
+    this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
+      this.rfcForm.get(['data', 'nombre'])?.reset();
+      this.rfcForm.get(['data', 'apellido'])?.reset();
+      this.rfcForm.get(['data', 'razonSocial'])?.reset();
+      if (value === 'PM') {
+        this.rfcForm.get(['data', 'apellido'])?.disable();
+        this.rfcForm.get(['data', 'nombre'])?.disable();
+        this.rfcForm.get(['data', 'razonSocial'])?.enable();
+      } else if (value === 'PF') {
+        this.rfcForm.get(['data', 'nombre'])?.enable();
+        this.rfcForm.get(['data', 'apellido'])?.enable();
+        this.rfcForm.get(['data', 'razonSocial'])?.disable();
+      }
+      this.tipoSujeto = value as TipoSujetoCode | null;
+    });
   }
 
   onSubmit() {
+    this.responseError = null;
     if (this.rfcForm.invalid) {
-      this.rfcForm.markAllAsTouched();
+      markAllAsDirty(this.rfcForm);
       return;
     }
-
     this.loading = true;
-    const cpControl = this.rfcForm.get(['data', 'cp'] as const);
-    const nombreControl = this.rfcForm.get(['data', 'nombre'] as const);
-    const apellidoControl = this.rfcForm.get(['data', 'apellido'] as const);
 
     if (this.dataStatus.dataIsRequired) {
-      const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
-      const rfcWithDataReqBody = {
-        rfc: rfcFormValue.rfc,
-        cp: rfcFormValue.data.cp,
-        nombre: `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
-      };
-
-      this.rfcFormResponse$ = new Observable((subscriber) =>
-        subscriber.next()
-      ).pipe(
-        switchMapWithLoading<RFCWithData>(() =>
-          this.rfcService.validateRFCWithData$(rfcWithDataReqBody)
-        ),
-        tap((value) => {
-          if (value.data) {
-            // TODO: handle SUCCESS responses NO REGISTRADO, INVALID NAME, INVALID CP.
-          }
-
-          if (value.error) {
-            const error = value.error as
-              | ValidateRFCWithDataBadRequestResponse
-              | ValidateRFCWithDataServiceUnavailableResponse;
-
-            if (error.status === 'SERVICE_ERROR') {
-              this.responseError =
-                'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-              return;
-            }
-
-            // BAD REQUEST
-            error.error.forEach((err) => {
-              const field = err.field.slice(0, -3); // strip down index from field
-              const code = err.code;
-
-              if (field === 'rfc') {
-                const rfcControl = this.rfcForm.get('rfc');
-                if (code === 'FORMAT_ERROR') {
-                  rfcControl?.setErrors({
-                    rfc: 'Ingresa un RFC válido con homoclave.',
-                  });
-                }
-
-                if (code === 'EMPTY_ERROR') {
-                  rfcControl?.setErrors({
-                    rfc: 'El campo RFC no puede estar vacío.',
-                  });
-                }
-
-                if (code === 'REQUIRED_FIELD_ERROR') {
-                  rfcControl?.setErrors({
-                    rfc: 'El campo RFC no puede estar vacío.',
-                  });
-                }
-              }
-
-              if (field === 'cp') {
-                if (code === 'FORMAT_ERROR') {
-                  cpControl?.setErrors({
-                    cp: 'Ingresa un código postal válido.',
-                  });
-                }
-
-                if (code === 'EMPTY_ERROR') {
-                  cpControl?.setErrors({
-                    cp: 'El campo Código Postal no puede estar vacío.',
-                  });
-                }
-
-                if (code === 'REQUIRED_FIELD_ERROR') {
-                  cpControl?.setErrors({
-                    cp: 'El campo Código Postal no puede estar vacío.',
-                  });
-                }
-              }
-
-              if (field === 'nombre') {
-                if (code === 'EMPTY_ERROR') {
-                  nombreControl?.setErrors({
-                    nombre: 'El campo Nombre(s) no puede estar vacío.',
-                  });
-                  apellidoControl?.setErrors({
-                    apellido: 'El campo Apellido no puede estar vacío.',
-                  });
-                }
-
-                if (code === 'REQUIRED_FIELD_ERROR') {
-                  nombreControl?.setErrors({
-                    nombre: 'El campo Nombre(s) no puede estar vacío.',
-                  });
-                  apellidoControl?.setErrors({
-                    apellido: 'El campo Apellido no puede estar vacío.',
-                  });
-                }
-              }
-            });
-          }
-          this.loading = false;
-        })
-      );
-
-      this.rfcFormResponse$.subscribe();
+      this.validateRFCWithData();
     } else {
       this.validateRFC();
-      // this.loading = false;
     }
   }
 
@@ -273,5 +176,136 @@ export class RfcFormComponent {
     this.rfcFormResponse$.subscribe();
   }
 
-  validateRFCWithData() {}
+  validateRFCWithData() {
+    const cpControl = this.rfcForm.get(['data', 'cp'] as const);
+    const nombreControl = this.rfcForm.get(['data', 'nombre'] as const);
+    const apellidoControl = this.rfcForm.get(['data', 'apellido'] as const);
+    const razonSocialControl = this.rfcForm.get([
+      'data',
+      'razonSocial',
+    ] as const);
+
+    const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
+    const rfcWithDataReqBody = {
+      rfc: rfcFormValue.rfc,
+      cp: rfcFormValue.data.cp,
+      nombre: razonSocialControl?.value
+        ? razonSocialControl?.value
+        : `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
+    };
+
+    console.log(rfcWithDataReqBody);
+
+    this.rfcFormResponse$ = new Observable((subscriber) =>
+      subscriber.next()
+    ).pipe(
+      switchMapWithLoading<RFCWithData>(() =>
+        this.rfcService.validateRFCWithData$(rfcWithDataReqBody)
+      ),
+      tap((value) => {
+        if (value.data) {
+          if (value.data.status === 'SUCCESS') {
+            const response = value.data.response;
+            const result = response.rfcs[0].result;
+            // SUCCESS AND FOUND
+            if (result === 'RFC válido, y susceptible de recibir facturas') {
+              this.storageService.setItem(
+                'tipoSujeto',
+                rfcFormValue.tipoSujeto
+              );
+              this.storageService.setItem('rfc', response.rfcs[0].rfc);
+              this.storageService.setItem('rfcResult', result);
+
+              this.router.navigateByUrl('/dashboard');
+            } else {
+              // SUCCESS AND NO REGISTRADO, NO CP MATCH, NO NAME MATCH
+              this.responseError = result + '.';
+            }
+          }
+        }
+
+        if (value.error) {
+          const error = value.error as
+            | ValidateRFCWithDataBadRequestResponse
+            | ValidateRFCWithDataServiceUnavailableResponse;
+
+          if (error.status === 'SERVICE_ERROR') {
+            this.responseError =
+              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+            return;
+          }
+
+          // BAD REQUEST
+          error.error.forEach((err) => {
+            const field = err.field.slice(0, -3); // strip down index from field
+            const code = err.code;
+
+            if (field === 'rfc') {
+              const rfcControl = this.rfcForm.get('rfc');
+              if (code === 'FORMAT_ERROR') {
+                rfcControl?.setErrors({
+                  rfc: 'Ingresa un RFC válido con homoclave.',
+                });
+              }
+
+              if (code === 'EMPTY_ERROR') {
+                rfcControl?.setErrors({
+                  rfc: 'El campo RFC no puede estar vacío.',
+                });
+              }
+
+              if (code === 'REQUIRED_FIELD_ERROR') {
+                rfcControl?.setErrors({
+                  rfc: 'El campo RFC no puede estar vacío.',
+                });
+              }
+            }
+
+            if (field === 'cp') {
+              if (code === 'FORMAT_ERROR') {
+                cpControl?.setErrors({
+                  cp: 'Ingresa un código postal válido.',
+                });
+              }
+
+              if (code === 'EMPTY_ERROR') {
+                cpControl?.setErrors({
+                  cp: 'El campo Código Postal no puede estar vacío.',
+                });
+              }
+
+              if (code === 'REQUIRED_FIELD_ERROR') {
+                cpControl?.setErrors({
+                  cp: 'El campo Código Postal no puede estar vacío.',
+                });
+              }
+            }
+
+            if (field === 'nombre') {
+              if (code === 'EMPTY_ERROR') {
+                nombreControl?.setErrors({
+                  nombre: 'El campo Nombre(s) no puede estar vacío.',
+                });
+                apellidoControl?.setErrors({
+                  apellido: 'El campo Apellido no puede estar vacío.',
+                });
+              }
+
+              if (code === 'REQUIRED_FIELD_ERROR') {
+                nombreControl?.setErrors({
+                  nombre: 'El campo Nombre(s) no puede estar vacío.',
+                });
+                apellidoControl?.setErrors({
+                  apellido: 'El campo Apellido no puede estar vacío.',
+                });
+              }
+            }
+          });
+        }
+        this.loading = value.loading;
+      })
+    );
+
+    this.rfcFormResponse$.subscribe();
+  }
 }

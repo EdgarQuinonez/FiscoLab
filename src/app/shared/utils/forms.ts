@@ -18,4 +18,17 @@ export function updateTreeValidity(
   });
 }
 
-export function markAllAsDirty(group: FormGroup | FormArray) {}
+export function markAllAsDirty(group: FormGroup | FormArray) {
+  Object.keys(group.controls).forEach((key) => {
+    const abstractControl = group.get(key);
+
+    if (
+      abstractControl instanceof FormGroup ||
+      abstractControl instanceof FormArray
+    ) {
+      markAllAsDirty(abstractControl);
+    } else {
+      abstractControl?.markAsDirty();
+    }
+  });
+}

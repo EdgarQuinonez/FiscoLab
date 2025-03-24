@@ -9,6 +9,9 @@
                 <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
                     <!-- <div class="w-full h-full"> -->
                         <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center w-full h-full">                            
+                            <span class="text-2xl font-bold text-center">Ingresa con RFC</span>
+                            <app-tipo-sujeto-control formControlName="tipoSujeto" />                            
+
                             <!-- <span class="text-2xl font-bold text-center">Ingresa un RFC</span> -->
                             <label class="flex flex-col w-full">
                                 <span>RFC: </span>                                                                                                                                                                              
@@ -45,36 +48,66 @@
                                             </p-message>
                                         } 
                                     </label>
-                                    <div class="flex w-full gap-1">
-        
+
+                                    @if (tipoSujeto === "PM") {
                                         <label class="flex flex-col w-full">
-                                            <span>Nombre(s):</span>                                                                                                                                                                              
-                                            <input type="text" formControlName="nombre" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'"  pInputText />                                    
+                                            <span>Razón Social: </span>                                                                                                                                                                              
+                                            <input type="text" formControlName="razonSocial" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
+                                            <!-- Validation errors -->
+                                            @if (rfcForm.get(['data', 'razonSocial'])?.hasError('razonSocial')) {                            
+                                                <p-message severity="error" variant="simple" size="small" >
+                                                    {{ rfcForm.get(['data', 'razonSocial'])?.getError('razonSocial')}}
+                                                </p-message>                                                                                    
+                                            }
                                     
-                                            @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
+                                            @if (rfcForm.get(['data', 'razonSocial'])?.hasError("required") && (rfcForm.get(['data', 'razonSocial'])?.dirty || rfcForm.get(['data', 'razonSocial'])?.touched)) {
                                                 <p-message severity="error" variant="simple" size="small" >
                                                     El campo es requerido.
                                                 </p-message>
                                             } 
-                                        </label>                             
-                                        <label class="flex flex-col w-full">
-                                            <span>Apellido:</span>                                                                                                                                                                              
-                                            <input type="text" formControlName="apellido" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />                                     
-                                    
-                                            @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
-                                                <p-message severity="error" variant="simple" size="small" >
-                                                    El campo es requerido.
-                                                </p-message>
-                                            }
-                                        </label>                             
-                                    </div>                             
+                                        </label>    
+                                    } @else if (tipoSujeto === "PF" || tipoSujeto === null) {                                        
+                                        <div class="flex w-full gap-1">
+            
+                                            <label class="flex flex-col w-full">
+                                                <span>Nombre(s):</span>                                                                                                                                                                              
+                                                <input type="text" formControlName="nombre" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'"  pInputText />                                    
+                                        
+                                                @if (rfcForm.get(['data', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'nombre'])?.dirty || rfcForm.get(['data', 'nombre'])?.touched)) {
+                                                    <p-message severity="error" variant="simple" size="small" >
+                                                        El campo es requerido.
+                                                    </p-message>
+                                                } 
+                                            </label>                             
+                                            <label class="flex flex-col w-full">
+                                                <span>Apellido:</span>                                                                                                                                                                              
+                                                <input type="text" formControlName="apellido" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />                                     
+                                        
+                                                @if (rfcForm.get(['data', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'apellido'])?.dirty || rfcForm.get(['data', 'apellido'])?.touched)) {
+                                                    <p-message severity="error" variant="simple" size="small" >
+                                                        El campo es requerido.
+                                                    </p-message>
+                                                }
+                                            </label>                             
+                                        </div>                             
+                                    }
                                 </ng-container>                                                             
-                            <app-tipo-sujeto-control formControlName="tipoSujeto" />
+                            <div class="flex w-full mt-4 justify-between">
 
-                            <p-button class="self-end mt-4" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
+                                @if (responseError) {
+                                    <p-message severity="error">
+                                        {{ responseError }}
+                                    </p-message>
+                                } @else {
+                                    <div></div>
+                                }
+                                <p-button class="self-end" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
+                            </div>
 
                             
                         </form>
+
+                        
                     <!-- </div> -->
                 </p-tabpanel>
                 <p-tabpanel value="1">            
