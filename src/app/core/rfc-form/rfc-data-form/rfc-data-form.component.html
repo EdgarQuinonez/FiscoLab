@@ -1,4 +1,7 @@
 <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2">
+    <span class="text-2xl font-bold text-center">Calcula el RFC </span>
+
+    <app-tipo-sujeto-control formControlName="tipoSujeto" class="self-center"></app-tipo-sujeto-control>
     @if (tipoSujeto === "PF" || tipoSujeto === null) {        
         <ng-container formGroupName="pfDataForm">
     
@@ -29,29 +32,31 @@
                     }
                 </label>        
             </div>    
-            <label>
-                <span>Nombre(s): </span>
-                <input type="text" class="w-full" formControlName="nombres" pInputText>
-        
-                @if (rfcForm.get('nombres')?.hasError('required') && (rfcForm.get('nombres')?.touched || rfcForm.get('nombres')?.dirty)) {
-                    <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
-                } 
-        
-                @if (rfcForm.get('nombres')?.hasError('nombres')) {
-                    <p-message severity="error" variant="simple" size="small">
-                        {{ rfcForm.get('nombres')?.getError('nombres')}}
-                    </p-message>    
-                }
-            </label>        
             
-            <label class="flex flex-col self-start items-start justify-center w-full">
-                <span class="mr-2">Fecha de nacimiento: </span>
-                <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
-        
-                @if (rfcForm.get('fechaNacimiento')?.hasError('required') && (rfcForm.get('fechaNacimiento')?.touched || rfcForm.get('fechaNacimiento')?.dirty)) {
-                    <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
-                }
-            </label>
+            <div class="flex gap-1">
+                <label class="flex flex-col self-start items-start justify-center w-full">
+                    <span>Nombre(s): </span>
+                    <input type="text" class="w-full" formControlName="nombres" pInputText>
+            
+                    @if (rfcForm.get('nombres')?.hasError('required') && (rfcForm.get('nombres')?.touched || rfcForm.get('nombres')?.dirty)) {
+                        <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                    } 
+            
+                    @if (rfcForm.get('nombres')?.hasError('nombres')) {
+                        <p-message severity="error" variant="simple" size="small">
+                            {{ rfcForm.get('nombres')?.getError('nombres')}}
+                        </p-message>    
+                    }
+                </label>        
+                <label class="flex flex-col self-start items-start justify-center w-full">
+                    <span>Fecha de nacimiento: </span>
+                    <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
+            
+                    @if (rfcForm.get('fechaNacimiento')?.hasError('required') && (rfcForm.get('fechaNacimiento')?.touched || rfcForm.get('fechaNacimiento')?.dirty)) {
+                        <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                    }
+                </label>
+            </div>
         </ng-container>
     }
 

@@ -12,6 +12,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { Observable } from 'rxjs';
+import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -20,6 +21,7 @@ import { Observable } from 'rxjs';
     DatePickerModule,
     MessageModule,
     InputTextModule,
+    TipoSujetoControlComponent,
     ReactiveFormsModule,
   ],
   templateUrl: './rfc-data-form.component.html',
@@ -27,6 +29,7 @@ import { Observable } from 'rxjs';
 })
 export class RfcDataFormComponent {
   rfcForm = new FormGroup({
+    tipoSujeto: new FormControl('', Validators.required),
     pfDataForm: new FormGroup({
       nombres: new FormControl(''),
       apellidoPaterno: new FormControl(''),
