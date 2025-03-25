@@ -2,8 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development';
 import {
+  GenerateRfcPf,
   GenerateRfcPfRequest,
   GenerateRfcPfSuccessResponse,
+  GenerateRfcPm,
+  GenerateRfcPmRequest,
   ObtainPersonalDataPfRFC,
   ObtainPersonalDataPfRFCSuccessResponse,
   RFC,
@@ -44,7 +47,16 @@ export class RfcService {
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_pf?testCaseId=${params.testCaseId}`;
 
-    return this.http.post<GenerateRfcPfSuccessResponse>(endpoint, personalData);
+    return this.http.post<GenerateRfcPf>(endpoint, personalData);
+  }
+
+  generateRfcPM$(companyData: GenerateRfcPmRequest) {
+    const params = {
+      testCaseId: '66423072bb869119db3517b4', // SUCCESS
+    };
+    const endpoint = `${environment.apiUrl}/sat/rfc_pm?testCaseId=${params.testCaseId}`;
+
+    return this.http.post<GenerateRfcPm>(endpoint, companyData);
   }
 
   obtainPersonalDataRfcPF$(rfc: string) {

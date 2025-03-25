@@ -5,10 +5,10 @@
             <p-tab value="1">Datos</p-tab>
         </p-tablist>
         <p-tabpanels>
-            <div class="flex flex-col items-center justify-center h-[28rem] w-[43rem]">
+            <!-- <div class="flex flex-col items-center justify-center h-[28rem] w-[43rem]"> -->
                 <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
                     <!-- <div class="w-full h-full"> -->
-                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center w-full h-full">                            
+                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center h-[28rem] w-[43rem]">                            
                             <span class="text-2xl font-bold text-center">Ingresa con RFC</span>
                             <app-tipo-sujeto-control formControlName="tipoSujeto" />                            
 
@@ -91,7 +91,7 @@
                                             </label>                             
                                         </div>                             
                                     }
-                                </ng-container>                                                             
+                            </ng-container>                                                             
                             <div class="flex w-full mt-4 justify-between">
 
                                 @if (responseError) {
@@ -116,6 +116,6 @@
                     <!-- <app-curp-by-data></app-curp-by-data> -->
                 </p-tabpanel>
                 
-            </div>
+            <!-- </div> -->
         </p-tabpanels>
     </p-tabs>

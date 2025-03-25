@@ -128,3 +128,17 @@ export interface ObtainPersonalDataPfRFCSuccessResponse
 }
 
 export type ObtainPersonalDataPfRFC = ObtainPersonalDataPfRFCSuccessResponse;
+
+export interface GenerateRfcPmRequest {
+  razonSocial: string;
+  fechaConstitucion: string; // yyyy-mm-dd
+}
+
+export interface GenerateRfcPmSuccessReponse extends SuccessKibanResponse {
+  request: GenerateRfcPmRequest;
+  response: {
+    rfc: string;
+  };
+}
+
+export type GenerateRfcPm = GenerateRfcPmSuccessReponse;
