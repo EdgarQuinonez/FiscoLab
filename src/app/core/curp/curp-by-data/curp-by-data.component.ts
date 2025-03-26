@@ -31,6 +31,7 @@ import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
+import { markAllAsDirty } from '@shared/utils/forms';
 @Component({
   selector: 'app-curp-by-data',
   imports: [
@@ -81,6 +82,7 @@ export class CurpByDataComponent {
   });
 
   ngOnInit() {
+    this.dataForm.reset(); // I need it so that required validator works properly when using Object as default value.
     // init gender
     for (const [code, name] of Object.entries(curpCatalog.GENDER)) {
       this.gender.push({
@@ -100,6 +102,7 @@ export class CurpByDataComponent {
 
   onSubmit() {
     if (this.dataForm.invalid) {
+      markAllAsDirty(this.dataForm);
       return;
     }
 

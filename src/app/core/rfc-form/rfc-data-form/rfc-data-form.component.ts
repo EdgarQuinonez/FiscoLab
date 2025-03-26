@@ -14,6 +14,9 @@ import { MessageModule } from 'primeng/message';
 import { debounceTime, map, Observable, startWith } from 'rxjs';
 import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
 import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
+import { RfcService } from '@shared/services/rfc.service';
+import { RfcFormValue } from './rfc-data.interface';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -35,10 +38,10 @@ export class RfcDataFormComponent {
       nombres: new FormControl('', Validators.required),
       apellidoPaterno: new FormControl('', Validators.required),
       apellidoMaterno: new FormControl(''),
-      fechaNacimiento: new FormControl('', Validators.required),
+      fechaNacimiento: new FormControl({}, Validators.required),
     }),
     pmDataForm: new FormGroup({
-      fechaConstitucion: new FormControl('', Validators.required),
+      fechaConstitucion: new FormControl({}, Validators.required),
       razonSocial: new FormControl('', Validators.required),
     }),
     data: new FormGroup({
@@ -53,7 +56,11 @@ export class RfcDataFormComponent {
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
 
+  constructor(private rfcService: RfcService) {}
+
   ngOnInit() {
+    this.rfcForm.reset();
+
     const dataGroup = this.rfcForm.get('data') as FormGroup;
     dataGroup?.valueChanges
       .pipe(
@@ -115,11 +122,28 @@ export class RfcDataFormComponent {
   onSubmit() {
     this.responseError = null;
     if (this.rfcForm.invalid) {
+      console.log(
+        this.rfcForm
+          .get(['pfDataForm', 'fechaNacimiento'])
+          ?.hasError('required')
+      );
       markAllAsDirty(this.rfcForm);
       return;
     }
 
     this.loading = true;
+    const rfcFormValue = this.rfcForm.value as RfcFormValue;
+    console.log(rfcFormValue);
+    // const tipoSujeto = rfcFormValue.tipoSujeto as TipoSujetoCode;
+
+    // if (tipoSujeto === 'PF') {
+    //   const personalData = rfcFormValue.pfDataForm;
+    //   this.rfcService.generateRfcPF$({
+    //     ...personalData,
+    //     fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
+    //   });
+    // }
+
     // Generate either RFC and then validate based on the dataStatus.
     // if (this.dataStatus.dataIsRequired) {
     //   this.validateRFCWithData();
