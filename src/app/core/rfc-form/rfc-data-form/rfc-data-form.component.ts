@@ -11,8 +11,9 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { Observable } from 'rxjs';
+import { debounceTime, map, Observable, startWith } from 'rxjs';
 import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
+import { updateTreeValidity } from '@shared/utils/forms';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -51,6 +52,57 @@ export class RfcDataFormComponent {
   dataStatus: { dataIsRequired: boolean } = { dataIsRequired: false };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
+
+  ngOnInit() {
+    const dataGroup = this.rfcForm.get('data') as FormGroup;
+    dataGroup?.valueChanges
+      .pipe(
+        debounceTime(200),
+        map((value) => {
+          for (let fieldValue of Object.values(value)) {
+            if (fieldValue) {
+              // dataGroup.addValidators(Validators.required);
+              return { dataIsRequired: true };
+            }
+          }
+          // dataGroup.removeValidators(Validators.required);
+          return { dataIsRequired: false };
+        }),
+        startWith({ dataIsRequired: false })
+      )
+      .subscribe((value) => {
+        // const dataGroup = this.rfcForm.get('data') as FormGroup;
+        this.dataStatus = value;
+        if (this.dataStatus.dataIsRequired) {
+          Object.keys(dataGroup.controls).forEach((name) => {
+            dataGroup.get(name)?.addValidators(Validators.required);
+          });
+        } else {
+          Object.keys(dataGroup.controls).forEach((name) => {
+            dataGroup.get(name)?.removeValidators(Validators.required);
+            dataGroup.get(name)?.markAsPristine();
+          });
+        }
+
+        updateTreeValidity(this.rfcForm, { emitEvent: false });
+      });
+
+    this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
+      this.rfcForm.get(['data', 'nombre'])?.reset();
+      this.rfcForm.get(['data', 'apellido'])?.reset();
+      this.rfcForm.get(['data', 'razonSocial'])?.reset();
+      if (value === 'PM') {
+        this.rfcForm.get(['data', 'apellido'])?.disable();
+        this.rfcForm.get(['data', 'nombre'])?.disable();
+        this.rfcForm.get(['data', 'razonSocial'])?.enable();
+      } else if (value === 'PF') {
+        this.rfcForm.get(['data', 'nombre'])?.enable();
+        this.rfcForm.get(['data', 'apellido'])?.enable();
+        this.rfcForm.get(['data', 'razonSocial'])?.disable();
+      }
+      this.tipoSujeto = value as TipoSujetoCode | null;
+    });
+  }
 
   onSubmit() {}
 }

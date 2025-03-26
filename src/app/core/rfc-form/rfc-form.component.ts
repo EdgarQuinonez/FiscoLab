@@ -117,7 +117,7 @@ export class RfcFormComponent {
         this.rfcForm.get(['data', 'apellido'])?.disable();
         this.rfcForm.get(['data', 'nombre'])?.disable();
         this.rfcForm.get(['data', 'razonSocial'])?.enable();
-      } else if (value === 'PF') {
+      } else if (value === 'PF' || value === null) {
         this.rfcForm.get(['data', 'nombre'])?.enable();
         this.rfcForm.get(['data', 'apellido'])?.enable();
         this.rfcForm.get(['data', 'razonSocial'])?.disable();

@@ -1,14 +1,14 @@
 
-    <p-tabs value="0">
+    <p-tabs value="0" class="w-full h-full">
         <p-tablist>
             <p-tab value="0">RFC</p-tab>
             <p-tab value="1">Datos</p-tab>
         </p-tablist>
-        <p-tabpanels>
+        <p-tabpanels class="w-full h-full">
             <!-- <div class="flex flex-col items-center justify-center h-[28rem] w-[43rem]"> -->
-                <p-tabpanel value="0" class="flex flex-1 justify-center items-center w-full">
+                <p-tabpanel value="0">
                     <!-- <div class="w-full h-full"> -->
-                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-center h-[28rem] w-[43rem]">                            
+                        <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 items-center justify-start w-full h-full relative">                            
                             <span class="text-2xl font-bold text-center">Ingresa con RFC</span>
                             <app-tipo-sujeto-control formControlName="tipoSujeto" />                            
 
@@ -31,23 +31,9 @@
                             </label>
                             
                             <ng-container formGroupName="data" >
+                               
     
-                                    <label class="flex flex-col w-full">
-                                        <span>Código Postal: </span>                                                                                                                                                                              
-                                        <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
-                                        <!-- Validation errors -->
-                                        @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
-                                            <p-message severity="error" variant="simple" size="small" >
-                                                {{ rfcForm.get(['data', 'cp'])?.getError('cp')}}
-                                            </p-message>                                                                                    
-                                        }
-                                
-                                        @if (rfcForm.get(['data', 'cp'])?.hasError("required") && (rfcForm.get(['data', 'cp'])?.dirty || rfcForm.get(['data', 'cp'])?.touched)) {
-                                            <p-message severity="error" variant="simple" size="small" >
-                                                El campo es requerido.
-                                            </p-message>
-                                        } 
-                                    </label>
+                                    
 
                                     @if (tipoSujeto === "PM") {
                                         <label class="flex flex-col w-full">
@@ -91,8 +77,30 @@
                                             </label>                             
                                         </div>                             
                                     }
+
+                                    <div class="flex gap-1 w-full">
+                                        <label class="flex flex-col w-full">
+                                            <span>Código Postal: </span>                                                                                                                                                                              
+                                            <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
+                                            <!-- Validation errors -->
+                                            @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
+                                                <p-message severity="error" variant="simple" size="small" >
+                                                    {{ rfcForm.get(['data', 'cp'])?.getError('cp')}}
+                                                </p-message>                                                                                    
+                                            }
+                                    
+                                            @if (rfcForm.get(['data', 'cp'])?.hasError("required") && (rfcForm.get(['data', 'cp'])?.dirty || rfcForm.get(['data', 'cp'])?.touched)) {
+                                                <p-message severity="error" variant="simple" size="small" >
+                                                    El campo es requerido.
+                                                </p-message>
+                                            } 
+                                        </label>
+                                        <div class="w-full">
+                                
+                                        </div>
+                                    </div>
                             </ng-container>                                                             
-                            <div class="flex w-full mt-4 justify-between">
+                            <div class="flex w-full justify-between absolute bottom-[0.5rem]">
 
                                 @if (responseError) {
                                     <p-message severity="error">
