@@ -1,7 +1,14 @@
 <form [formGroup]="rfcForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 h-full w-full relative">
-    <span class="text-2xl font-bold text-center">Calcular el RFC </span>
+    <span class="text-2xl font-bold text-center mb-4">Calcular el RFC </span>
 
-    <app-tipo-sujeto-control formControlName="tipoSujeto" class="self-center"></app-tipo-sujeto-control>
+    <label class="self-center">
+        <app-tipo-sujeto-control formControlName="tipoSujeto" />                            
+        @if (rfcForm.get('tipoSujeto')?.hasError("required") && (rfcForm.get('tipoSujeto')?.dirty || rfcForm.get('tipoSujeto')?.touched)) {
+            <p-message severity="error" variant="simple" size="small" >
+                Selecciona un tipo de sujeto contable.
+            </p-message>
+        } 
+    </label>
     @if (tipoSujeto === "PF" || tipoSujeto === null) {        
         <ng-container formGroupName="pfDataForm">
     

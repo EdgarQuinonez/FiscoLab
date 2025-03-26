@@ -28,22 +28,23 @@
             }
         </label>        
     </div>    
-    <label>
-        <span>Nombre(s): </span>
-        <input type="text" class="w-full" formControlName="nombres" pInputText>
-
-        @if (dataForm.get('nombres')?.hasError('required') && (dataForm.get('nombres')?.touched || dataForm.get('nombres')?.dirty)) {
-            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
-        } 
-
-        @if (dataForm.get('nombres')?.hasError('nombres')) {
-            <p-message severity="error" variant="simple" size="small">
-                {{ dataForm.get('nombres')?.getError('nombres')}}
-            </p-message>    
-        }
-    </label>        
+           
     <div class="flex gap-1">
-        <label class="flex flex-col self-start items-start justify-start w-full">
+        <label class="flex flex-col items-start justify-start w-full">
+            <span>Nombre(s): </span>
+            <input type="text" class="w-full" formControlName="nombres" pInputText>
+    
+            @if (dataForm.get('nombres')?.hasError('required') && (dataForm.get('nombres')?.touched || dataForm.get('nombres')?.dirty)) {
+                <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+            } 
+    
+            @if (dataForm.get('nombres')?.hasError('nombres')) {
+                <p-message severity="error" variant="simple" size="small">
+                    {{ dataForm.get('nombres')?.getError('nombres')}}
+                </p-message>    
+            }
+        </label> 
+        <label class="flex flex-col items-start justify-start w-full">
             <span class="mr-2">Fecha de nacimiento: </span>
             <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
     
@@ -51,9 +52,7 @@
                 <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
             }
         </label>
-        <div class="w-full">
-
-        </div>
+        
     </div>
     <div class="flex items-center justify-start gap-1">
         <label class="flex flex-col items-start justify-start flex-1">
@@ -73,7 +72,17 @@
         </label>
     </div>
 
-    <p-button type="submit" label="Ingresar" icon="pi pi-check" iconPos="right" class="flex self-end mt-4 absolute bottom-[0.5rem]" [loading]="loading"/>
+    <div class="flex w-full justify-between absolute bottom-[0.5rem]">
+
+        @if (responseError) {
+            <p-message severity="error">
+                {{ responseError }}
+            </p-message>
+        } @else {
+            <div></div>
+        }
+        <p-button class="self-end" icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit" [loading]="loading" />
+    </div>
 
 </form>
 

@@ -31,6 +31,7 @@ import {
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
+import { RfcFormService } from './rfc-form.service';
 
 @Component({
   selector: 'app-rfc-form',
@@ -70,7 +71,8 @@ export class RfcFormComponent {
   constructor(
     private rfcService: RfcService,
     private router: Router,
-    private storageService: StorageService
+    private storageService: StorageService,
+    private rfcFormService: RfcFormService
   ) {}
 
   loading = false;
@@ -144,169 +146,74 @@ export class RfcFormComponent {
   validateRFC() {
     const rfcFormValue = this.rfcForm.value as RfcFormValue;
 
-    this.rfcFormResponse$ = new Observable((subscriber) =>
-      subscriber.next()
-    ).pipe(
-      switchMapWithLoading<RFC>(() =>
-        this.rfcService.validateRFC$(rfcFormValue.rfc)
-      ),
-      tap((value) => {
-        this.loading = value.loading;
+    this.rfcFormResponse$ = this.rfcFormService.validateRFC$(rfcFormValue);
 
-        if (value.data) {
-          const response = (value.data as ValidateRFCSuccessResponse).response;
-          this.storageService.setItem('tipoSujeto', rfcFormValue.tipoSujeto);
-          this.storageService.setItem('rfc', response.rfcs[0].rfc);
-          this.storageService.setItem('rfcResult', response.rfcs[0].result);
-
-          this.router.navigateByUrl('/dashboard');
-        }
-
-        if (value.error) {
-          const error = (value.error as ValidateRFCBadRequestResponse).error;
-          this.rfcForm.get('rfc')?.setErrors({
-            rfc:
-              error[0].code === 'FORMAT_ERROR'
-                ? 'Ingresa un RFC válido con homoclave.'
-                : '',
-          });
-        }
-      })
-    );
-
-    this.rfcFormResponse$.subscribe();
+    this.rfcFormResponse$.subscribe((value) => {
+      this.loading = value.loading;
+      if (value.error) {
+        const error = (value.error as ValidateRFCBadRequestResponse).error;
+        this.rfcForm.get('rfc')?.setErrors({
+          rfc:
+            error[0].code === 'FORMAT_ERROR'
+              ? 'Ingresa un RFC válido con homoclave.'
+              : '',
+        });
+      }
+    });
   }
 
   validateRFCWithData() {
-    const cpControl = this.rfcForm.get(['data', 'cp'] as const);
-    const nombreControl = this.rfcForm.get(['data', 'nombre'] as const);
-    const apellidoControl = this.rfcForm.get(['data', 'apellido'] as const);
-    const razonSocialControl = this.rfcForm.get([
-      'data',
-      'razonSocial',
-    ] as const);
-
     const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
-    const rfcWithDataReqBody = {
-      rfc: rfcFormValue.rfc,
-      cp: rfcFormValue.data.cp,
-      nombre: razonSocialControl?.value
-        ? razonSocialControl?.value
-        : `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
-    };
 
-    console.log(rfcWithDataReqBody);
+    this.rfcFormResponse$ =
+      this.rfcFormService.validateRFCWithData$(rfcFormValue);
 
-    this.rfcFormResponse$ = new Observable((subscriber) =>
-      subscriber.next()
-    ).pipe(
-      switchMapWithLoading<RFCWithData>(() =>
-        this.rfcService.validateRFCWithData$(rfcWithDataReqBody)
-      ),
-      tap((value) => {
-        if (value.data) {
-          if (value.data.status === 'SUCCESS') {
-            const response = value.data.response;
-            const result = response.rfcs[0].result;
-            // SUCCESS AND FOUND
-            if (result === 'RFC válido, y susceptible de recibir facturas') {
-              this.storageService.setItem(
-                'tipoSujeto',
-                rfcFormValue.tipoSujeto
-              );
-              this.storageService.setItem('rfc', response.rfcs[0].rfc);
-              this.storageService.setItem('rfcResult', result);
+    this.rfcFormResponse$.subscribe((value) => {
+      this.loading = value.loading;
 
-              this.router.navigateByUrl('/dashboard');
-            } else {
-              // SUCCESS AND NO REGISTRADO, NO CP MATCH, NO NAME MATCH
-              this.responseError = result + '.';
-            }
+      if (value.data) {
+        if (value.data.status === 'SUCCESS') {
+          const rfcResult = value.data.response.rfcs[0].result;
+          // RFC not valid.
+          if (rfcResult != 'RFC válido, y susceptible de recibir facturas') {
+            this.responseError = rfcResult + '.';
           }
         }
+      }
 
-        if (value.error) {
-          const error = value.error as
-            | ValidateRFCWithDataBadRequestResponse
-            | ValidateRFCWithDataServiceUnavailableResponse;
+      if (value.error) {
+        const error = value.error as
+          | ValidateRFCWithDataBadRequestResponse
+          | ValidateRFCWithDataServiceUnavailableResponse;
 
-          if (error.status === 'SERVICE_ERROR') {
-            this.responseError =
-              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-            return;
+        if (error.status === 'SERVICE_ERROR') {
+          this.responseError =
+            'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+          return;
+        }
+
+        // BAD REQUEST
+        error.error.forEach((err) => {
+          const field = err.field.slice(0, -3); // strip down index from field
+          const code = err.code;
+
+          if (field === 'rfc') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get('rfc')?.setErrors({
+                rfc: 'Ingresa un RFC válido con homoclave.',
+              });
+            }
           }
 
-          // BAD REQUEST
-          error.error.forEach((err) => {
-            const field = err.field.slice(0, -3); // strip down index from field
-            const code = err.code;
-
-            if (field === 'rfc') {
-              const rfcControl = this.rfcForm.get('rfc');
-              if (code === 'FORMAT_ERROR') {
-                rfcControl?.setErrors({
-                  rfc: 'Ingresa un RFC válido con homoclave.',
-                });
-              }
-
-              if (code === 'EMPTY_ERROR') {
-                rfcControl?.setErrors({
-                  rfc: 'El campo RFC no puede estar vacío.',
-                });
-              }
-
-              if (code === 'REQUIRED_FIELD_ERROR') {
-                rfcControl?.setErrors({
-                  rfc: 'El campo RFC no puede estar vacío.',
-                });
-              }
+          if (field === 'cp') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                cp: 'Ingresa un código postal válido.',
+              });
             }
-
-            if (field === 'cp') {
-              if (code === 'FORMAT_ERROR') {
-                cpControl?.setErrors({
-                  cp: 'Ingresa un código postal válido.',
-                });
-              }
-
-              if (code === 'EMPTY_ERROR') {
-                cpControl?.setErrors({
-                  cp: 'El campo Código Postal no puede estar vacío.',
-                });
-              }
-
-              if (code === 'REQUIRED_FIELD_ERROR') {
-                cpControl?.setErrors({
-                  cp: 'El campo Código Postal no puede estar vacío.',
-                });
-              }
-            }
-
-            if (field === 'nombre') {
-              if (code === 'EMPTY_ERROR') {
-                nombreControl?.setErrors({
-                  nombre: 'El campo Nombre(s) no puede estar vacío.',
-                });
-                apellidoControl?.setErrors({
-                  apellido: 'El campo Apellido no puede estar vacío.',
-                });
-              }
-
-              if (code === 'REQUIRED_FIELD_ERROR') {
-                nombreControl?.setErrors({
-                  nombre: 'El campo Nombre(s) no puede estar vacío.',
-                });
-                apellidoControl?.setErrors({
-                  apellido: 'El campo Apellido no puede estar vacío.',
-                });
-              }
-            }
-          });
-        }
-        this.loading = value.loading;
-      })
-    );
-
-    this.rfcFormResponse$.subscribe();
+          }
+        });
+      }
+    });
   }
 }
