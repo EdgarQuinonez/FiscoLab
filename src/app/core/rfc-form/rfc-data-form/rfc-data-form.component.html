@@ -5,27 +5,27 @@
     @if (tipoSujeto === "PF" || tipoSujeto === null) {        
         <ng-container formGroupName="pfDataForm">
     
-            <div class="flex gap-1">
-                <label class="flex flex-col items-start justify-center w-full">
+            <div class="flex gap-1 justify-start">
+                <label class="flex flex-col items-start justify-start w-full">
                     <span>Primer apellido: </span>
                     <input class="w-full" type="text" formControlName="apellidoPaterno" pInputText>
         
-                    @if (rfcForm.get('apellidoPaterno')?.hasError('required') && (rfcForm.get('apellidoPaterno')?.touched || rfcForm.get('apellidoPaterno')?.dirty)) {
+                    @if (rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.hasError('required') && (rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.touched || rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.dirty)) {
                         <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
                     } 
         
-                    @if (rfcForm.get('apellidoPaterno')?.hasError('apellidoPaterno')) {
+                    @if (rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.hasError('apellidoPaterno')) {
                         <p-message severity="error" variant="simple" size="small">
                             {{ rfcForm.get('apellidoPaterno')?.getError('apellidoPaterno')}}
                         </p-message>    
                     }
                 </label>
-                <label class="flex flex-col items-start justify-center w-full">
+                <label class="flex flex-col items-start w-full">
                     <!-- NOT REQUIRED -->
                     <span>Segundo apellido: </span>
                     <input class="w-full" type="text" formControlName="apellidoMaterno" placeholder="(Opcional)" pInputText>        
         
-                    @if (rfcForm.get('apellidoMaterno')?.hasError('apellidoMaterno')) {
+                    @if (rfcForm.get(['pfDataForm', 'apellidoMaterno'])?.hasError('apellidoMaterno')) {
                         <p-message severity="error" variant="simple" size="small">
                             {{ rfcForm.get('apellidoMaterno')?.getError('apellidoMaterno')}}
                         </p-message>    
@@ -33,26 +33,26 @@
                 </label>        
             </div>    
             
-            <div class="flex gap-1">
-                <label class="flex flex-col items-start justify-center w-full">
+            <div class="flex gap-1 justify-start">
+                <label class="flex flex-col items-start justify-start w-full">
                     <span>Nombre(s): </span>
                     <input type="text" class="w-full" formControlName="nombres" pInputText>
             
-                    @if (rfcForm.get('nombres')?.hasError('required') && (rfcForm.get('nombres')?.touched || rfcForm.get('nombres')?.dirty)) {
+                    @if (rfcForm.get(['pfDataForm', 'nombres'])?.hasError('required') && (rfcForm.get(['pfDataForm', 'nombres'])?.touched || rfcForm.get(['pfDataForm', 'nombres'])?.dirty)) {
                         <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
                     } 
             
-                    @if (rfcForm.get('nombres')?.hasError('nombres')) {
+                    @if (rfcForm.get(['pfDataForm', 'nombres'])?.hasError('nombres')) {
                         <p-message severity="error" variant="simple" size="small">
                             {{ rfcForm.get('nombres')?.getError('nombres')}}
                         </p-message>    
                     }
                 </label>        
-                <label class="flex flex-col items-start justify-center w-full">
+                <label class="flex flex-col items-start justify-start w-full">
                     <span>Fecha de nacimiento: </span>
                     <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
             
-                    @if (rfcForm.get('fechaNacimiento')?.hasError('required') && (rfcForm.get('fechaNacimiento')?.touched || rfcForm.get('fechaNacimiento')?.dirty)) {
+                    @if (rfcForm.get(['pfDataForm', 'fechaNacimiento'])?.hasError('required') && (rfcForm.get(['pfDataForm', 'fechaNacimiento'])?.touched || rfcForm.get(['pfDataForm', 'fechaNacimiento'])?.dirty)) {
                         <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
                     }
                 </label>
@@ -67,13 +67,13 @@
                 <span>Razón Social: </span>                                                                                                                                                                              
                 <input type="text" formControlName="razonSocial" pInputText />
                 <!-- Validation errors -->
-                @if (rfcForm.get(['data', 'razonSocial'])?.hasError('razonSocial')) {                            
+                @if (rfcForm.get(['pmDataForm', 'razonSocial'])?.hasError('razonSocial')) {                            
                     <p-message severity="error" variant="simple" size="small" >
-                        {{ rfcForm.get(['data', 'razonSocial'])?.getError('razonSocial')}}
+                        {{ rfcForm.get(['pmDataForm', 'razonSocial'])?.getError('razonSocial')}}
                     </p-message>                                                                                    
                 }
         
-                @if (rfcForm.get(['data', 'razonSocial'])?.hasError("required") && (rfcForm.get(['data', 'razonSocial'])?.dirty || rfcForm.get(['data', 'razonSocial'])?.touched)) {
+                @if (rfcForm.get(['pmDataForm', 'razonSocial'])?.hasError("required") && (rfcForm.get(['pmDataForm', 'razonSocial'])?.dirty || rfcForm.get(['pmDataForm', 'razonSocial'])?.touched)) {
                     <p-message severity="error" variant="simple" size="small" >
                         El campo es requerido.
                     </p-message>
@@ -85,7 +85,7 @@
                     <span>Fecha de constitución: </span>
                     <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaConstitucion" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
             
-                    @if (rfcForm.get('fechaConstitucion')?.hasError('required') && (rfcForm.get('fechaConstitucion')?.touched || rfcForm.get('fechaConstitucion')?.dirty)) {
+                    @if (rfcForm.get(['pmDataForm', 'fechaConstitucion'])?.hasError('required') && (rfcForm.get(['pmDataForm', 'fechaConstitucion'])?.touched || rfcForm.get(['pmDataForm', 'fechaConstitucion'])?.dirty)) {
                         <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
                     }
                 </label>
@@ -100,7 +100,7 @@
 
     <ng-container formGroupName="data" >
         <div class="flex gap-1">
-            <label class="flex flex-col w-full items-start justify-center w-full">
+            <label class="flex flex-col w-full items-start justify-start w-full">
                 <span>Código Postal: </span>                                                                                                                                                                              
                 <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" class="w-full" pInputText />
                 <!-- Validation errors -->

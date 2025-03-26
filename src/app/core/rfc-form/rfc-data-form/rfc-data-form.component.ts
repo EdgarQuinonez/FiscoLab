@@ -13,7 +13,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { debounceTime, map, Observable, startWith } from 'rxjs';
 import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
-import { updateTreeValidity } from '@shared/utils/forms';
+import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -32,14 +32,14 @@ export class RfcDataFormComponent {
   rfcForm = new FormGroup({
     tipoSujeto: new FormControl('', Validators.required),
     pfDataForm: new FormGroup({
-      nombres: new FormControl(''),
-      apellidoPaterno: new FormControl(''),
+      nombres: new FormControl('', Validators.required),
+      apellidoPaterno: new FormControl('', Validators.required),
       apellidoMaterno: new FormControl(''),
-      fechaNacimiento: new FormControl(''),
+      fechaNacimiento: new FormControl('', Validators.required),
     }),
     pmDataForm: new FormGroup({
-      fechaConstitucion: new FormControl(''),
-      razonSocial: new FormControl(''),
+      fechaConstitucion: new FormControl('', Validators.required),
+      razonSocial: new FormControl('', Validators.required),
     }),
     data: new FormGroup({
       cp: new FormControl(''),
@@ -92,7 +92,7 @@ export class RfcDataFormComponent {
       const pfForm = this.rfcForm.get('pfDataForm') as FormGroup;
 
       if (value === 'PM') {
-        pfForm.reset();
+        pmForm.reset();
         Object.keys(pmForm.controls).forEach((name) => {
           pmForm.get(name)?.enable();
         });
@@ -100,7 +100,7 @@ export class RfcDataFormComponent {
           pfForm.get(name)?.disable();
         });
       } else if (value === 'PF' || value === null) {
-        pmForm.reset();
+        pfForm.reset();
         Object.keys(pmForm.controls).forEach((name) => {
           pmForm.get(name)?.disable();
         });
@@ -112,5 +112,19 @@ export class RfcDataFormComponent {
     });
   }
 
-  onSubmit() {}
+  onSubmit() {
+    this.responseError = null;
+    if (this.rfcForm.invalid) {
+      markAllAsDirty(this.rfcForm);
+      return;
+    }
+
+    this.loading = true;
+    // Generate either RFC and then validate based on the dataStatus.
+    // if (this.dataStatus.dataIsRequired) {
+    //   this.validateRFCWithData();
+    // } else {
+    //   this.validateRFC();
+    // }
+  }
 }
