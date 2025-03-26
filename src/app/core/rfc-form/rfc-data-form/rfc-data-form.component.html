@@ -61,22 +61,40 @@
     }
 
     @if (tipoSujeto === "PM") {
-        <label class="flex flex-col w-full">
-            <span>Razón Social: </span>                                                                                                                                                                              
-            <input type="text" formControlName="razonSocial" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
-            <!-- Validation errors -->
-            @if (rfcForm.get(['data', 'razonSocial'])?.hasError('razonSocial')) {                            
-                <p-message severity="error" variant="simple" size="small" >
-                    {{ rfcForm.get(['data', 'razonSocial'])?.getError('razonSocial')}}
-                </p-message>                                                                                    
-            }
+        <ng-container formGroupName="pmDataForm">
+
+            <label class="flex flex-col w-full">
+                <span>Razón Social: </span>                                                                                                                                                                              
+                <input type="text" formControlName="razonSocial" pInputText />
+                <!-- Validation errors -->
+                @if (rfcForm.get(['data', 'razonSocial'])?.hasError('razonSocial')) {                            
+                    <p-message severity="error" variant="simple" size="small" >
+                        {{ rfcForm.get(['data', 'razonSocial'])?.getError('razonSocial')}}
+                    </p-message>                                                                                    
+                }
+        
+                @if (rfcForm.get(['data', 'razonSocial'])?.hasError("required") && (rfcForm.get(['data', 'razonSocial'])?.dirty || rfcForm.get(['data', 'razonSocial'])?.touched)) {
+                    <p-message severity="error" variant="simple" size="small" >
+                        El campo es requerido.
+                    </p-message>
+                } 
+            </label> 
+
+            <div class="flex gap-1">     
+                <label class="flex flex-col items-start justify-center w-full">
+                    <span>Fecha de constitución: </span>
+                    <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaConstitucion" [styleClass]="'w-full'" [inputStyleClass]="'w-full'" />
+            
+                    @if (rfcForm.get('fechaConstitucion')?.hasError('required') && (rfcForm.get('fechaConstitucion')?.touched || rfcForm.get('fechaConstitucion')?.dirty)) {
+                        <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                    }
+                </label>
+                <div class="w-full">
     
-            @if (rfcForm.get(['data', 'razonSocial'])?.hasError("required") && (rfcForm.get(['data', 'razonSocial'])?.dirty || rfcForm.get(['data', 'razonSocial'])?.touched)) {
-                <p-message severity="error" variant="simple" size="small" >
-                    El campo es requerido.
-                </p-message>
-            } 
-        </label>   
+                </div>
+            </div>
+
+        </ng-container>
 
     }
 

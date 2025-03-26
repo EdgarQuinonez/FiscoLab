@@ -88,17 +88,25 @@ export class RfcDataFormComponent {
       });
 
     this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
-      this.rfcForm.get(['data', 'nombre'])?.reset();
-      this.rfcForm.get(['data', 'apellido'])?.reset();
-      this.rfcForm.get(['data', 'razonSocial'])?.reset();
+      const pmForm = this.rfcForm.get('pmDataForm') as FormGroup;
+      const pfForm = this.rfcForm.get('pfDataForm') as FormGroup;
+
       if (value === 'PM') {
-        this.rfcForm.get(['data', 'apellido'])?.disable();
-        this.rfcForm.get(['data', 'nombre'])?.disable();
-        this.rfcForm.get(['data', 'razonSocial'])?.enable();
-      } else if (value === 'PF') {
-        this.rfcForm.get(['data', 'nombre'])?.enable();
-        this.rfcForm.get(['data', 'apellido'])?.enable();
-        this.rfcForm.get(['data', 'razonSocial'])?.disable();
+        pfForm.reset();
+        Object.keys(pmForm.controls).forEach((name) => {
+          pmForm.get(name)?.enable();
+        });
+        Object.keys(pfForm.controls).forEach((name) => {
+          pfForm.get(name)?.disable();
+        });
+      } else if (value === 'PF' || value === null) {
+        pmForm.reset();
+        Object.keys(pmForm.controls).forEach((name) => {
+          pmForm.get(name)?.disable();
+        });
+        Object.keys(pfForm.controls).forEach((name) => {
+          pfForm.get(name)?.enable();
+        });
       }
       this.tipoSujeto = value as TipoSujetoCode | null;
     });
