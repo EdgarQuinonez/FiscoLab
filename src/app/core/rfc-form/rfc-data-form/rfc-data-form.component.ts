@@ -5,18 +5,32 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RFC, RFCWithData } from '@shared/services/rfc.service.interface';
+import {
+  GenerateRfcPf,
+  GenerateRfcPm,
+  RFC,
+  RFCWithData,
+} from '@shared/services/rfc.service.interface';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
-import { debounceTime, map, Observable, startWith } from 'rxjs';
+import {
+  debounceTime,
+  map,
+  Observable,
+  of,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
 import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
 import { RfcService } from '@shared/services/rfc.service';
 import { RfcFormValue } from './rfc-data.interface';
 import { format } from 'date-fns';
+import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -99,7 +113,7 @@ export class RfcDataFormComponent {
       const pfForm = this.rfcForm.get('pfDataForm') as FormGroup;
 
       if (value === 'PM') {
-        pmForm.reset();
+        pfForm.reset();
         Object.keys(pmForm.controls).forEach((name) => {
           pmForm.get(name)?.enable();
         });
@@ -107,7 +121,7 @@ export class RfcDataFormComponent {
           pfForm.get(name)?.disable();
         });
       } else if (value === 'PF' || value === null) {
-        pfForm.reset();
+        pmForm.reset();
         Object.keys(pmForm.controls).forEach((name) => {
           pmForm.get(name)?.disable();
         });
@@ -122,33 +136,65 @@ export class RfcDataFormComponent {
   onSubmit() {
     this.responseError = null;
     if (this.rfcForm.invalid) {
-      console.log(
-        this.rfcForm
-          .get(['pfDataForm', 'fechaNacimiento'])
-          ?.hasError('required')
-      );
       markAllAsDirty(this.rfcForm);
       return;
     }
 
     this.loading = true;
     const rfcFormValue = this.rfcForm.value as RfcFormValue;
-    console.log(rfcFormValue);
-    // const tipoSujeto = rfcFormValue.tipoSujeto as TipoSujetoCode;
+    // console.log(rfcFormValue);
+    const tipoSujeto = rfcFormValue.tipoSujeto as TipoSujetoCode;
+    let rfc$: Observable<LoadingState<GenerateRfcPf | GenerateRfcPm>> | null =
+      null;
 
-    // if (tipoSujeto === 'PF') {
-    //   const personalData = rfcFormValue.pfDataForm;
-    //   this.rfcService.generateRfcPF$({
-    //     ...personalData,
-    //     fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
-    //   });
-    // }
+    if (tipoSujeto === 'PF') {
+      const personalData = rfcFormValue.pfDataForm;
+      rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+        switchMapWithLoading(() =>
+          this.rfcService.generateRfcPF$({
+            ...personalData,
+            fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
+          })
+        )
+      );
+    } else if (tipoSujeto === 'PM') {
+      const companyData = rfcFormValue.pmDataForm;
+      rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+        switchMapWithLoading(() =>
+          this.rfcService.generateRfcPM$({
+            ...companyData,
+            fechaConstitucion: format(
+              companyData.fechaConstitucion,
+              'yyyy-MM-dd'
+            ),
+          })
+        )
+      );
+    }
 
-    // Generate either RFC and then validate based on the dataStatus.
-    // if (this.dataStatus.dataIsRequired) {
-    //   this.validateRFCWithData();
-    // } else {
-    //   this.validateRFC();
-    // }
+    if (this.dataStatus.dataIsRequired) {
+      if (rfc$) {
+        rfc$
+          .pipe(
+            switchMapWithLoading(
+              (value: LoadingState<GenerateRfcPf | GenerateRfcPm>) => {
+                console.log(value);
+                return this.rfcService.validateRFCWithData$({
+                  rfc: '',
+                  cp: rfcFormValue.data.cp,
+                  nombre:
+                    tipoSujeto === 'PF'
+                      ? `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`
+                      : rfcFormValue.pmDataForm.razonSocial,
+                });
+              }
+            )
+          )
+          .subscribe((value) => {
+            this.loading = value.loading;
+          });
+      }
+    } else {
+    }
   }
 }

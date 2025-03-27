@@ -112,14 +112,14 @@ export class RfcFormComponent {
       });
 
     this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
-      this.rfcForm.get(['data', 'nombre'])?.reset();
-      this.rfcForm.get(['data', 'apellido'])?.reset();
-      this.rfcForm.get(['data', 'razonSocial'])?.reset();
       if (value === 'PM') {
+        this.rfcForm.get(['data', 'nombre'])?.reset();
+        this.rfcForm.get(['data', 'apellido'])?.reset();
         this.rfcForm.get(['data', 'apellido'])?.disable();
         this.rfcForm.get(['data', 'nombre'])?.disable();
         this.rfcForm.get(['data', 'razonSocial'])?.enable();
       } else if (value === 'PF' || value === null) {
+        this.rfcForm.get(['data', 'razonSocial'])?.reset();
         this.rfcForm.get(['data', 'nombre'])?.enable();
         this.rfcForm.get(['data', 'apellido'])?.enable();
         this.rfcForm.get(['data', 'razonSocial'])?.disable();
