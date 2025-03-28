@@ -7,7 +7,9 @@ import {
 } from '@angular/forms';
 import {
   GenerateRfcPf,
+  GenerateRfcPfSuccessResponse,
   GenerateRfcPm,
+  GenerateRfcPmSuccessReponse,
   RFC,
   RFCWithData,
 } from '@shared/services/rfc.service.interface';
@@ -28,7 +30,7 @@ import {
 import { TipoSujetoControlComponent } from '../tipo-sujeto-control/tipo-sujeto-control.component';
 import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
 import { RfcService } from '@shared/services/rfc.service';
-import { RfcFormValue } from './rfc-data.interface';
+import { RfcFormValue } from './rfc-data-form.interface';
 import { format } from 'date-fns';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 
@@ -147,54 +149,61 @@ export class RfcDataFormComponent {
     let rfc$: Observable<LoadingState<GenerateRfcPf | GenerateRfcPm>> | null =
       null;
 
-    if (tipoSujeto === 'PF') {
-      const personalData = rfcFormValue.pfDataForm;
-      rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
-        switchMapWithLoading(() =>
-          this.rfcService.generateRfcPF$({
-            ...personalData,
-            fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
-          })
-        )
-      );
-    } else if (tipoSujeto === 'PM') {
-      const companyData = rfcFormValue.pmDataForm;
-      rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
-        switchMapWithLoading(() =>
-          this.rfcService.generateRfcPM$({
-            ...companyData,
-            fechaConstitucion: format(
-              companyData.fechaConstitucion,
-              'yyyy-MM-dd'
-            ),
-          })
-        )
-      );
-    }
+    // if (tipoSujeto === 'PF') {
+    //   const personalData = rfcFormValue.pfDataForm;
+    //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+    //     switchMapWithLoading(() =>
+    //       this.rfcService.generateRfcPF$({
+    //         ...personalData,
+    //         fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
+    //       })
+    //     ),
+    //     tap((value) => {
+    //       if (value.error) {
+    //         console.log(value.error);
+    //       }
+    //     })
+    //   );
+    // } else if (tipoSujeto === 'PM') {
+    //   const companyData = rfcFormValue.pmDataForm;
+    //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+    //     switchMapWithLoading(() =>
+    //       this.rfcService.generateRfcPM$({
+    //         ...companyData,
+    //         fechaConstitucion: format(
+    //           companyData.fechaConstitucion,
+    //           'yyyy-MM-dd'
+    //         ),
+    //       })
+    //     )
+    //   );
+    // }
 
-    if (this.dataStatus.dataIsRequired) {
-      if (rfc$) {
-        rfc$
-          .pipe(
-            switchMapWithLoading(
-              (value: LoadingState<GenerateRfcPf | GenerateRfcPm>) => {
-                console.log(value);
-                return this.rfcService.validateRFCWithData$({
-                  rfc: '',
-                  cp: rfcFormValue.data.cp,
-                  nombre:
-                    tipoSujeto === 'PF'
-                      ? `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`
-                      : rfcFormValue.pmDataForm.razonSocial,
-                });
-              }
-            )
-          )
-          .subscribe((value) => {
-            this.loading = value.loading;
-          });
-      }
-    } else {
-    }
+    // if (this.dataStatus.dataIsRequired) {
+    //   if (rfc$) {
+    //     rfc$
+    //       .pipe(
+    //         switchMapWithLoading(
+    //           (value: LoadingState<GenerateRfcPfSuccessResponse | GenerateRfcPmSuccessReponse>) => {
+    //             // TODO: analyze if I know for sure only success responses reach here and data is defined
+    //             const response = value.data?.response;
+
+    //             return this.rfcService.validateRFCWithData$({
+    //               rfc: response.rfc,
+    //               cp: rfcFormValue.data.cp,
+    //               nombre:
+    //                 rfcFormValue.tipoSujeto === 'PM'
+    //                   ? rfcFormValue.pmDataForm.razonSocial
+    //                   : `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
+    //             });
+    //           }
+    //         )
+    //       )
+    //       .subscribe((value) => {
+    //         this.loading = value.loading;
+    //       });
+    //   }
+    // } else {
+    // }
   }
 }

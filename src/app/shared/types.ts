@@ -25,3 +25,8 @@ export interface ServiceUnavailableResponse {
 }
 
 export type TipoSujetoCode = 'PM' | 'PF';
+
+export type KibanBadRequestCodeResponse =
+  | 'FORMAT_ERROR'
+  | 'EMPTY_ERROR'
+  | 'REQUIRED_FIELD_ERROR';

@@ -39,47 +39,47 @@ export class RfcFisicaComponent {
     private rfcFisicaService: RfcFisicaService,
     private storageService: StorageService
   ) {}
-  ngOnInit() {
-    this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
-      switchMapWithLoading<RFC>(() => {
-        const dataJson = this.storageService.getItem('personalData');
-        if (!dataJson) {
-          throw new Error('Missing personalData key in local storage.');
-        }
-        const curpData = JSON.parse(dataJson) as CurpFoundResponseData;
-        const personalData = {
-          nombres: curpData.nombres,
-          apellidoPaterno: curpData.primerApellido,
-          apellidoMaterno: curpData.segundoApellido,
-          fechaNacimiento: curpData.fechaNacimiento,
-        };
+  // ngOnInit() {
+  //   this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
+  //     switchMapWithLoading<RFC>(() => {
+  //       const dataJson = this.storageService.getItem('personalData');
+  //       if (!dataJson) {
+  //         throw new Error('Missing personalData key in local storage.');
+  //       }
+  //       const curpData = JSON.parse(dataJson) as CurpFoundResponseData;
+  //       const personalData = {
+  //         nombres: curpData.nombres,
+  //         apellidoPaterno: curpData.primerApellido,
+  //         apellidoMaterno: curpData.segundoApellido,
+  //         fechaNacimiento: curpData.fechaNacimiento,
+  //       };
 
-        return this.rfcFisicaService.generateAndValidateRFC$(personalData);
-      }),
-      tap((value) => {
-        if (value.data) {
-          const response = (value.data as ValidateRFCSuccessResponse).response
-            .rfcs[0];
-          const personalDataStr = this.storageService.getItem('personalData');
+  //       return this.rfcFisicaService.generateAndValidateRFC$(personalData);
+  //     }),
+  //     tap((value) => {
+  //       if (value.data) {
+  //         const response = (value.data as ValidateRFCSuccessResponse).response
+  //           .rfcs[0];
+  //         const personalDataStr = this.storageService.getItem('personalData');
 
-          if (
-            typeof personalDataStr === 'string' &&
-            personalDataStr.length > 0
-          ) {
-            const personalData: CurpFoundResponseData =
-              JSON.parse(personalDataStr);
-            this.nombres = personalData.nombres;
-          }
+  //         if (
+  //           typeof personalDataStr === 'string' &&
+  //           personalDataStr.length > 0
+  //         ) {
+  //           const personalData: CurpFoundResponseData =
+  //             JSON.parse(personalDataStr);
+  //           this.nombres = personalData.nombres;
+  //         }
 
-          if (
-            response.result === 'RFC válido, y susceptible de recibir facturas'
-          ) {
-            this.storageService.setItem('rfc', response.rfc);
-          }
-        }
-      })
-    );
-  }
+  //         if (
+  //           response.result === 'RFC válido, y susceptible de recibir facturas'
+  //         ) {
+  //           this.storageService.setItem('rfc', response.rfc);
+  //         }
+  //       }
+  //     })
+  //   );
+  // }
 
   getPersonalDataOnClick() {
     this.personalData$ = new Observable((subscriber) => subscriber.next()).pipe(

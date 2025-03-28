@@ -41,13 +41,13 @@ export class RfcFisicaService {
   //   return this.http.post<GenerateResponse>(endpoint, requestBody);
   // }
 
-  generateAndValidateRFC$(personalData: GenerateRfcPfRequest) {
-    return this.rfcService
-      .generateRfcPF$(personalData)
-      .pipe(
-        switchMap((value) => this.rfcService.validateRFC$(value.response.rfc))
-      );
-  }
+  // generateAndValidateRFC$(personalData: GenerateRfcPfRequest) {
+  //   return this.rfcService
+  //     .generateRfcPF$(personalData)
+  //     .pipe(
+  //       switchMap((value) => this.rfcService.validateRFC$(value.response.rfc))
+  //     );
+  // }
 
   // personalDataFromRFC$() {
   //   const params = {

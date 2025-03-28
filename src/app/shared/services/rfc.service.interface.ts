@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   SuccessKibanResponse,
   ServiceUnavailableResponse,
+  KibanBadRequestCodeResponse,
 } from '@shared/types';
 
 export interface ValidateRFCRequestBody {
@@ -108,7 +109,25 @@ export interface GenerateRfcPfSuccessResponse extends SuccessKibanResponse {
   };
 }
 
-export type GenerateRfcPf = GenerateRfcPfSuccessResponse;
+export interface GenerateRfcPfBadRequestResponse extends HttpErrorResponse {
+  error: [
+    {
+      code: KibanBadRequestCodeResponse;
+      field: string;
+      message: string;
+    }
+  ];
+}
+
+export interface GenerateRfcPfServiceUnavailableResponse
+  extends ServiceUnavailableResponse {
+  request: GenerateRfcPf;
+}
+
+export type GenerateRfcPf =
+  | GenerateRfcPfSuccessResponse
+  | GenerateRfcPfBadRequestResponse
+  | GenerateRfcPfServiceUnavailableResponse;
 
 export interface ObtainPersonalDataPfRFCRequest {
   rfc: string;
@@ -141,4 +160,22 @@ export interface GenerateRfcPmSuccessReponse extends SuccessKibanResponse {
   };
 }
 
-export type GenerateRfcPm = GenerateRfcPmSuccessReponse;
+export interface GenerateRfcPmBadRequestResponse extends HttpErrorResponse {
+  error: [
+    {
+      code: KibanBadRequestCodeResponse;
+      field: string;
+      message: string;
+    }
+  ];
+}
+
+export interface GenerateRfcPmServiceUnavailableResponse
+  extends ServiceUnavailableResponse {
+  request: GenerateRfcPmRequest;
+}
+
+export type GenerateRfcPm =
+  | GenerateRfcPmSuccessReponse
+  | GenerateRfcPmBadRequestResponse
+  | GenerateRfcPmServiceUnavailableResponse;
