@@ -32,11 +32,16 @@ export class RfcFormService {
       tap((value) => {
         if (value.data) {
           const response = (value.data as ValidateRFCSuccessResponse).response;
-          this.storageService.setItem('tipoSujeto', rfcFormValue.tipoSujeto);
-          this.storageService.setItem('rfc', response.rfcs[0].rfc);
-          this.storageService.setItem('rfcResult', response.rfcs[0].result);
+          if (
+            response.rfcs[0].result ===
+            'RFC válido, y susceptible de recibir facturas'
+          ) {
+            this.storageService.setItem('tipoSujeto', rfcFormValue.tipoSujeto);
+            this.storageService.setItem('rfc', response.rfcs[0].rfc);
+            this.storageService.setItem('rfcResult', response.rfcs[0].result);
 
-          this.router.navigateByUrl('/dashboard');
+            this.router.navigateByUrl('/dashboard');
+          }
         }
       })
     );
@@ -66,6 +71,8 @@ export class RfcFormService {
               );
               this.storageService.setItem('rfc', response.rfcs[0].rfc);
               this.storageService.setItem('rfcResult', result);
+              this.storageService.setItem('cp', response.rfcs[0].cp);
+              this.storageService.setItem('nombre', response.rfcs[0].nombre);
 
               this.router.navigateByUrl('/dashboard');
             }

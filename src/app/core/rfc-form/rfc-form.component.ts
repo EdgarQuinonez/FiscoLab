@@ -150,7 +150,19 @@ export class RfcFormComponent {
 
     this.rfcFormResponse$.subscribe((value) => {
       this.loading = value.loading;
+
+      if (value.data) {
+        if (value.data.status === 'SUCCESS') {
+          const rfcResult = value.data.response.rfcs[0].result;
+          // RFC not valid.
+          if (rfcResult != 'RFC válido, y susceptible de recibir facturas') {
+            this.responseError = rfcResult + '.';
+          }
+        }
+      }
+
       if (value.error) {
+        // TODO: Check if service unavailable needs to be handled here as well.
         const error = (value.error as ValidateRFCBadRequestResponse).error;
         this.rfcForm.get('rfc')?.setErrors({
           rfc:

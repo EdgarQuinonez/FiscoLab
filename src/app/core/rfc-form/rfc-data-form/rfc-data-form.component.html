@@ -23,7 +23,7 @@
         
                     @if (rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.hasError('apellidoPaterno')) {
                         <p-message severity="error" variant="simple" size="small">
-                            {{ rfcForm.get('apellidoPaterno')?.getError('apellidoPaterno')}}
+                            {{ rfcForm.get(['pfDataForm', 'apellidoPaterno'])?.getError('apellidoPaterno')}}
                         </p-message>    
                     }
                 </label>
@@ -34,7 +34,7 @@
         
                     @if (rfcForm.get(['pfDataForm', 'apellidoMaterno'])?.hasError('apellidoMaterno')) {
                         <p-message severity="error" variant="simple" size="small">
-                            {{ rfcForm.get('apellidoMaterno')?.getError('apellidoMaterno')}}
+                            {{ rfcForm.get(['pfDataForm', 'apellidoMaterno'])?.getError('apellidoMaterno')}}
                         </p-message>    
                     }
                 </label>        
@@ -51,7 +51,7 @@
             
                     @if (rfcForm.get(['pfDataForm', 'nombres'])?.hasError('nombres')) {
                         <p-message severity="error" variant="simple" size="small">
-                            {{ rfcForm.get('nombres')?.getError('nombres')}}
+                            {{ rfcForm.get(['pfDataForm', 'nombres'])?.getError('nombres')}}
                         </p-message>    
                     }
                 </label>        

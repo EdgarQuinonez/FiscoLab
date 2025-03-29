@@ -7,11 +7,16 @@ import {
 } from '@angular/forms';
 import {
   GenerateRfcPf,
+  GenerateRfcPfBadRequestResponse,
+  GenerateRfcPfServiceUnavailableResponse,
   GenerateRfcPfSuccessResponse,
   GenerateRfcPm,
   GenerateRfcPmSuccessReponse,
   RFC,
   RFCWithData,
+  ValidateRFCSuccessResponse,
+  ValidateRFCWithDataBadRequestResponse,
+  ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +24,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import {
+  catchError,
   debounceTime,
   map,
   Observable,
@@ -33,6 +39,8 @@ import { RfcService } from '@shared/services/rfc.service';
 import { RfcFormValue } from './rfc-data-form.interface';
 import { format } from 'date-fns';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
+import { Router } from '@angular/router';
+import { StorageService } from '@shared/services/storage.service';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -72,7 +80,11 @@ export class RfcDataFormComponent {
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
 
-  constructor(private rfcService: RfcService) {}
+  constructor(
+    private rfcService: RfcService,
+    private router: Router,
+    private storageService: StorageService
+  ) {}
 
   ngOnInit() {
     this.rfcForm.reset();
@@ -135,75 +147,361 @@ export class RfcDataFormComponent {
     });
   }
 
+  // onSubmit() {
+  //   this.responseError = null;
+  //   if (this.rfcForm.invalid) {
+  //     markAllAsDirty(this.rfcForm);
+  //     return;
+  //   }
+
+  //   this.loading = true;
+  //   const rfcFormValue = this.rfcForm.value as RfcFormValue;
+  //   // console.log(rfcFormValue);
+  //   const tipoSujeto = rfcFormValue.tipoSujeto as TipoSujetoCode;
+  //   let rfc$: Observable<LoadingState<GenerateRfcPf | GenerateRfcPm>> | null =
+  //     null;
+
+  //   // if (tipoSujeto === 'PF') {
+  //   //   const personalData = rfcFormValue.pfDataForm;
+  //   //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+  //   //     switchMapWithLoading(() =>
+  //   //       this.rfcService.generateRfcPF$({
+  //   //         ...personalData,
+  //   //         fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
+  //   //       })
+  //   //     ),
+  //   //     tap((value) => {
+  //   //       if (value.error) {
+  //   //         console.log(value.error);
+  //   //       }
+  //   //     })
+  //   //   );
+  //   // } else if (tipoSujeto === 'PM') {
+  //   //   const companyData = rfcFormValue.pmDataForm;
+  //   //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
+  //   //     switchMapWithLoading(() =>
+  //   //       this.rfcService.generateRfcPM$({
+  //   //         ...companyData,
+  //   //         fechaConstitucion: format(
+  //   //           companyData.fechaConstitucion,
+  //   //           'yyyy-MM-dd'
+  //   //         ),
+  //   //       })
+  //   //     )
+  //   //   );
+  //   // }
+
+  //   // if (this.dataStatus.dataIsRequired) {
+  //   //   if (rfc$) {
+  //   //     rfc$
+  //   //       .pipe(
+  //   //         switchMapWithLoading(
+  //   //           (value: LoadingState<GenerateRfcPfSuccessResponse | GenerateRfcPmSuccessReponse>) => {
+  //   //             // TODO: analyze if I know for sure only success responses reach here and data is defined
+  //   //             const response = value.data?.response;
+
+  //   //             return this.rfcService.validateRFCWithData$({
+  //   //               rfc: response.rfc,
+  //   //               cp: rfcFormValue.data.cp,
+  //   //               nombre:
+  //   //                 rfcFormValue.tipoSujeto === 'PM'
+  //   //                   ? rfcFormValue.pmDataForm.razonSocial
+  //   //                   : `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
+  //   //             });
+  //   //           }
+  //   //         )
+  //   //       )
+  //   //       .subscribe((value) => {
+  //   //         this.loading = value.loading;
+  //   //       });
+  //   //   }
+  //   // } else {
+  //   // }
+  // }
+
   onSubmit() {
+    // console.log('submitting');
     this.responseError = null;
     if (this.rfcForm.invalid) {
+      // console.log('INVALID');
       markAllAsDirty(this.rfcForm);
       return;
     }
 
     this.loading = true;
     const rfcFormValue = this.rfcForm.value as RfcFormValue;
-    // console.log(rfcFormValue);
-    const tipoSujeto = rfcFormValue.tipoSujeto as TipoSujetoCode;
-    let rfc$: Observable<LoadingState<GenerateRfcPf | GenerateRfcPm>> | null =
-      null;
 
-    // if (tipoSujeto === 'PF') {
-    //   const personalData = rfcFormValue.pfDataForm;
-    //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
-    //     switchMapWithLoading(() =>
-    //       this.rfcService.generateRfcPF$({
-    //         ...personalData,
-    //         fechaNacimiento: format(personalData.fechaNacimiento, 'yyyy-MM-dd'),
-    //       })
-    //     ),
-    //     tap((value) => {
-    //       if (value.error) {
-    //         console.log(value.error);
-    //       }
-    //     })
-    //   );
-    // } else if (tipoSujeto === 'PM') {
-    //   const companyData = rfcFormValue.pmDataForm;
-    //   rfc$ = new Observable((subscriber) => subscriber.next()).pipe(
-    //     switchMapWithLoading(() =>
-    //       this.rfcService.generateRfcPM$({
-    //         ...companyData,
-    //         fechaConstitucion: format(
-    //           companyData.fechaConstitucion,
-    //           'yyyy-MM-dd'
-    //         ),
-    //       })
-    //     )
-    //   );
-    // }
+    if (rfcFormValue.tipoSujeto === 'PF') {
+      this.rfcService
+        .generateRfcPF$({
+          nombres: rfcFormValue.pfDataForm.nombres,
+          apellidoPaterno: rfcFormValue.pfDataForm.apellidoPaterno,
+          apellidoMaterno: rfcFormValue.pfDataForm.apellidoMaterno,
+          fechaNacimiento: format(
+            rfcFormValue.pfDataForm.fechaNacimiento,
+            'yyyy-MM-dd'
+          ),
+        })
+        .pipe(
+          switchMapWithLoading<RFC | RFCWithData>(
+            (value: GenerateRfcPfSuccessResponse) => {
+              if (this.dataStatus.dataIsRequired) {
+                // VALIDATE WITH DATA
 
-    // if (this.dataStatus.dataIsRequired) {
-    //   if (rfc$) {
-    //     rfc$
-    //       .pipe(
-    //         switchMapWithLoading(
-    //           (value: LoadingState<GenerateRfcPfSuccessResponse | GenerateRfcPmSuccessReponse>) => {
-    //             // TODO: analyze if I know for sure only success responses reach here and data is defined
-    //             const response = value.data?.response;
+                return this.rfcService.validateRFCWithData$({
+                  rfc: value.response.rfc,
+                  cp: rfcFormValue.data.cp,
+                  nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
+                });
+              } else {
+                return this.rfcService.validateRFC$(value.response.rfc);
+              }
+            }
+          ),
+          tap((value) => {
+            this.loading = value.loading;
+            if (this.dataStatus.dataIsRequired) {
+              // HANDLE WITH DATA RESPONSE
+              if (value.data) {
+                const data = value.data as RFCWithData;
+                if (data.status === 'SUCCESS') {
+                  const rfcResult = data.response.rfcs[0].result;
+                  // RFC not valid.
+                  if (
+                    rfcResult != 'RFC válido, y susceptible de recibir facturas'
+                  ) {
+                    this.responseError = rfcResult + '.';
+                  } else {
+                    const response = data.response.rfcs[0];
+                    this.storageService.setItem('rfc', response.rfc);
+                    this.storageService.setItem('rfcResult', response.result);
+                    this.storageService.setItem(
+                      'tipoSujeto',
+                      rfcFormValue.tipoSujeto
+                    );
+                    this.storageService.setItem('cp', response.cp);
+                    this.storageService.setItem('nombre', response.nombre);
 
-    //             return this.rfcService.validateRFCWithData$({
-    //               rfc: response.rfc,
-    //               cp: rfcFormValue.data.cp,
-    //               nombre:
-    //                 rfcFormValue.tipoSujeto === 'PM'
-    //                   ? rfcFormValue.pmDataForm.razonSocial
-    //                   : `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
-    //             });
-    //           }
-    //         )
-    //       )
-    //       .subscribe((value) => {
-    //         this.loading = value.loading;
-    //       });
-    //   }
-    // } else {
-    // }
+                    this.router.navigateByUrl('/dashboard');
+                  }
+                }
+              }
+
+              if (value.error) {
+                const error = value.error as
+                  | ValidateRFCWithDataBadRequestResponse
+                  | ValidateRFCWithDataServiceUnavailableResponse;
+
+                if (error.status === 'SERVICE_ERROR') {
+                  this.responseError =
+                    'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+                  return;
+                }
+
+                // BAD REQUEST
+                error.error.forEach((err) => {
+                  const field = err.field.slice(0, -3); // strip down index from field
+                  const code = err.code;
+
+                  // if (field === 'rfc') {
+                  //   if (code === 'FORMAT_ERROR') {
+                  //     this.rfcForm.get('rfc')?.setErrors({
+                  //       rfc: 'Ingresa un RFC válido con homoclave.',
+                  //     });
+                  //   }
+                  // }
+
+                  if (field === 'cp') {
+                    if (code === 'FORMAT_ERROR') {
+                      this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                        cp: 'Ingresa un código postal válido.',
+                      });
+                    }
+                  }
+                });
+              }
+            } else {
+              if (value.data) {
+                const response = (value.data as ValidateRFCSuccessResponse)
+                  .response;
+                if (
+                  response.rfcs[0].result ===
+                  'RFC válido, y susceptible de recibir facturas'
+                ) {
+                  this.storageService.setItem(
+                    'tipoSujeto',
+                    rfcFormValue.tipoSujeto
+                  );
+                  this.storageService.setItem('rfc', response.rfcs[0].rfc);
+                  this.storageService.setItem(
+                    'rfcResult',
+                    response.rfcs[0].result
+                  );
+
+                  this.router.navigateByUrl('/dashboard');
+                }
+              }
+            }
+          }),
+          catchError(
+            (
+              err:
+                | GenerateRfcPfBadRequestResponse
+                | GenerateRfcPfServiceUnavailableResponse
+            ) => {
+              if (err.status === 'SERVICE_ERROR') {
+                this.responseError =
+                  'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+              }
+
+              if (err.status === 400) {
+                // HANDLE BAD REQUEST
+
+                err.error.forEach((err) => {
+                  const control = this.rfcForm.get(['pfDataForm', err.field]);
+                  if (err.code === 'FORMAT_ERROR') {
+                    control?.setErrors({
+                      [err.field]: 'No uses caracteres especiales.',
+                    });
+                  }
+                });
+
+                this.loading = false;
+              }
+
+              return of(err);
+            }
+          )
+        )
+        .subscribe();
+    }
+
+    if (rfcFormValue.tipoSujeto === 'PM') {
+      this.rfcService
+        .generateRfcPM$({
+          razonSocial: rfcFormValue.pmDataForm.razonSocial,
+          fechaConstitucion: format(
+            rfcFormValue.pmDataForm.fechaConstitucion,
+            'yyyy-MM-dd'
+          ),
+        })
+        .pipe(
+          switchMapWithLoading<RFC | RFCWithData>(
+            (value: GenerateRfcPmSuccessReponse) => {
+              if (this.dataStatus.dataIsRequired) {
+                // VALIDATE WITH DATA
+
+                return this.rfcService.validateRFCWithData$({
+                  rfc: value.response.rfc,
+                  cp: rfcFormValue.data.cp,
+                  nombre: rfcFormValue.pmDataForm.razonSocial,
+                });
+              } else {
+                return this.rfcService.validateRFC$(value.response.rfc);
+              }
+            }
+          ),
+          tap((value) => {
+            this.loading = value.loading;
+            if (this.dataStatus.dataIsRequired) {
+              // HANDLE WITH DATA RESPONSE
+              if (value.data) {
+                const data = value.data as RFCWithData;
+                if (data.status === 'SUCCESS') {
+                  const rfcResult = data.response.rfcs[0].result;
+                  // RFC not valid.
+                  if (
+                    rfcResult != 'RFC válido, y susceptible de recibir facturas'
+                  ) {
+                    this.responseError = rfcResult + '.';
+                  } else {
+                    const response = data.response.rfcs[0];
+                    this.storageService.setItem('rfc', response.rfc);
+                    this.storageService.setItem('rfcResult', response.result);
+                    this.storageService.setItem(
+                      'tipoSujeto',
+                      rfcFormValue.tipoSujeto
+                    );
+                    this.storageService.setItem('cp', response.cp);
+                    this.storageService.setItem('nombre', response.nombre);
+
+                    this.router.navigateByUrl('/dashboard');
+                  }
+                }
+              }
+
+              if (value.error) {
+                const error = value.error as
+                  | ValidateRFCWithDataBadRequestResponse
+                  | ValidateRFCWithDataServiceUnavailableResponse;
+
+                if (error.status === 'SERVICE_ERROR') {
+                  this.responseError =
+                    'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+                  return;
+                }
+
+                // BAD REQUEST
+                error.error.forEach((err) => {
+                  const field = err.field.slice(0, -3); // strip down index from field
+                  const code = err.code;
+
+                  // if (field === 'rfc') {
+                  //   if (code === 'FORMAT_ERROR') {
+                  //     this.rfcForm.get('rfc')?.setErrors({
+                  //       rfc: 'Ingresa un RFC válido con homoclave.',
+                  //     });
+                  //   }
+                  // }
+
+                  if (field === 'cp') {
+                    if (code === 'FORMAT_ERROR') {
+                      this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                        cp: 'Ingresa un código postal válido.',
+                      });
+                    }
+                  }
+                });
+              }
+            } else {
+              if (value.data) {
+                const response = (value.data as ValidateRFCSuccessResponse)
+                  .response;
+                if (
+                  response.rfcs[0].result ===
+                  'RFC válido, y susceptible de recibir facturas'
+                ) {
+                  this.storageService.setItem(
+                    'tipoSujeto',
+                    rfcFormValue.tipoSujeto
+                  );
+                  this.storageService.setItem('rfc', response.rfcs[0].rfc);
+                  this.storageService.setItem(
+                    'rfcResult',
+                    response.rfcs[0].result
+                  );
+
+                  this.router.navigateByUrl('/dashboard');
+                }
+              }
+            }
+          }),
+          catchError(
+            (
+              err:
+                | GenerateRfcPfBadRequestResponse
+                | GenerateRfcPfServiceUnavailableResponse
+            ) => {
+              if (err.status === 'SERVICE_ERROR') {
+                this.responseError =
+                  'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+              }
+
+              return of(err);
+            }
+          )
+        )
+        .subscribe();
+    }
   }
 }

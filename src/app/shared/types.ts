@@ -30,3 +30,12 @@ export type KibanBadRequestCodeResponse =
   | 'FORMAT_ERROR'
   | 'EMPTY_ERROR'
   | 'REQUIRED_FIELD_ERROR';
+
+// LOCAL STORAGE KEYS
+// rfc
+// rfcResult: retrieved from rfc validation.
+// tipoSujeto: user input when 'PF' | 'PM'
+// curp
+// personalData: retrieved from curp validation
+// cp: Código Postal validado
+// nombre: Nombre o Razón Social retrieved from validate rfc with data response.
