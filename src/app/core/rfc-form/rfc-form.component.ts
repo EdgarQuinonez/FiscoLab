@@ -131,6 +131,7 @@ export class RfcFormComponent {
   }
 
   onSubmit() {
+    this.rfcService.validateRFCWithDataCPLookup$('', '');
     this.responseError = null;
     if (this.rfcForm.invalid) {
       markAllAsDirty(this.rfcForm);
