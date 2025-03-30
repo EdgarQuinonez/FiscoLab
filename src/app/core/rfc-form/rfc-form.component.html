@@ -88,7 +88,12 @@
                                     <div class="flex gap-1 w-full">
                                         <label class="flex flex-col w-full">
                                             <span>Código Postal: </span>                                                                                                                                                                              
-                                            <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
+                                            <p-inputgroup>
+                                                <p-inputgroup-addon>
+                                                    <app-match-cp-button></app-match-cp-button>
+                                                </p-inputgroup-addon>
+                                                <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
+                                            </p-inputgroup>
                                             <!-- Validation errors -->
                                             @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
                                                 <p-message severity="error" variant="simple" size="small" >

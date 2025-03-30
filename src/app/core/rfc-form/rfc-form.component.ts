@@ -32,6 +32,7 @@ import {
   ValidateRFCWithDataServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
+import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
 
 @Component({
   selector: 'app-rfc-form',
@@ -47,6 +48,7 @@ import { RfcFormService } from './rfc-form.service';
     MessageModule,
     TipoSujetoControlComponent,
     RfcDataFormComponent,
+    MatchCpButtonComponent,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
