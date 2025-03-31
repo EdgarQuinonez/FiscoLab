@@ -13,7 +13,10 @@ import {
   RFCWithData,
   ValidateRFCWithDataRequest,
 } from './rfc.service.interface';
-import { XMLParser } from 'fast-xml-parser';
+// import cpCatalog from '../../../../public/cp.catalog.json';
+import cpCatalog from '@public/cp.catalog.json';
+import estadosCatalog from '@public/estados.catalog.json';
+import municipiosCatalog from '@public/municipio.catalog.json';
 
 @Injectable({
   providedIn: 'root',
@@ -77,25 +80,5 @@ export class RfcService {
     estado?: string,
     municipio?: string,
     colonia?: string
-  ) {
-    const parser = new XMLParser();
-
-    console.log('get');
-    this.http
-      .get('CPdescarga.xml', { responseType: 'text' })
-      .subscribe((value) => {
-        const parsedXML = parser.parse(value);
-        // write estado.catalog.json
-        const estados = new Set();
-        parsedXML.NewDataSet.table.forEach((asenta: any) => {
-          const estadoObj = {
-            c_estado: asenta.c_estado,
-            d_estado: asenta.d_estado,
-          };
-          estados.add(estadoObj);
-        });
-      });
-
-    // console.log(parser.parse(''));
-  }
+  ) {}
 }

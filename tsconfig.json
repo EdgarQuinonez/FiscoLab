@@ -20,6 +20,7 @@
     "module": "ES2022",
     "baseUrl": "./src",
     "paths": {
+      "@public/*": ["../public/*"],
       "@environments/*" : ["environments/*"],
       "@core/*" : ["app/core/*"],
       "@shared/*" : ["app/shared/*"],
