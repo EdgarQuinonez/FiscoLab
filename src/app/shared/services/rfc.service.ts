@@ -34,7 +34,7 @@ export class RfcService {
     });
   }
 
-  validateRFCWithData$(rfcObj: { rfc: string; cp: string; nombre: string }) {
+  validateRFCWithData$(rfcs: ValidateRFCWithDataRequest['rfcs']) {
     const params = {
       // SUCCESS - INVALID
       testCaseId: '663567bb713cf2110a1106d0',
@@ -42,7 +42,7 @@ export class RfcService {
     const endpoint = `${environment.apiUrl}/sat/rfc_validate_from_data?testCaseId=${params.testCaseId}`;
 
     return this.http.post<RFCWithData>(endpoint, {
-      rfcs: [rfcObj],
+      rfcs: rfcs,
     });
   }
 
@@ -77,8 +77,40 @@ export class RfcService {
   validateRFCWithDataCPLookup$(
     rfc: string,
     nombre: string,
-    estado?: string,
-    municipio?: string,
-    colonia?: string
-  ) {}
+    c_estado?: keyof typeof cpCatalog,
+    c_mnpio?: keyof (typeof cpCatalog)[keyof typeof cpCatalog]
+    // colonia?: string
+  ) {
+    const rfcs: ValidateRFCWithDataRequest['rfcs'] = [];
+    const rfcsLimit = 5000;
+    let cpArray: string[]; // holds cps to use in the request body
+
+    if (c_estado && c_mnpio) {
+      const queryResults = cpCatalog[c_estado][c_mnpio];
+      cpArray = queryResults;
+
+      if (cpArray.length > rfcsLimit) {
+        // TODO: Consider warning user about multiple queries that have to be made in order to complete their request.
+        throw new Error(
+          'Se ha excedido el número de RFCs que se pueden hacer en una sola consulta.'
+        );
+      }
+
+      for (let cp in queryResults) {
+        const rfcObj = {
+          rfc: rfc,
+          nombre: nombre,
+          cp: cp,
+        };
+
+        rfcs.push(rfcObj);
+      }
+    } else if (c_estado && !c_mnpio) {
+      // Iterate through all of the mnpios of the state and retrieve their cps into an cpArray
+    } else {
+      // Iterate through all states and mnpios to retrieve all of their cps
+    }
+
+    return this.validateRFCWithData$(rfcs);
+  }
 }

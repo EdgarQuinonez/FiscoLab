@@ -56,21 +56,19 @@ export type ValidateRFCWithDataResult =
   | 'El Código Postal no coincide con el registrado en el RFC';
 
 export interface ValidateRFCWithDataRequest {
-  rfcs: [{ rfc: string; cp: string; nombre: string }];
+  rfcs: { rfc: string; cp: string; nombre: string }[];
 }
 
 export interface ValidateRFCWithDataSuccessResponse
   extends SuccessKibanResponse {
   request: ValidateRFCWithDataRequest;
   response: {
-    rfcs: [
-      {
-        cp: string;
-        nombre: string;
-        result: ValidateRFCWithDataResult;
-        rfc: string;
-      }
-    ];
+    rfcs: {
+      cp: string;
+      nombre: string;
+      result: ValidateRFCWithDataResult;
+      rfc: string;
+    }[];
   };
 }
 
