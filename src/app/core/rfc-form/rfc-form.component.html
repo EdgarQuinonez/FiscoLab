@@ -90,7 +90,7 @@
                                             <span>Código Postal: </span>                                                                                                                                                                              
                                             <p-inputgroup>
                                                 <p-inputgroup-addon>
-                                                    <app-match-cp-button></app-match-cp-button>
+                                                    <app-query-cp-form />
                                                 </p-inputgroup-addon>
                                                 <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
                                             </p-inputgroup>
@@ -139,7 +139,3 @@
             <!-- </div> -->
         </p-tabpanels>
     </p-tabs>
-
-
-<app-query-cp-form [visible]="queryCpFormShown">
-</app-query-cp-form>

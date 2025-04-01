@@ -49,8 +49,7 @@ import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
     MessageModule,
     TipoSujetoControlComponent,
     RfcDataFormComponent,
-    MatchCpButtonComponent,
-    QueryCpFormComponent
+    QueryCpFormComponent,
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
@@ -80,7 +79,7 @@ export class RfcFormComponent {
   ) {}
 
   loading = false;
-  queryCpFormShown = true;
+  queryCpFormShown = false;
 
   ngOnInit() {
     const dataGroup = this.rfcForm.get('data') as FormGroup;
