@@ -1,0 +1,21 @@
+<p-button (click)="showDialog()" label="Consultar CP" />
+<p-dialog header="Consulta de Código Postal" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-8">Selecciona el estado y municipio.</span>
+    
+    <form [formGroup]="queryCPForm" (ngSubmit)="onSubmit()">
+        <div class="flex items-center gap-4 mb-4">
+            <label for="estado" class="font-semibold w-24">Estado</label>
+            <p-autocomplete id="estado" formControlName="estado" [suggestions]="estados" placeholder="Seleccione un estado"></p-autocomplete>
+        </div>
+        
+        <div class="flex items-center gap-4 mb-8">
+            <label for="municipio" class="font-semibold w-24">Municipio</label>
+            <p-autocomplete id="municipio" formControlName="municipio" [suggestions]="municipios" placeholder="Seleccione un municipio"></p-autocomplete>
+        </div>
+        <div class="flex justify-end gap-2">
+            <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+            <p-button label="Enviar" [disabled]="loading" />
+        </div>
+    </form>
+    
+</p-dialog>
