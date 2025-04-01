@@ -1,5 +1,5 @@
-<p-button (click)="showDialog()" label="Consultar CP" />
-<p-dialog header="Consulta de Código Postal" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+<!-- <p-button (click)="showDialog()" label="Consultar CP" /> -->
+<p-dialog header="Consulta de Código Postal" [modal]="true" [visible]="visible()" [style]="{ width: '25rem' }">
     <span class="p-text-secondary block mb-8">Selecciona el estado y municipio.</span>
     
     <form [formGroup]="queryCPForm" (ngSubmit)="onSubmit()">
@@ -13,7 +13,7 @@
             <p-autocomplete id="municipio" formControlName="municipio" [suggestions]="municipios" placeholder="Seleccione un municipio"></p-autocomplete>
         </div>
         <div class="flex justify-end gap-2">
-            <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+            <p-button label="Cancelar" severity="secondary" (click)="handleClose()" />
             <p-button label="Enviar" [disabled]="loading" />
         </div>
     </form>

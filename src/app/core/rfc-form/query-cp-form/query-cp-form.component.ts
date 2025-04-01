@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
+import { ClavesEstados } from '@shared/types';
 
 @Component({
   selector: 'app-query-cp-form',
@@ -18,21 +19,32 @@ import municipiosCatalog from '@public/municipio.catalog.json';
   styleUrl: './query-cp-form.component.scss',
 })
 export class QueryCpFormComponent {
-  visible = false;
+  visible = input(false)
+  // visible = false;
   loading = false;
 
   estados = ['all', ...estadosCatalog];
-  municipios = ['all'];
-  // TODO: Figure out how to add default value option like "Todos" and how to handle its value, maybe null.
+  municipios = ['all', ...municipiosCatalog["09"]];
 
   queryCPForm = new FormGroup({
     estado: new FormControl(''),
     municipio: new FormControl(''),
   });
 
-  showDialog() {
-    this.visible = true;
+
+  // showDialog() {
+  //   this.visible = true;
+  // }
+
+  handleClose() {
+
   }
 
-  onSubmit() {}
+  onSubmit() {
+    if (this.queryCPForm.invalid) {
+      return
+    }
+
+    console.log(this.queryCPForm.value)
+  }
 }

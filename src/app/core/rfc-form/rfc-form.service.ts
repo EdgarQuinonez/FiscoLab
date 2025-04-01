@@ -50,13 +50,13 @@ export class RfcFormService {
   validateRFCWithData$(rfcFormValue: RfcFormWithDataValue) {
     return new Observable((subscriber) => subscriber.next()).pipe(
       switchMapWithLoading<RFCWithData>(() =>
-        this.rfcService.validateRFCWithData$({
+        this.rfcService.validateRFCWithData$([{
           rfc: rfcFormValue.rfc,
           cp: rfcFormValue.data.cp,
           nombre: rfcFormValue.data.razonSocial
             ? rfcFormValue.data.razonSocial
             : `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
-        })
+        }])
       ),
       tap((value) => {
         if (value.data) {

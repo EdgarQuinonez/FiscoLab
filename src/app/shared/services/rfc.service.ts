@@ -17,6 +17,7 @@ import {
 import cpCatalog from '@public/cp.catalog.json';
 import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
+import { ClavesEstados, ClavesMunicipios } from '@shared/types';
 
 @Injectable({
   providedIn: 'root',
@@ -77,8 +78,8 @@ export class RfcService {
   validateRFCWithDataCPLookup$(
     rfc: string,
     nombre: string,
-    c_estado?: keyof typeof cpCatalog,
-    c_mnpio?: keyof (typeof cpCatalog)[keyof typeof cpCatalog]
+    c_estado?: ClavesEstados,
+    c_mnpio?: ClavesMunicipios
     // colonia?: string
   ) {
     const rfcs: ValidateRFCWithDataRequest['rfcs'] = [];

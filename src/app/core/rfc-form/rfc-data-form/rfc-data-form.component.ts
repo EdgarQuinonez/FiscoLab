@@ -176,11 +176,11 @@ export class RfcDataFormComponent {
               if (this.dataStatus.dataIsRequired) {
                 // VALIDATE WITH DATA
 
-                return this.rfcService.validateRFCWithData$({
+                return this.rfcService.validateRFCWithData$([{
                   rfc: value.response.rfc,
                   cp: rfcFormValue.data.cp,
                   nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
-                });
+                }]);
               } else {
                 return this.rfcService.validateRFC$(value.response.rfc);
               }
@@ -319,11 +319,11 @@ export class RfcDataFormComponent {
               if (this.dataStatus.dataIsRequired) {
                 // VALIDATE WITH DATA
 
-                return this.rfcService.validateRFCWithData$({
+                return this.rfcService.validateRFCWithData$([{
                   rfc: value.response.rfc,
                   cp: rfcFormValue.data.cp,
                   nombre: rfcFormValue.pmDataForm.razonSocial,
-                });
+                }]);
               } else {
                 return this.rfcService.validateRFC$(value.response.rfc);
               }

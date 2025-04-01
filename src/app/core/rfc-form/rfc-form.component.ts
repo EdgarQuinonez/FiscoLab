@@ -33,6 +33,7 @@ import {
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
+import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
 
 @Component({
   selector: 'app-rfc-form',
@@ -49,6 +50,7 @@ import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.compon
     TipoSujetoControlComponent,
     RfcDataFormComponent,
     MatchCpButtonComponent,
+    QueryCpFormComponent
   ],
   templateUrl: './rfc-form.component.html',
   styleUrl: './rfc-form.component.scss',
@@ -78,6 +80,7 @@ export class RfcFormComponent {
   ) {}
 
   loading = false;
+  queryCpFormShown = true;
 
   ngOnInit() {
     const dataGroup = this.rfcForm.get('data') as FormGroup;

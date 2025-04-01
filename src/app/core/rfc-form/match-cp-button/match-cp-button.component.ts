@@ -7,4 +7,12 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './match-cp-button.component.html',
   styleUrl: './match-cp-button.component.scss',
 })
-export class MatchCpButtonComponent {}
+export class MatchCpButtonComponent {
+
+  // output to send event on clicked to set queryCpFormShown to true
+  handleClick() {
+    // move show dialog logic here
+    console.log('autocompletar clicked.')
+  }
+  
+}

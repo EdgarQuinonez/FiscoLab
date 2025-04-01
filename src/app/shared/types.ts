@@ -1,3 +1,5 @@
+import cpCatalog from '@public/cp.catalog.json';
+
 export interface SuccessKibanResponse {
   id: string;
   finishedAt: string;
@@ -30,6 +32,10 @@ export type KibanBadRequestCodeResponse =
   | 'FORMAT_ERROR'
   | 'EMPTY_ERROR'
   | 'REQUIRED_FIELD_ERROR';
+
+
+export type ClavesEstados = keyof typeof cpCatalog
+export type ClavesMunicipios = keyof (typeof cpCatalog)[keyof typeof cpCatalog];
 
 // LOCAL STORAGE KEYS
 // rfc
