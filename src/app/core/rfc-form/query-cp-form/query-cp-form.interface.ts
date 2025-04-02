@@ -1,12 +1,12 @@
 import { ClavesEstados, ClavesMunicipios } from '@shared/types';
 
 export interface QueryCPFormValue {
-  estado: {
+  estado?: {
     c_estado: ClavesEstados;
     d_estado: string;
-  } | null;
-  municipio: {
+  } | null | undefined;
+  municipio?: {
     c_mnpio: ClavesMunicipios;
     D_mnpio: string;
-  } | null;
+  } | null | undefined;
 }

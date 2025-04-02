@@ -21,6 +21,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import {
+  RfcFormFormGroup,
   RfcFormValue,
   RfcFormWithDataValue,
   RfcFormWithDataValueOnCPAutocomplete,
@@ -38,6 +39,7 @@ import {
 import { RfcFormService } from './rfc-form.service';
 import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
 import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
+import { QueryCPFormValue } from './query-cp-form/query-cp-form.interface';
 
 @Component({
   selector: 'app-rfc-form',
@@ -59,18 +61,22 @@ import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
   styleUrl: './rfc-form.component.scss',
 })
 export class RfcFormComponent {
-  rfcForm = new FormGroup({
+  rfcForm = new FormGroup<RfcFormFormGroup>({
     rfc: new FormControl('', Validators.required),
     tipoSujeto: new FormControl<TipoSujetoCode | null>(
       null,
       Validators.required
     ),
     data: new FormGroup({
+      pfData: new FormGroup({
+        nombre: new FormControl(''),
+        apellido: new FormControl(''),
+      }),
+      pmData: new FormGroup({
+        razonSocial: new FormControl('')
+      }),
       cp: new FormControl(''),
-      nombre: new FormControl(''),
-      apellido: new FormControl(''),
-      razonSocial: new FormControl(''),
-    }),
+    })
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
@@ -89,18 +95,21 @@ export class RfcFormComponent {
   queryCpFormShown = false;
 
   ngOnInit() {
-    const dataGroup = this.rfcForm.get('data') as FormGroup;
+   
+  }
+
+  subscribeToTipoSujetoValueChanges() {
+    const dataGroup: RfcFormFormGroup["data"] = this.rfcForm.get("data") as FormGroup;
     dataGroup?.valueChanges
       .pipe(
         debounceTime(200),
         map((value) => {
           for (let fieldValue of Object.values(value)) {
+            // TODO: Check recursively if any form control from FormControl has a value
             if (fieldValue) {
-              // dataGroup.addValidators(Validators.required);
               return { dataIsRequired: true };
             }
           }
-          // dataGroup.removeValidators(Validators.required);
           return { dataIsRequired: false };
         }),
         startWith({ dataIsRequired: false })
@@ -154,9 +163,9 @@ export class RfcFormComponent {
     }
   }
 
-  setQueryCPResult(eventData: Event) {
+  setQueryCPResult(eventData: QueryCPFormValue) {
     // Assuming that rfc, nombre, apellidos or razonSocial controls are valid.
-
+    console.log(eventData)
     if (
       this.rfcForm.get('tipoSujeto')?.invalid ||
       this.rfcForm.get('rfc')?.invalid ||
