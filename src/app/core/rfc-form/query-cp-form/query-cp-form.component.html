@@ -1,21 +1,21 @@
 <p-button label="Autocompletar" icon="pi pi-check-square" iconPos="right" (click)="showPanel()"  class="h-full"/>
-<p-dialog header="Consulta de Código Postal" [modal]="true" [visible]="visible" styleClass="w-[27.5rem]">
+<p-dialog header="Consulta de Código Postal" [modal]="true" [(visible)]="visible" styleClass="w-[27.5rem] overflow-hidden">
     <span class="p-text-secondary block mb-8">Selecciona el estado y municipio para reducir el tamaño de tu búsqueda.</span>
     
-    <form [formGroup]="queryCPForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="queryCPForm" (ngSubmit)="onSubmit()" class="h-[21.5625rem] relative">
         <!-- <div> -->
 
             <div class="flex items-center gap-4 mb-4">
                 <label for="estado" class="font-semibold w-24">Estado</label>
-                <p-autocomplete id="estado" formControlName="estado" [suggestions]="estadosSuggestions" optionLabel="d_estado" (completeMethod)="completeEstados($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
+                <p-autocomplete id="estado" formControlName="estado" [forceSelection]="true" [dropdown]="true" [suggestions]="estadosSuggestions" optionLabel="d_estado" (completeMethod)="completeEstados($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
             </div>
             
             <div class="flex items-center gap-4 mb-8">
                 <label for="municipio" class="font-semibold w-24">Municipio</label>
-                <p-autocomplete id="municipio" formControlName="municipio" [suggestions]="municipiosSuggestions" optionLabel="D_mnpio" (completeMethod)="completeMunicipios($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
+                <p-autocomplete id="municipio" formControlName="municipio" [forceSelection]="true" [dropdown]="true" [suggestions]="municipiosSuggestions" optionLabel="D_mnpio" (completeMethod)="completeMunicipios($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
             </div>
         <!-- </div> -->
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 absolute bottom-4 w-full">
             <p-button label="Cancelar" severity="secondary" (click)="closePanel()" />
             <p-button type="submit" label="Enviar" [disabled]="loading" />
         </div>

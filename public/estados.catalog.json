@@ -1,130 +1,130 @@
 [
-    {
-      "c_estado": 9,
-      "d_estado": "Ciudad de México"
-    },
-    {
-      "c_estado": 1,
-      "d_estado": "Aguascalientes"
-    },
-    {
-      "c_estado": 2,
-      "d_estado": "Baja California"
-    },
-    {
-      "c_estado": 3,
-      "d_estado": "Baja California Sur"
-    },
-    {
-      "c_estado": 4,
-      "d_estado": "Campeche"
-    },
-    {
-      "c_estado": 5,
-      "d_estado": "Coahuila de Zaragoza"
-    },
-    {
-      "c_estado": 6,
-      "d_estado": "Colima"
-    },
-    {
-      "c_estado": 7,
-      "d_estado": "Chiapas"
-    },
-    {
-      "c_estado": 8,
-      "d_estado": "Chihuahua"
-    },
-    {
-      "c_estado": 10,
-      "d_estado": "Durango"
-    },
-    {
-      "c_estado": 11,
-      "d_estado": "Guanajuato"
-    },
-    {
-      "c_estado": 12,
-      "d_estado": "Guerrero"
-    },
-    {
-      "c_estado": 13,
-      "d_estado": "Hidalgo"
-    },
-    {
-      "c_estado": 14,
-      "d_estado": "Jalisco"
-    },
-    {
-      "c_estado": 15,
-      "d_estado": "México"
-    },
-    {
-      "c_estado": 16,
-      "d_estado": "Michoacán de Ocampo"
-    },
-    {
-      "c_estado": 17,
-      "d_estado": "Morelos"
-    },
-    {
-      "c_estado": 18,
-      "d_estado": "Nayarit"
-    },
-    {
-      "c_estado": 19,
-      "d_estado": "Nuevo León"
-    },
-    {
-      "c_estado": 20,
-      "d_estado": "Oaxaca"
-    },
-    {
-      "c_estado": 21,
-      "d_estado": "Puebla"
-    },
-    {
-      "c_estado": 22,
-      "d_estado": "Querétaro"
-    },
-    {
-      "c_estado": 23,
-      "d_estado": "Quintana Roo"
-    },
-    {
-      "c_estado": 24,
-      "d_estado": "San Luis Potosí"
-    },
-    {
-      "c_estado": 25,
-      "d_estado": "Sinaloa"
-    },
-    {
-      "c_estado": 26,
-      "d_estado": "Sonora"
-    },
-    {
-      "c_estado": 27,
-      "d_estado": "Tabasco"
-    },
-    {
-      "c_estado": 28,
-      "d_estado": "Tamaulipas"
-    },
-    {
-      "c_estado": 29,
-      "d_estado": "Tlaxcala"
-    },
-    {
-      "c_estado": 30,
-      "d_estado": "Veracruz de Ignacio de la Llave"
-    },
-    {
-      "c_estado": 31,
-      "d_estado": "Yucatán"
-    },
-    {
-      "c_estado": 32,
-      "d_estado": "Zacatecas"
-    }
-  ]
+  {
+    "c_estado": "09",
+    "d_estado": "Ciudad de México"
+  },
+  {
+    "c_estado": "01",
+    "d_estado": "Aguascalientes"
+  },
+  {
+    "c_estado": "02",
+    "d_estado": "Baja California"
+  },
+  {
+    "c_estado": "03",
+    "d_estado": "Baja California Sur"
+  },
+  {
+    "c_estado": "04",
+    "d_estado": "Campeche"
+  },
+  {
+    "c_estado": "05",
+    "d_estado": "Coahuila de Zaragoza"
+  },
+  {
+    "c_estado": "06",
+    "d_estado": "Colima"
+  },
+  {
+    "c_estado": "07",
+    "d_estado": "Chiapas"
+  },
+  {
+    "c_estado": "08",
+    "d_estado": "Chihuahua"
+  },
+  {
+    "c_estado": "10",
+    "d_estado": "Durango"
+  },
+  {
+    "c_estado": "11",
+    "d_estado": "Guanajuato"
+  },
+  {
+    "c_estado": "12",
+    "d_estado": "Guerrero"
+  },
+  {
+    "c_estado": "13",
+    "d_estado": "Hidalgo"
+  },
+  {
+    "c_estado": "14",
+    "d_estado": "Jalisco"
+  },
+  {
+    "c_estado": "15",
+    "d_estado": "México"
+  },
+  {
+    "c_estado": "16",
+    "d_estado": "Michoacán de Ocampo"
+  },
+  {
+    "c_estado": "17",
+    "d_estado": "Morelos"
+  },
+  {
+    "c_estado": "18",
+    "d_estado": "Nayarit"
+  },
+  {
+    "c_estado": "19",
+    "d_estado": "Nuevo León"
+  },
+  {
+    "c_estado": "20",
+    "d_estado": "Oaxaca"
+  },
+  {
+    "c_estado": "21",
+    "d_estado": "Puebla"
+  },
+  {
+    "c_estado": "22",
+    "d_estado": "Querétaro"
+  },
+  {
+    "c_estado": "23",
+    "d_estado": "Quintana Roo"
+  },
+  {
+    "c_estado": "24",
+    "d_estado": "San Luis Potosí"
+  },
+  {
+    "c_estado": "25",
+    "d_estado": "Sinaloa"
+  },
+  {
+    "c_estado": "26",
+    "d_estado": "Sonora"
+  },
+  {
+    "c_estado": "27",
+    "d_estado": "Tabasco"
+  },
+  {
+    "c_estado": "28",
+    "d_estado": "Tamaulipas"
+  },
+  {
+    "c_estado": "29",
+    "d_estado": "Tlaxcala"
+  },
+  {
+    "c_estado": "30",
+    "d_estado": "Veracruz de Ignacio de la Llave"
+  },
+  {
+    "c_estado": "31",
+    "d_estado": "Yucatán"
+  },
+  {
+    "c_estado": "32",
+    "d_estado": "Zacatecas"
+  }
+]

@@ -8,7 +8,8 @@ import {
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
-import { ClavesEstados } from '@shared/types';
+import { ClavesEstados, ClavesMunicipios } from '@shared/types';
+import { debounceTime } from 'rxjs';
 
 @Component({
   selector: 'app-query-cp-form',
@@ -27,15 +28,25 @@ export class QueryCpFormComponent {
 
   estados = [...estadosCatalog];
   // clave y nombre
-  estadosSuggestions: { c_estado: number; d_estado: string }[] = [];
-  municipios = [...municipiosCatalog['09']];
+  estadosSuggestions: { c_estado: ClavesEstados; d_estado: string }[] = [];
+  municipios: { c_mnpio: ClavesMunicipios; D_mnpio: string }[] = [];
   // clave y nombre
-  municipiosSuggestions: { c_mnpio: string; D_mnpio: string }[] = [];
+  municipiosSuggestions: { c_mnpio: ClavesMunicipios; D_mnpio: string }[] = [];
 
   queryCPForm = new FormGroup({
-    estado: new FormControl(''),
-    municipio: new FormControl(''),
+    estado: new FormControl<{
+      c_estado: ClavesEstados;
+      d_estado: string;
+    } | null>(null),
+    municipio: new FormControl<{
+      c_mnpio: ClavesMunicipios;
+      D_mnpio: string;
+    } | null>(null),
   });
+
+  ngOnInit() {
+    this.setMunicipios();
+  }
 
   showPanel() {
     this.visible = true;
@@ -48,17 +59,34 @@ export class QueryCpFormComponent {
   completeEstados(e: AutoCompleteCompleteEvent) {
     const query = e.query.toLowerCase();
 
-    this.estadosSuggestions = this.estados.filter(
-      (state) => state['d_estado'].toLowerCase().indexOf(query) === 0
-    );
+    this.estadosSuggestions = (
+      this.estados as { c_estado: ClavesEstados; d_estado: string }[]
+    ).filter((state) => state['d_estado'].toLowerCase().indexOf(query) === 0);
   }
 
   completeMunicipios(e: AutoCompleteCompleteEvent) {
     const query = e.query.toLowerCase();
 
-    this.municipiosSuggestions = this.municipios.filter(
-      (state) => state['D_mnpio'].toLowerCase().indexOf(query) === 0
-    );
+    this.municipiosSuggestions = (
+      this.municipios as { c_mnpio: ClavesMunicipios; D_mnpio: string }[]
+    ).filter((state) => state['D_mnpio'].toLowerCase().indexOf(query) === 0);
+  }
+
+  setMunicipios() {
+    this.queryCPForm
+      .get('estado')
+      ?.valueChanges.pipe(debounceTime(200))
+      .subscribe((value) => {
+        this.queryCPForm.get('municipio')?.reset();
+        if (value) {
+          this.municipios = [
+            ...(municipiosCatalog[value.c_estado] as {
+              c_mnpio: ClavesMunicipios;
+              D_mnpio: string;
+            }[]),
+          ];
+        }
+      });
   }
 
   onSubmit() {
