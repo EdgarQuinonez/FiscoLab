@@ -3,21 +3,21 @@ import { TipoSujetoCode } from '@shared/types';
 
 export interface RfcFormFormGroup {
   rfc: FormControl<string | null>;
-  tipoSujeto: FormControl<string | null>;
+  tipoSujeto: FormControl<TipoSujetoCode | null>;
   data: FormGroup<{
     pfData: FormGroup<RfcFormPFDataFormGroup>;
     pmData: FormGroup<RfcFormPMDataFormGroup>;
-    cp: FormControl<string | null>
-  }>
+    cp: FormControl<string | null>;
+  }>;
 }
 
 export interface RfcFormPFDataFormGroup {
-    nombre: FormControl<string | null>;
-    apellido: FormControl<string | null>;
+  nombre: FormControl<string | null>;
+  apellido: FormControl<string | null>;
 }
 
 export interface RfcFormPMDataFormGroup {
-  razonSocial: FormControl<string | null>
+  razonSocial: FormControl<string | null>;
 }
 
 export interface RfcFormValue {

@@ -22,11 +22,22 @@ import { MessageModule } from 'primeng/message';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
 import {
   RfcFormFormGroup,
+  RfcFormPFDataFormGroup,
+  RfcFormPMDataFormGroup,
   RfcFormValue,
   RfcFormWithDataValue,
   RfcFormWithDataValueOnCPAutocomplete,
 } from './rfc-form.interface';
-import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
+import {
+  addTreeValidators,
+  checkAllValuesNull,
+  disableAll,
+  enableAll,
+  markAllAsDirty,
+  markAllAsPristine,
+  removeTreeValidators,
+  updateTreeValidity,
+} from '@shared/utils/forms';
 import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
 import {
   RFC,
@@ -73,10 +84,10 @@ export class RfcFormComponent {
         apellido: new FormControl(''),
       }),
       pmData: new FormGroup({
-        razonSocial: new FormControl('')
+        razonSocial: new FormControl(''),
       }),
       cp: new FormControl(''),
-    })
+    }),
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
@@ -95,56 +106,63 @@ export class RfcFormComponent {
   queryCpFormShown = false;
 
   ngOnInit() {
-   
+    this.subscribeToDataGroupValueChanges();
+    this.subscribeToTipoSujetoValueChanges();
   }
 
-  subscribeToTipoSujetoValueChanges() {
-    const dataGroup: RfcFormFormGroup["data"] = this.rfcForm.get("data") as FormGroup;
+  subscribeToDataGroupValueChanges() {
+    const dataGroup: RfcFormFormGroup['data'] = this.rfcForm.get(
+      'data'
+    ) as FormGroup;
+
     dataGroup?.valueChanges
       .pipe(
         debounceTime(200),
         map((value) => {
-          for (let fieldValue of Object.values(value)) {
-            // TODO: Check recursively if any form control from FormControl has a value
-            if (fieldValue) {
-              return { dataIsRequired: true };
-            }
+          if (checkAllValuesNull(value)) {
+            return { dataIsRequired: false };
           }
-          return { dataIsRequired: false };
+
+          return { dataIsRequired: true };
         }),
         startWith({ dataIsRequired: false })
       )
       .subscribe((value) => {
-        // const dataGroup = this.rfcForm.get('data') as FormGroup;
         this.dataStatus = value;
         if (this.dataStatus.dataIsRequired) {
-          Object.keys(dataGroup.controls).forEach((name) => {
-            dataGroup.get(name)?.addValidators(Validators.required);
-          });
+          addTreeValidators(dataGroup, Validators.required);
         } else {
-          Object.keys(dataGroup.controls).forEach((name) => {
-            dataGroup.get(name)?.removeValidators(Validators.required);
-            dataGroup.get(name)?.markAsPristine();
-          });
+          removeTreeValidators(dataGroup, Validators.required);
+          markAllAsPristine(dataGroup);
         }
 
         updateTreeValidity(this.rfcForm, { emitEvent: false });
       });
+  }
+
+  subscribeToTipoSujetoValueChanges() {
+    const dataGroup: RfcFormFormGroup['data'] = this.rfcForm.get(
+      'data'
+    ) as FormGroup;
+    const pmDataGroup: FormGroup<RfcFormPMDataFormGroup> | null = dataGroup.get(
+      'pmData'
+    ) as FormGroup;
+    const pfDataGroup: FormGroup<RfcFormPFDataFormGroup> | null = dataGroup.get(
+      'pfData'
+    ) as FormGroup;
 
     this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
       if (value === 'PM') {
-        this.rfcForm.get(['data', 'nombre'])?.reset();
-        this.rfcForm.get(['data', 'apellido'])?.reset();
-        this.rfcForm.get(['data', 'apellido'])?.disable();
-        this.rfcForm.get(['data', 'nombre'])?.disable();
-        this.rfcForm.get(['data', 'razonSocial'])?.enable();
+        // disable PF controls so validation doesn't apply to them
+        disableAll(pfDataGroup);
+        enableAll(pmDataGroup);
+        pmDataGroup.reset();
       } else if (value === 'PF' || value === null) {
-        this.rfcForm.get(['data', 'razonSocial'])?.reset();
-        this.rfcForm.get(['data', 'nombre'])?.enable();
-        this.rfcForm.get(['data', 'apellido'])?.enable();
-        this.rfcForm.get(['data', 'razonSocial'])?.disable();
+        disableAll(pmDataGroup);
+        enableAll(pfDataGroup);
+        pfDataGroup.reset();
       }
-      this.tipoSujeto = value as TipoSujetoCode | null;
+      this.tipoSujeto = value;
     });
   }
 
@@ -165,18 +183,18 @@ export class RfcFormComponent {
 
   setQueryCPResult(eventData: QueryCPFormValue) {
     // Assuming that rfc, nombre, apellidos or razonSocial controls are valid.
-    console.log(eventData)
-    if (
-      this.rfcForm.get('tipoSujeto')?.invalid ||
-      this.rfcForm.get('rfc')?.invalid ||
-      this.rfcForm.get(['data', 'nombre'] as const)?.invalid ||
-      this.rfcForm.get(['data', 'apellido'] as const)?.invalid ||
-      this.rfcForm.get('razonSocial')?.invalid
-    ) {
-      this.responseError =
-        'Revisa los campos anteriores para autocompletar el Código Postal.';
-      return;
-    }
+    // console.log(eventData);
+    // if (
+    //   this.rfcForm.get('tipoSujeto')?.invalid ||
+    //   this.rfcForm.get('rfc')?.invalid ||
+    //   this.rfcForm.get(['data', 'nombre'] as const)?.invalid ||
+    //   this.rfcForm.get(['data', 'apellido'] as const)?.invalid ||
+    //   this.rfcForm.get('razonSocial')?.invalid
+    // ) {
+    //   this.responseError =
+    //     'Revisa los campos anteriores para autocompletar el Código Postal.';
+    //   return;
+    // }
 
     const rfcFormValues = this.rfcForm
       .value as RfcFormWithDataValueOnCPAutocomplete;
@@ -193,7 +211,7 @@ export class RfcFormComponent {
       );
     }
 
-    this.rfcForm.get('tipoSujeto')?.markAsDirty();
+    // this.rfcForm.get('tipoSujeto')?.markAsDirty();
   }
 
   handleAutoCompleteCPClick() {
