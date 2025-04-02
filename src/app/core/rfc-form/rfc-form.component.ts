@@ -20,7 +20,11 @@ import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
 import { TipoSujetoControlComponent } from './tipo-sujeto-control/tipo-sujeto-control.component';
-import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
+import {
+  RfcFormValue,
+  RfcFormWithDataValue,
+  RfcFormWithDataValueOnCPAutocomplete,
+} from './rfc-form.interface';
 import { markAllAsDirty, updateTreeValidity } from '@shared/utils/forms';
 import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
 import {
@@ -57,7 +61,10 @@ import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
 export class RfcFormComponent {
   rfcForm = new FormGroup({
     rfc: new FormControl('', Validators.required),
-    tipoSujeto: new FormControl('', Validators.required),
+    tipoSujeto: new FormControl<TipoSujetoCode | null>(
+      null,
+      Validators.required
+    ),
     data: new FormGroup({
       cp: new FormControl(''),
       nombre: new FormControl(''),
@@ -133,7 +140,6 @@ export class RfcFormComponent {
   }
 
   onSubmit() {
-    this.rfcService.validateRFCWithDataCPLookup$('', '');
     this.responseError = null;
     if (this.rfcForm.invalid) {
       markAllAsDirty(this.rfcForm);
@@ -145,6 +151,47 @@ export class RfcFormComponent {
       this.validateRFCWithData();
     } else {
       this.validateRFC();
+    }
+  }
+
+  setQueryCPResult(eventData: Event) {
+    // Assuming that rfc, nombre, apellidos or razonSocial controls are valid.
+
+    if (
+      this.rfcForm.get('tipoSujeto')?.invalid ||
+      this.rfcForm.get('rfc')?.invalid ||
+      this.rfcForm.get(['data', 'nombre'] as const)?.invalid ||
+      this.rfcForm.get(['data', 'apellido'] as const)?.invalid ||
+      this.rfcForm.get('razonSocial')?.invalid
+    ) {
+      this.responseError =
+        'Revisa los campos anteriores para autocompletar el Código Postal.';
+      return;
+    }
+
+    const rfcFormValues = this.rfcForm
+      .value as RfcFormWithDataValueOnCPAutocomplete;
+
+    if (this.rfcForm.get('tipoSujeto')?.value === 'PF') {
+      this.rfcService.validateRFCWithDataCPLookup$(
+        rfcFormValues.rfc,
+        `${rfcFormValues.data.nombre} ${rfcFormValues.data.apellido}`
+      );
+    } else if (this.rfcForm.get('tipoSujeto')?.value === 'PM') {
+      this.rfcService.validateRFCWithDataCPLookup$(
+        rfcFormValues.rfc,
+        rfcFormValues.data.razonSocial
+      );
+    }
+
+    this.rfcForm.get('tipoSujeto')?.markAsDirty();
+  }
+
+  handleAutoCompleteCPClick() {
+    // Validate controls based on the tipoSujeto value and trigger validation errors.
+    if (this.rfcForm.get('tipoSujeto')?.value === 'PF') {
+      if (this.rfcForm.get('')) {
+      }
     }
   }
 

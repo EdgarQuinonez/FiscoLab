@@ -16,3 +16,15 @@ export interface RfcFormWithDataValue {
     razonSocial?: string;
   };
 }
+
+export interface RfcFormWithDataValueOnCPAutocomplete
+  extends Omit<RfcFormWithDataValue, 'data'> {
+  rfc: string;
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    cp: null;
+    nombre: string;
+    apellido: string;
+    razonSocial: string;
+  };
+}

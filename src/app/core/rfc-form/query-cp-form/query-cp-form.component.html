@@ -7,17 +7,17 @@
 
             <div class="flex items-center gap-4 mb-4">
                 <label for="estado" class="font-semibold w-24">Estado</label>
-                <p-autocomplete id="estado" formControlName="estado" [forceSelection]="true" [dropdown]="true" [suggestions]="estadosSuggestions" optionLabel="d_estado" (completeMethod)="completeEstados($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
+                <p-autocomplete id="estado" formControlName="estado" [forceSelection]="true" emptyMessage="Sin resultados." [dropdown]="true" [suggestions]="estadosSuggestions" optionLabel="d_estado" (completeMethod)="completeEstados($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
             </div>
             
             <div class="flex items-center gap-4 mb-8">
                 <label for="municipio" class="font-semibold w-24">Municipio</label>
-                <p-autocomplete id="municipio" formControlName="municipio" [forceSelection]="true" [dropdown]="true" [suggestions]="municipiosSuggestions" optionLabel="D_mnpio" (completeMethod)="completeMunicipios($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
+                <p-autocomplete id="municipio" formControlName="municipio" [forceSelection]="true" emptyMessage="Sin resultados." [dropdown]="true" [suggestions]="municipiosSuggestions" optionLabel="D_mnpio" (completeMethod)="completeMunicipios($event)" placeholder="(Opcional)" class="flex"></p-autocomplete>
             </div>
         <!-- </div> -->
         <div class="flex justify-end gap-2 absolute bottom-4 w-full">
             <p-button label="Cancelar" severity="secondary" (click)="closePanel()" />
-            <p-button type="submit" label="Enviar" [disabled]="loading" />
+            <p-button type="submit" label="Enviar"/>
         </div>
     </form>
     

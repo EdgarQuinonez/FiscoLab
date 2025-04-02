@@ -10,6 +10,8 @@ import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
 import { ClavesEstados, ClavesMunicipios } from '@shared/types';
 import { debounceTime } from 'rxjs';
+import { RfcService } from '@shared/services/rfc.service';
+import { QueryCPFormValue } from './query-cp-form.interface';
 
 @Component({
   selector: 'app-query-cp-form',
@@ -23,8 +25,10 @@ import { debounceTime } from 'rxjs';
   styleUrl: './query-cp-form.component.scss',
 })
 export class QueryCpFormComponent {
+  queryCPSubmitted = output<QueryCPFormValue>();
+
   visible = false;
-  loading = false;
+  // loading = false;
 
   estados = [...estadosCatalog];
   // clave y nombre
@@ -43,6 +47,8 @@ export class QueryCpFormComponent {
       D_mnpio: string;
     } | null>(null),
   });
+
+  constructor(private rfcService: RfcService) {}
 
   ngOnInit() {
     this.setMunicipios();
@@ -94,6 +100,10 @@ export class QueryCpFormComponent {
       return;
     }
 
-    console.log(this.queryCPForm.value);
+    const queryCPFormValues = this.queryCPForm.value;
+
+    if (this.queryCPForm.value) {
+      this.queryCPSubmitted.emit(queryCPFormValues);
+    }
   }
 }
