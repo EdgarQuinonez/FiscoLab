@@ -42,7 +42,7 @@ export class RfcService {
       // SUCCESS - INVALID
       // testCaseId: '663567bb713cf2110a1106d0',
       // SUCCESS - VALID,
-      testCaseId: '663567a9713cf2110a110673',
+      testCaseId: '663567bb713cf2110a1106cf',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate_from_data?testCaseId=${params.testCaseId}`;
 
@@ -110,6 +110,7 @@ export class RfcService {
       // Iterate through all states and mnpios to retrieve all of their cps
     }
 
-    return this.validateRFCWithData$(rfcs);
+    // TODO: THIS SHOULD TRANSFORM THE OUTPUT TO FINALLY RETURN A STRING (VALID CP CODE) OR ERROR (INVALID ERR MSG TO SET ON RESPONSEERROR)
+    this.validateRFCWithData$(rfcs).pipe();
   }
 }
