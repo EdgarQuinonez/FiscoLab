@@ -11,6 +11,7 @@ import {
   ObtainPersonalDataPfRFCSuccessResponse,
   RFC,
   RFCWithData,
+  ValidateRfcCpQueryRequest,
   ValidateRFCWithDataRequest,
 } from './rfc.service.interface';
 // import cpCatalog from '../../../../public/cp.catalog.json';
@@ -18,6 +19,7 @@ import cpCatalog from '@public/cp.catalog.json';
 import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
 import { ClavesEstados, ClavesMunicipios } from '@shared/types';
+import { template } from 'lodash';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +40,9 @@ export class RfcService {
   validateRFCWithData$(rfcs: ValidateRFCWithDataRequest['rfcs']) {
     const params = {
       // SUCCESS - INVALID
-      testCaseId: '663567bb713cf2110a1106d0',
+      // testCaseId: '663567bb713cf2110a1106d0',
+      // SUCCESS - VALID,
+      testCaseId: '663567a9713cf2110a110673',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate_from_data?testCaseId=${params.testCaseId}`;
 
@@ -75,19 +79,13 @@ export class RfcService {
   }
 
   // TODO: Match RFC with CP and nombres in a single request
-  validateRFCWithDataCPLookup$(
-    rfc: string,
-    nombre: string,
-    c_estado?: ClavesEstados,
-    c_mnpio?: ClavesMunicipios
-    // colonia?: string
-  ) {
+  cpQuery$(requestBody: ValidateRfcCpQueryRequest) {
     const rfcs: ValidateRFCWithDataRequest['rfcs'] = [];
     const rfcsLimit = 5000;
     let cpArray: string[]; // holds cps to use in the request body
 
-    if (c_estado && c_mnpio) {
-      const queryResults = cpCatalog[c_estado][c_mnpio];
+    if (requestBody.estado && requestBody.municipio) {
+      const queryResults = cpCatalog[requestBody.estado][requestBody.municipio];
       cpArray = queryResults;
 
       if (cpArray.length > rfcsLimit) {
@@ -99,14 +97,14 @@ export class RfcService {
 
       for (let cp in queryResults) {
         const rfcObj = {
-          rfc: rfc,
-          nombre: nombre,
+          rfc: requestBody.rfc,
+          nombre: requestBody.nombre,
           cp: cp,
         };
 
         rfcs.push(rfcObj);
       }
-    } else if (c_estado && !c_mnpio) {
+    } else if (requestBody.estado && !requestBody.municipio) {
       // Iterate through all of the mnpios of the state and retrieve their cps into an cpArray
     } else {
       // Iterate through all states and mnpios to retrieve all of their cps

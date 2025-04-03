@@ -25,8 +25,8 @@ import {
   RfcFormPFDataFormGroup,
   RfcFormPMDataFormGroup,
   RfcFormValue,
-  RfcFormWithDataValue,
-  RfcFormWithDataValueOnCPAutocomplete,
+  RfcFormDataValue,
+  RfcFormValueWithCP,
 } from './rfc-form.interface';
 import {
   addTreeValidators,
@@ -46,6 +46,8 @@ import {
   ValidateRFCBadRequestResponse,
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
+  ValidateRFCWithDataRequest,
+  ValidateRfcCpQueryRequest,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
@@ -156,11 +158,11 @@ export class RfcFormComponent {
         // disable PF controls so validation doesn't apply to them
         disableAll(pfDataGroup);
         enableAll(pmDataGroup);
-        pmDataGroup.reset();
+        pfDataGroup.reset();
       } else if (value === 'PF' || value === null) {
         disableAll(pmDataGroup);
         enableAll(pfDataGroup);
-        pfDataGroup.reset();
+        pmDataGroup.reset();
       }
       this.tipoSujeto = value;
     });
@@ -182,36 +184,46 @@ export class RfcFormComponent {
   }
 
   setQueryCPResult(eventData: QueryCPFormValue) {
-    // Assuming that rfc, nombre, apellidos or razonSocial controls are valid.
-    // console.log(eventData);
-    // if (
-    //   this.rfcForm.get('tipoSujeto')?.invalid ||
-    //   this.rfcForm.get('rfc')?.invalid ||
-    //   this.rfcForm.get(['data', 'nombre'] as const)?.invalid ||
-    //   this.rfcForm.get(['data', 'apellido'] as const)?.invalid ||
-    //   this.rfcForm.get('razonSocial')?.invalid
-    // ) {
-    //   this.responseError =
-    //     'Revisa los campos anteriores para autocompletar el Código Postal.';
-    //   return;
-    // }
-
-    const rfcFormValues = this.rfcForm
-      .value as RfcFormWithDataValueOnCPAutocomplete;
-
-    if (this.rfcForm.get('tipoSujeto')?.value === 'PF') {
-      this.rfcService.validateRFCWithDataCPLookup$(
-        rfcFormValues.rfc,
-        `${rfcFormValues.data.nombre} ${rfcFormValues.data.apellido}`
-      );
-    } else if (this.rfcForm.get('tipoSujeto')?.value === 'PM') {
-      this.rfcService.validateRFCWithDataCPLookup$(
-        rfcFormValues.rfc,
-        rfcFormValues.data.razonSocial
-      );
+    // Assuming validation
+    if (
+      this.rfcForm.get('tipoSujeto')?.invalid ||
+      this.rfcForm.get(['data', 'cp'])?.invalid ||
+      this.rfcForm.get(['rfc'])?.invalid
+    ) {
+      markAllAsDirty(this.rfcForm);
+      return;
     }
 
-    // this.rfcForm.get('tipoSujeto')?.markAsDirty();
+    if (
+      this.rfcForm.get('tipoSujeto')?.value === 'PF' ||
+      this.rfcForm.get('tipoSujeto')?.value === null
+    ) {
+      if (this.rfcForm.get(['data', 'pfData'])?.invalid) {
+        markAllAsDirty(this.rfcForm);
+
+        return;
+      }
+    } else if (this.rfcForm.get('tipoSujeto')?.value === 'PM') {
+      if (this.rfcForm.get(['data', 'pmData'])?.invalid) {
+        markAllAsDirty(this.rfcForm);
+
+        return;
+      }
+    }
+
+    const formValues = this.rfcForm.value as RfcFormValueWithCP;
+
+    const requestBody: ValidateRfcCpQueryRequest = {
+      rfc: formValues.rfc,
+      nombre:
+        formValues.tipoSujeto === 'PF'
+          ? `${formValues.data.pfData.nombre} ${formValues.data.pfData.nombre}`
+          : formValues.data.pmData.razonSocial,
+      estado: eventData.estado?.c_estado,
+      municipio: eventData.municipio?.c_mnpio,
+    };
+
+    this.rfcService.cpQuery$(requestBody);
   }
 
   handleAutoCompleteCPClick() {
@@ -254,7 +266,7 @@ export class RfcFormComponent {
   }
 
   validateRFCWithData() {
-    const rfcFormValue = this.rfcForm.value as RfcFormWithDataValue;
+    const rfcFormValue = this.rfcForm.value as RfcFormDataValue;
 
     this.rfcFormResponse$ =
       this.rfcFormService.validateRFCWithData$(rfcFormValue);

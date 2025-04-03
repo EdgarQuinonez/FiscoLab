@@ -3,6 +3,8 @@ import {
   SuccessKibanResponse,
   ServiceUnavailableResponse,
   KibanBadRequestCodeResponse,
+  ClavesEstados,
+  ClavesMunicipios,
 } from '@shared/types';
 
 export interface ValidateRFCRequestBody {
@@ -177,3 +179,10 @@ export type GenerateRfcPm =
   | GenerateRfcPmSuccessReponse
   | GenerateRfcPmBadRequestResponse
   | GenerateRfcPmServiceUnavailableResponse;
+
+export interface ValidateRfcCpQueryRequest {
+  rfc: string;
+  nombre: string;
+  estado?: ClavesEstados;
+  municipio?: ClavesMunicipios;
+}

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { RfcFormValue, RfcFormWithDataValue } from './rfc-form.interface';
+import { RfcFormValue, RfcFormDataValue } from './rfc-form.interface';
 import {
   RFC,
   ValidateRFCSuccessResponse,
@@ -47,16 +47,19 @@ export class RfcFormService {
     );
   }
 
-  validateRFCWithData$(rfcFormValue: RfcFormWithDataValue) {
+  validateRFCWithData$(rfcFormValue: RfcFormDataValue) {
     return new Observable((subscriber) => subscriber.next()).pipe(
       switchMapWithLoading<RFCWithData>(() =>
-        this.rfcService.validateRFCWithData$([{
-          rfc: rfcFormValue.rfc,
-          cp: rfcFormValue.data.cp,
-          nombre: rfcFormValue.data.razonSocial
-            ? rfcFormValue.data.razonSocial
-            : `${rfcFormValue.data.nombre} ${rfcFormValue.data.apellido}`,
-        }])
+        this.rfcService.validateRFCWithData$([
+          {
+            rfc: rfcFormValue.rfc,
+            cp: rfcFormValue.data.cp,
+            nombre:
+              rfcFormValue.tipoSujeto === 'PM'
+                ? rfcFormValue.data.pmData.razonSocial
+                : `${rfcFormValue.data.pfData.nombre} ${rfcFormValue.data.pfData.apellido}`,
+          },
+        ])
       ),
       tap((value) => {
         if (value.data) {

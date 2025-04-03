@@ -23,28 +23,43 @@ export interface RfcFormPMDataFormGroup {
 export interface RfcFormValue {
   rfc: string;
   tipoSujeto: TipoSujetoCode;
-  data: { cp: null; nombre: null; apellido: null; razonSocial: null };
-}
-
-export interface RfcFormWithDataValue {
-  rfc: string;
-  tipoSujeto: TipoSujetoCode;
   data: {
-    cp: string;
-    nombre?: string;
-    apellido?: string;
-    razonSocial?: string;
-  };
-}
-
-export interface RfcFormWithDataValueOnCPAutocomplete
-  extends Omit<RfcFormWithDataValue, 'data'> {
-  rfc: string;
-  tipoSujeto: TipoSujetoCode;
-  data: {
+    pfData: {
+      nombre: null;
+      apellido: null;
+    };
+    pmData: {
+      razonSocial: null;
+    };
     cp: null;
-    nombre: string;
-    apellido: string;
-    razonSocial: string;
   };
+}
+
+export interface RfcFormDataValue {
+  rfc: string;
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    pfData: RfcFormPfDataValue;
+    pmData: RfcFormPmDataValue;
+    cp: string;
+  };
+}
+
+export interface RfcFormValueWithCP {
+  rfc: string;
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    pfData: RfcFormPfDataValue;
+    pmData: RfcFormPmDataValue;
+    cp: null;
+  };
+}
+
+export interface RfcFormPfDataValue {
+  nombre: string;
+  apellido: string;
+}
+
+export interface RfcFormPmDataValue {
+  razonSocial: string;
 }
