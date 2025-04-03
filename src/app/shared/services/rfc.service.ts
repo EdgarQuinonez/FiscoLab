@@ -12,6 +12,7 @@ import {
   RFC,
   RFCWithData,
   ValidateRfcCpQueryRequest,
+  ValidateRFCRequestBody,
   ValidateRFCWithDataRequest,
 } from './rfc.service.interface';
 // import cpCatalog from '../../../../public/cp.catalog.json';
@@ -19,7 +20,8 @@ import cpCatalog from '@public/cp.catalog.json';
 import estadosCatalog from '@public/estados.catalog.json';
 import municipiosCatalog from '@public/municipio.catalog.json';
 import { ClavesEstados, ClavesMunicipios } from '@shared/types';
-import { template } from 'lodash';
+import { Observable, Subscription } from 'rxjs';
+import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 
 @Injectable({
   providedIn: 'root',
@@ -27,14 +29,12 @@ import { template } from 'lodash';
 export class RfcService {
   constructor(private http: HttpClient) {}
 
-  validateRFC$(rfc: string) {
+  validateRFC$(requestBody: ValidateRFCRequestBody) {
     const params = {
       testCaseId: '663567bb713cf2110a1106ce',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`;
-    return this.http.post<RFC>(endpoint, {
-      rfcs: [{ rfc: rfc }],
-    });
+    return this.http.post<RFC>(endpoint, requestBody);
   }
 
   validateRFCWithData$(rfcs: ValidateRFCWithDataRequest['rfcs']) {
@@ -111,6 +111,11 @@ export class RfcService {
     }
 
     // TODO: THIS SHOULD TRANSFORM THE OUTPUT TO FINALLY RETURN A STRING (VALID CP CODE) OR ERROR (INVALID ERR MSG TO SET ON RESPONSEERROR)
-    this.validateRFCWithData$(rfcs).pipe();
+    // new Observable(subscriber => subscriber.next()).pipe(
+    //   switchMapWithLoading(
+    //     () => this.validateRFCWithData$(rfcs)
+    //   ),
+
+    // )
   }
 }

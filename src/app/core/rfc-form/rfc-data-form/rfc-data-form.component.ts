@@ -182,7 +182,7 @@ export class RfcDataFormComponent {
                   nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
                 }]);
               } else {
-                return this.rfcService.validateRFC$(value.response.rfc);
+                return this.rfcService.validateRFC$({ rfcs: [{ rfc: value.response.rfc}]});
               }
             }
           ),
@@ -325,7 +325,7 @@ export class RfcDataFormComponent {
                   nombre: rfcFormValue.pmDataForm.razonSocial,
                 }]);
               } else {
-                return this.rfcService.validateRFC$(value.response.rfc);
+                return this.rfcService.validateRFC$({ rfcs: [{ rfc: value.response.rfc}]});
               }
             }
           ),

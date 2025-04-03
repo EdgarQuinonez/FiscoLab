@@ -27,23 +27,8 @@ export class RfcFormService {
   validateRFC$(rfcFormValue: RfcFormValue) {
     return new Observable((subscriber) => subscriber.next()).pipe(
       switchMapWithLoading<RFC>(() =>
-        this.rfcService.validateRFC$(rfcFormValue.rfc)
+        this.rfcService.validateRFC$({rfcs: [ { rfc: rfcFormValue.rfc}]})
       ),
-      tap((value) => {
-        if (value.data) {
-          const response = (value.data as ValidateRFCSuccessResponse).response;
-          if (
-            response.rfcs[0].result ===
-            'RFC válido, y susceptible de recibir facturas'
-          ) {
-            this.storageService.setItem('tipoSujeto', rfcFormValue.tipoSujeto);
-            this.storageService.setItem('rfc', response.rfcs[0].rfc);
-            this.storageService.setItem('rfcResult', response.rfcs[0].result);
-
-            this.router.navigateByUrl('/dashboard');
-          }
-        }
-      })
     );
   }
 

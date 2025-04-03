@@ -48,6 +48,7 @@ import {
   ValidateRFCWithDataServiceUnavailableResponse,
   ValidateRFCWithDataRequest,
   ValidateRfcCpQueryRequest,
+  ValidateRFCServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
@@ -176,14 +177,77 @@ export class RfcFormComponent {
     }
     this.loading = true;
 
-    if (this.dataStatus.dataIsRequired) {
-      this.validateRFCWithData();
-    } else {
-      this.validateRFC();
+    if (this.rfcFormResponse$ === null) {
+      // needs to call API
+      if (this.dataStatus.dataIsRequired){
+        // validation with data
+        const formValue = this.rfcForm.value as RfcFormDataValue
+        this.rfcFormResponse$ = this.rfcFormService.validateRFCWithData$(formValue)
+      } else {
+        const formValue = this.rfcForm.value as RfcFormValue
+        this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue)
+      }
     }
+
+    // Handle rfc form response SUCCESS - VALID, SUCCESS - INVALID or ERROR (BAD REQUEST AND SERVICE_UNAVAILABLE)
+    this.rfcFormResponse$.subscribe(value => {
+      if (value.data){
+        // SUCCESS
+        if (value.data.status === 'SUCCESS') {
+          const response = value.data.response.rfcs[0]
+          const result = response.result
+
+          // VALID
+          if (result === "RFC válido, y susceptible de recibir facturas") {
+            const formValue = this.rfcForm.value as RfcFormValue | RfcFormDataValue
+
+            this.storageService.setItem('tipoSujeto', formValue.tipoSujeto);
+            this.storageService.setItem('rfc', response.rfc);
+            this.storageService.setItem('rfcResult', response.result);
+
+            this.router.navigateByUrl('/dashboard');
+          } else {
+          // INVALID
+            this.responseError = result
+          }
+        }
+      }
+
+      // BAD REQUEST or SERVICE_UNAVAILABLE
+      if (value.error) {
+        const error = value.error as ValidateRFCBadRequestResponse | ValidateRFCWithDataBadRequestResponse | ValidateRFCServiceUnavailableResponse | ValidateRFCWithDataServiceUnavailableResponse
+
+        if (error.status === 'SERVICE_ERROR') {
+          this.responseError = error.errorMessage
+        } else {
+          error.error.forEach((err) => {
+            const field = err.field.slice(0, -3); // strip down index from field
+            const code = err.code;
+  
+            if (field === 'rfc') {
+              if (code === 'FORMAT_ERROR') {
+                this.rfcForm.get('rfc')?.setErrors({
+                  rfc: 'Ingresa un RFC válido con homoclave.',
+                });
+              }
+            }
+  
+            if (field === 'cp') {
+              if (code === 'FORMAT_ERROR') {
+                this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                  cp: 'Ingresa un código postal válido.',
+                });
+              }
+            }
+          });
+        }
+      }
+    })
+
   }
 
-  setQueryCPResult(eventData: QueryCPFormValue) {
+  // sets the CP on the field when autocomplete is successful - valid.
+  autocompleteCP(eventData: QueryCPFormValue) {
     // Assuming validation
     if (
       this.rfcForm.get('tipoSujeto')?.invalid ||
@@ -232,91 +296,5 @@ export class RfcFormComponent {
       if (this.rfcForm.get('')) {
       }
     }
-  }
-
-  validateRFC() {
-    const rfcFormValue = this.rfcForm.value as RfcFormValue;
-
-    this.rfcFormResponse$ = this.rfcFormService.validateRFC$(rfcFormValue);
-
-    this.rfcFormResponse$.subscribe((value) => {
-      this.loading = value.loading;
-
-      if (value.data) {
-        if (value.data.status === 'SUCCESS') {
-          const rfcResult = value.data.response.rfcs[0].result;
-          // RFC not valid.
-          if (rfcResult != 'RFC válido, y susceptible de recibir facturas') {
-            this.responseError = rfcResult + '.';
-          }
-        }
-      }
-
-      if (value.error) {
-        // TODO: Check if service unavailable needs to be handled here as well.
-        const error = (value.error as ValidateRFCBadRequestResponse).error;
-        this.rfcForm.get('rfc')?.setErrors({
-          rfc:
-            error[0].code === 'FORMAT_ERROR'
-              ? 'Ingresa un RFC válido con homoclave.'
-              : '',
-        });
-      }
-    });
-  }
-
-  validateRFCWithData() {
-    const rfcFormValue = this.rfcForm.value as RfcFormDataValue;
-
-    this.rfcFormResponse$ =
-      this.rfcFormService.validateRFCWithData$(rfcFormValue);
-
-    this.rfcFormResponse$.subscribe((value) => {
-      this.loading = value.loading;
-
-      if (value.data) {
-        if (value.data.status === 'SUCCESS') {
-          const rfcResult = value.data.response.rfcs[0].result;
-          // RFC not valid.
-          if (rfcResult != 'RFC válido, y susceptible de recibir facturas') {
-            this.responseError = rfcResult + '.';
-          }
-        }
-      }
-
-      if (value.error) {
-        const error = value.error as
-          | ValidateRFCWithDataBadRequestResponse
-          | ValidateRFCWithDataServiceUnavailableResponse;
-
-        if (error.status === 'SERVICE_ERROR') {
-          this.responseError =
-            'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-          return;
-        }
-
-        // BAD REQUEST
-        error.error.forEach((err) => {
-          const field = err.field.slice(0, -3); // strip down index from field
-          const code = err.code;
-
-          if (field === 'rfc') {
-            if (code === 'FORMAT_ERROR') {
-              this.rfcForm.get('rfc')?.setErrors({
-                rfc: 'Ingresa un RFC válido con homoclave.',
-              });
-            }
-          }
-
-          if (field === 'cp') {
-            if (code === 'FORMAT_ERROR') {
-              this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-                cp: 'Ingresa un código postal válido.',
-              });
-            }
-          }
-        });
-      }
-    });
   }
 }
