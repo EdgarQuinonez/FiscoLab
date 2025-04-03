@@ -191,6 +191,8 @@ export class RfcFormComponent {
 
     // Handle rfc form response SUCCESS - VALID, SUCCESS - INVALID or ERROR (BAD REQUEST AND SERVICE_UNAVAILABLE)
     this.rfcFormResponse$.subscribe(value => {
+      this.rfcFormResponse$ = null // Reset response in case of error (meaning user manually resubmitted the form)
+      this.loading = false
       if (value.data){
         // SUCCESS
         if (value.data.status === 'SUCCESS') {
@@ -212,7 +214,6 @@ export class RfcFormComponent {
           }
         }
       }
-
       // BAD REQUEST or SERVICE_UNAVAILABLE
       if (value.error) {
         const error = value.error as ValidateRFCBadRequestResponse | ValidateRFCWithDataBadRequestResponse | ValidateRFCServiceUnavailableResponse | ValidateRFCWithDataServiceUnavailableResponse
