@@ -51,7 +51,6 @@ import {
   ValidateRFCServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
-import { MatchCpButtonComponent } from './match-cp-button/match-cp-button.component';
 import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
 import { QueryCPFormValue } from './query-cp-form/query-cp-form.interface';
 
@@ -179,52 +178,68 @@ export class RfcFormComponent {
 
     if (this.rfcFormResponse$ === null) {
       // needs to call API
-      if (this.dataStatus.dataIsRequired){
+      if (this.dataStatus.dataIsRequired) {
         // validation with data
-        const formValue = this.rfcForm.value as RfcFormDataValue
-        this.rfcFormResponse$ = this.rfcFormService.validateRFCWithData$(formValue)
+        const formValue = this.rfcForm.value as RfcFormDataValue;
+        this.rfcFormResponse$ =
+          this.rfcFormService.validateRFCWithData$(formValue);
       } else {
-        const formValue = this.rfcForm.value as RfcFormValue
-        this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue)
+        const formValue = this.rfcForm.value as RfcFormValue;
+        this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue);
       }
     }
 
     // Handle rfc form response SUCCESS - VALID, SUCCESS - INVALID or ERROR (BAD REQUEST AND SERVICE_UNAVAILABLE)
-    this.rfcFormResponse$.subscribe(value => {
-      this.rfcFormResponse$ = null // Reset response in case of error (meaning user manually resubmitted the form)
-      this.loading = false
-      if (value.data){
+    this.rfcFormResponse$.subscribe((value) => {
+      this.rfcFormResponse$ = null; // Reset response in case of error (meaning user manually resubmitted the form)
+      this.loading = false;
+      if (value.data) {
         // SUCCESS
         if (value.data.status === 'SUCCESS') {
-          const response = value.data.response.rfcs[0]
-          const result = response.result
+          const response = value.data.response;
+          for (let rfc of response.rfcs) {
+            const result = rfc.result;
+            // VALID
+            if (result === 'RFC válido, y susceptible de recibir facturas') {
+              const formValue = this.rfcForm.value as
+                | RfcFormValue
+                | RfcFormDataValue;
 
-          // VALID
-          if (result === "RFC válido, y susceptible de recibir facturas") {
-            const formValue = this.rfcForm.value as RfcFormValue | RfcFormDataValue
+              this.storageService.setItem('tipoSujeto', formValue.tipoSujeto);
+              this.storageService.setItem('rfc', rfc.rfc);
+              this.storageService.setItem('rfcResult', rfc.result);
 
-            this.storageService.setItem('tipoSujeto', formValue.tipoSujeto);
-            this.storageService.setItem('rfc', response.rfc);
-            this.storageService.setItem('rfcResult', response.result);
-
-            this.router.navigateByUrl('/dashboard');
-          } else {
-          // INVALID
-            this.responseError = result
+              this.router.navigateByUrl('/dashboard');
+              break;
+            } else if (
+              result ===
+              'El Código Postal no coincide con el registrado en el RFC'
+            ) {
+              // TODO: make this independent of onSubmit so autocompleteCP focuses on setting the cpControl value and submit focuses on giving feedback to the user or letting them in to the dashboard.
+              continue;
+            } else {
+              // INVALID
+              this.responseError = result;
+              break;
+            }
           }
         }
       }
       // BAD REQUEST or SERVICE_UNAVAILABLE
       if (value.error) {
-        const error = value.error as ValidateRFCBadRequestResponse | ValidateRFCWithDataBadRequestResponse | ValidateRFCServiceUnavailableResponse | ValidateRFCWithDataServiceUnavailableResponse
+        const error = value.error as
+          | ValidateRFCBadRequestResponse
+          | ValidateRFCWithDataBadRequestResponse
+          | ValidateRFCServiceUnavailableResponse
+          | ValidateRFCWithDataServiceUnavailableResponse;
 
         if (error.status === 'SERVICE_ERROR') {
-          this.responseError = error.errorMessage
+          this.responseError = error.errorMessage;
         } else {
           error.error.forEach((err) => {
             const field = err.field.slice(0, -3); // strip down index from field
             const code = err.code;
-  
+
             if (field === 'rfc') {
               if (code === 'FORMAT_ERROR') {
                 this.rfcForm.get('rfc')?.setErrors({
@@ -232,7 +247,7 @@ export class RfcFormComponent {
                 });
               }
             }
-  
+
             if (field === 'cp') {
               if (code === 'FORMAT_ERROR') {
                 this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
@@ -243,13 +258,11 @@ export class RfcFormComponent {
           });
         }
       }
-    })
-
+    });
   }
 
   // sets the CP on the field when autocomplete is successful - valid.
   autocompleteCP(eventData: QueryCPFormValue) {
-    // Assuming validation
     if (
       this.rfcForm.get('tipoSujeto')?.invalid ||
       this.rfcForm.get(['data', 'cp'])?.invalid ||
@@ -288,7 +301,7 @@ export class RfcFormComponent {
       municipio: eventData.municipio?.c_mnpio,
     };
 
-    this.rfcService.cpQuery$(requestBody);
+    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
   }
 
   handleAutoCompleteCPClick() {

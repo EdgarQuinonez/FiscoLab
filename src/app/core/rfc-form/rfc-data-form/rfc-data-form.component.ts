@@ -148,10 +148,8 @@ export class RfcDataFormComponent {
   }
 
   onSubmit() {
-    // console.log('submitting');
     this.responseError = null;
     if (this.rfcForm.invalid) {
-      // console.log('INVALID');
       markAllAsDirty(this.rfcForm);
       return;
     }
@@ -176,13 +174,17 @@ export class RfcDataFormComponent {
               if (this.dataStatus.dataIsRequired) {
                 // VALIDATE WITH DATA
 
-                return this.rfcService.validateRFCWithData$([{
-                  rfc: value.response.rfc,
-                  cp: rfcFormValue.data.cp,
-                  nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
-                }]);
+                return this.rfcService.validateRFCWithData$([
+                  {
+                    rfc: value.response.rfc,
+                    cp: rfcFormValue.data.cp,
+                    nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
+                  },
+                ]);
               } else {
-                return this.rfcService.validateRFC$({ rfcs: [{ rfc: value.response.rfc}]});
+                return this.rfcService.validateRFC$({
+                  rfcs: [{ rfc: value.response.rfc }],
+                });
               }
             }
           ),
@@ -319,13 +321,17 @@ export class RfcDataFormComponent {
               if (this.dataStatus.dataIsRequired) {
                 // VALIDATE WITH DATA
 
-                return this.rfcService.validateRFCWithData$([{
-                  rfc: value.response.rfc,
-                  cp: rfcFormValue.data.cp,
-                  nombre: rfcFormValue.pmDataForm.razonSocial,
-                }]);
+                return this.rfcService.validateRFCWithData$([
+                  {
+                    rfc: value.response.rfc,
+                    cp: rfcFormValue.data.cp,
+                    nombre: rfcFormValue.pmDataForm.razonSocial,
+                  },
+                ]);
               } else {
-                return this.rfcService.validateRFC$({ rfcs: [{ rfc: value.response.rfc}]});
+                return this.rfcService.validateRFC$({
+                  rfcs: [{ rfc: value.response.rfc }],
+                });
               }
             }
           ),

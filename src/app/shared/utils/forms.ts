@@ -113,7 +113,6 @@ export function disableAll(
     ) {
       disableAll(abstractControl, options);
     } else {
-      console.log('disabled');
       abstractControl?.disable(options);
     }
   });
@@ -132,7 +131,6 @@ export function enableAll(
     ) {
       enableAll(abstractControl, options);
     } else {
-      console.log('enabled');
       abstractControl?.enable(options);
     }
   });
