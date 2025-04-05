@@ -104,14 +104,7 @@ export class RfcFormComponent {
     }),
   });
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
-  dataStatus!: { dataIsRequired: boolean };
-  responseError: string | null = null;
-  tipoSujeto: TipoSujetoCode | null = null;
-
   constructor(
-    private rfcService: RfcService,
     private router: Router,
     private storageService: StorageService,
     private rfcFormService: RfcFormService
@@ -143,8 +136,8 @@ export class RfcFormComponent {
         startWith({ dataIsRequired: false })
       )
       .subscribe((value) => {
-        this.dataStatus = value;
-        if (this.dataStatus.dataIsRequired) {
+        this.rfcFormService.dataStatus = value;
+        if (this.rfcFormService.dataStatus.dataIsRequired) {
           addTreeValidators(dataGroup, Validators.required);
         } else {
           removeTreeValidators(dataGroup, Validators.required);
@@ -177,40 +170,45 @@ export class RfcFormComponent {
         enableAll(pfDataGroup);
         pmDataGroup.reset();
       }
-      this.tipoSujeto = value;
+      this.rfcFormService.tipoSujeto = value;
     });
   }
 
   onSubmit() {
-    this.responseError = null;
+    this.rfcFormService.responseError = null;
     if (this.rfcForm.invalid) {
       markAllAsDirty(this.rfcForm);
       return;
     }
     this.loading = true;
 
-    if (this.rfcFormResponse$ === null && this.finalResponse$ === null) {
+    if (
+      this.rfcFormService.rfcFormResponse$ === null &&
+      this.rfcFormService.finalResponse$ === null
+    ) {
       // needs to call API
-      if (this.dataStatus.dataIsRequired) {
+      if (this.rfcFormService.dataStatus.dataIsRequired) {
         // validation with data
         const formValue = this.rfcForm.value as RfcFormDataValue;
-        this.rfcFormResponse$ =
+        this.rfcFormService.rfcFormResponse$ =
           this.rfcFormService.validateRFCWithData$(formValue);
       } else {
         const formValue = this.rfcForm.value as RfcFormValue;
-        this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue);
+        this.rfcFormService.rfcFormResponse$ =
+          this.rfcFormService.validateRFC$(formValue);
       }
       // filters response
-      this.finalResponse$ = this.getFinalResponse$();
+      this.rfcFormService.finalResponse$ =
+        this.rfcFormService.getFinalResponse$();
     }
 
     // ACTUALLY REFLECT SUCCESS-VALID OR INVALID OR BAD REQUEST IN FORM.
-    this.finalResponse$?.subscribe((value) => {
+    this.rfcFormService.finalResponse$?.subscribe((value) => {
       if (!value) {
         return;
       }
       if (value.status === 'SUCCESS') {
-        if (this.isRFCWithDataSuccess(value)) {
+        if (this.rfcFormService.isRFCWithDataSuccess(value)) {
           const response = value.response.rfcs[0];
           if (
             response.result === 'RFC válido, y susceptible de recibir facturas'
@@ -222,7 +220,7 @@ export class RfcFormComponent {
 
             this.router.navigateByUrl('/dashboard');
           } else {
-            this.responseError = response.result;
+            this.rfcFormService.responseError = response.result;
           }
         } else {
           const response = value.response.rfcs[0];
@@ -234,11 +232,11 @@ export class RfcFormComponent {
 
             this.router.navigateByUrl('/dashboard');
           } else {
-            this.responseError = response.result;
+            this.rfcFormService.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.responseError =
+        this.rfcFormService.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -270,70 +268,9 @@ export class RfcFormComponent {
 
       // After using the response set them to null in case of resubmitting form.
       this.loading = false;
-      this.rfcFormResponse$ = null;
-      this.finalResponse$ = null;
+      this.rfcFormService.rfcFormResponse$ = null;
+      this.rfcFormService.finalResponse$ = null;
     });
-  }
-
-  getFinalResponse$() {
-    // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
-    if (!this.rfcFormResponse$) {
-      return of(null);
-    }
-    return this.rfcFormResponse$.pipe(
-      filter((value): value is LoadingState<RFC | RFCWithData> => !!value),
-      map((value) => {
-        const data = value.data;
-        const error = value.error as
-          | ValidateRFCBadRequestResponse
-          | ValidateRFCWithDataBadRequestResponse
-          | ValidateRFCServiceUnavailableResponse
-          | ValidateRFCWithDataServiceUnavailableResponse;
-
-        if (data?.status === 'SUCCESS') {
-          if (this.isRFCWithDataSuccess(data)) {
-            const response = data.response;
-            const matched = response.rfcs.find(
-              (rfc) =>
-                rfc.result ===
-                  'RFC válido, y susceptible de recibir facturas' ||
-                rfc.result ===
-                  'El nombre, denominación o razón social no coincide con el registrado en el RFC' ||
-                rfc.result ===
-                  'RFC no registrado en el padrón de contribuyentes'
-            );
-
-            return {
-              ...data,
-              response: {
-                rfcs: [matched ?? response.rfcs[response.rfcs.length - 1]],
-              },
-            };
-          } else {
-            // Assuming its RFC, only once result/rfc is expected.
-            const response = data.response;
-
-            return {
-              ...data,
-              response: { rfcs: [response.rfcs[0]] },
-            };
-          }
-        }
-
-        // BAD REQUEST
-        if (error) {
-          return error;
-        }
-
-        return null;
-      })
-    );
-  }
-
-  isRFCWithDataSuccess(
-    data: RFC | RFCWithData
-  ): data is ValidateRFCWithDataSuccessResponse {
-    return 'request' in data && 'cp' in (data as any).response.rfcs[0];
   }
 
   // sets the CP on the field when autocomplete is successful - valid.
@@ -376,26 +313,28 @@ export class RfcFormComponent {
       municipio: eventData.municipio?.c_mnpio,
     };
 
-    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
-    this.finalResponse$ = this.getFinalResponse$();
+    this.rfcFormService.rfcFormResponse$ =
+      this.rfcFormService.cpQuery$(requestBody);
+    this.rfcFormService.finalResponse$ =
+      this.rfcFormService.getFinalResponse$();
 
-    this.finalResponse$.subscribe((value) => {
+    this.rfcFormService.finalResponse$.subscribe((value) => {
       if (!value) {
         return;
       }
       if (value.status === 'SUCCESS') {
-        if (this.isRFCWithDataSuccess(value)) {
+        if (this.rfcFormService.isRFCWithDataSuccess(value)) {
           const response = value.response.rfcs[0];
           if (
             response.result === 'RFC válido, y susceptible de recibir facturas'
           ) {
             this.rfcForm.get(['data', 'cp'] as const)?.setValue(response.cp);
           } else {
-            this.responseError = response.result;
+            this.rfcFormService.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.responseError =
+        this.rfcFormService.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -426,6 +365,18 @@ export class RfcFormComponent {
       }
       this.loading = false;
     });
+  }
+
+  getTipoSujeto() {
+    return this.rfcFormService.tipoSujeto;
+  }
+
+  isDataRequired() {
+    return this.rfcFormService.dataStatus.dataIsRequired;
+  }
+
+  getResponseError() {
+    return this.rfcFormService.responseError;
   }
 
   handleAutoCompleteCPClick() {

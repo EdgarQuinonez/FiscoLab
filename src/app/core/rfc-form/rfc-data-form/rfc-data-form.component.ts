@@ -68,17 +68,17 @@ import { RfcFormService } from '../rfc-form.service';
 export class RfcDataFormComponent {
   rfcForm = new FormGroup({
     tipoSujeto: new FormControl('', Validators.required),
-    pfDataForm: new FormGroup({
-      nombres: new FormControl('', Validators.required),
-      apellidoPaterno: new FormControl('', Validators.required),
-      apellidoMaterno: new FormControl(''),
-      fechaNacimiento: new FormControl({}, Validators.required),
-    }),
-    pmDataForm: new FormGroup({
-      fechaConstitucion: new FormControl({}, Validators.required),
-      razonSocial: new FormControl('', Validators.required),
-    }),
     data: new FormGroup({
+      pfDataForm: new FormGroup({
+        nombres: new FormControl('', Validators.required),
+        apellidoPaterno: new FormControl('', Validators.required),
+        apellidoMaterno: new FormControl(''),
+        fechaNacimiento: new FormControl({}, Validators.required),
+      }),
+      pmDataForm: new FormGroup({
+        fechaConstitucion: new FormControl({}, Validators.required),
+        razonSocial: new FormControl('', Validators.required),
+      }),
       cp: new FormControl(''),
     }),
   });
@@ -136,8 +136,11 @@ export class RfcDataFormComponent {
       });
 
     this.rfcForm.get('tipoSujeto')?.valueChanges.subscribe((value) => {
-      const pmForm = this.rfcForm.get('pmDataForm') as FormGroup;
-      const pfForm = this.rfcForm.get('pfDataForm') as FormGroup;
+      const pmForm = this.rfcForm.get([
+        'data',
+        'pmDataForm',
+      ] as const) as FormGroup;
+      const pfForm = this.rfcForm.get(['data', 'pfDataForm']) as FormGroup;
 
       if (value === 'PM') {
         pfForm.reset();
@@ -201,14 +204,14 @@ export class RfcDataFormComponent {
     };
 
     this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
-    this.finalResponse$ = this.getFinalResponse$();
+    this.finalResponse$ = this.rfcFormService.getFinalResponse$();
 
     this.finalResponse$.subscribe((value) => {
       if (!value) {
         return;
       }
       if (value.status === 'SUCCESS') {
-        if (this.isRFCWithDataSuccess(value)) {
+        if (this.rfcFormService.isRFCWithDataSuccess(value)) {
           const response = value.response.rfcs[0];
           if (
             response.result === 'RFC válido, y susceptible de recibir facturas'
