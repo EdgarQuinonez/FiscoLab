@@ -85,13 +85,6 @@ export class RfcDataFormComponent {
 
   loading = false;
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
-
-  dataStatus: { dataIsRequired: boolean } = { dataIsRequired: false };
-  responseError: string | null = null;
-  tipoSujeto: TipoSujetoCode | null = null;
-
   constructor(
     private rfcService: RfcService,
     private rfcFormService: RfcFormService,
@@ -120,8 +113,8 @@ export class RfcDataFormComponent {
       )
       .subscribe((value) => {
         // const dataGroup = this.rfcForm.get('data') as FormGroup;
-        this.dataStatus = value;
-        if (this.dataStatus.dataIsRequired) {
+        this.rfcFormService.dataStatus = value;
+        if (this.rfcFormService.dataStatus.dataIsRequired) {
           Object.keys(dataGroup.controls).forEach((name) => {
             dataGroup.get(name)?.addValidators(Validators.required);
           });
@@ -159,7 +152,7 @@ export class RfcDataFormComponent {
           pfForm.get(name)?.enable();
         });
       }
-      this.tipoSujeto = value as TipoSujetoCode | null;
+      this.rfcFormService.tipoSujeto = value as TipoSujetoCode | null;
     });
   }
 
@@ -203,10 +196,12 @@ export class RfcDataFormComponent {
       municipio: eventData.municipio?.c_mnpio,
     };
 
-    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
-    this.finalResponse$ = this.rfcFormService.getFinalResponse$();
+    this.rfcFormService.rfcFormResponse$ =
+      this.rfcFormService.cpQuery$(requestBody);
+    this.rfcFormService.finalResponse$ =
+      this.rfcFormService.getFinalResponse$();
 
-    this.finalResponse$.subscribe((value) => {
+    this.rfcFormService.finalResponse$.subscribe((value) => {
       if (!value) {
         return;
       }
@@ -218,11 +213,11 @@ export class RfcDataFormComponent {
           ) {
             this.rfcForm.get(['data', 'cp'] as const)?.setValue(response.cp);
           } else {
-            this.responseError = response.result;
+            this.rfcFormService.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.responseError =
+        this.rfcFormService.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -255,8 +250,20 @@ export class RfcDataFormComponent {
     });
   }
 
+  getTipoSujeto() {
+    return this.rfcFormService.tipoSujeto;
+  }
+
+  isDataRequired() {
+    return this.rfcFormService.dataStatus.dataIsRequired;
+  }
+
+  getResponseError() {
+    return this.rfcFormService.responseError;
+  }
+
   onSubmit() {
-    this.responseError = null;
+    this.rfcFormService.responseError = null;
     if (this.rfcForm.invalid) {
       markAllAsDirty(this.rfcForm);
       return;
@@ -279,7 +286,7 @@ export class RfcDataFormComponent {
         .pipe(
           switchMapWithLoading<RFC | RFCWithData>(
             (value: GenerateRfcPfSuccessResponse) => {
-              if (this.dataStatus.dataIsRequired) {
+              if (this.isDataRequired()) {
                 // VALIDATE WITH DATA
 
                 return this.rfcService.validateRFCWithData$([
@@ -298,7 +305,7 @@ export class RfcDataFormComponent {
           ),
           tap((value) => {
             this.loading = value.loading;
-            if (this.dataStatus.dataIsRequired) {
+            if (this.rfcFormService.dataStatus.dataIsRequired) {
               // HANDLE WITH DATA RESPONSE
               if (value.data) {
                 const data = value.data as RFCWithData;
@@ -308,7 +315,7 @@ export class RfcDataFormComponent {
                   if (
                     rfcResult != 'RFC válido, y susceptible de recibir facturas'
                   ) {
-                    this.responseError = rfcResult + '.';
+                    this.rfcFormService.responseError = rfcResult + '.';
                   } else {
                     const response = data.response.rfcs[0];
                     this.storageService.setItem('rfc', response.rfc);
@@ -331,7 +338,7 @@ export class RfcDataFormComponent {
                   | ValidateRFCWithDataServiceUnavailableResponse;
 
                 if (error.status === 'SERVICE_ERROR') {
-                  this.responseError =
+                  this.rfcFormService.responseError =
                     'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
                   return;
                 }
@@ -388,7 +395,7 @@ export class RfcDataFormComponent {
                 | GenerateRfcPfServiceUnavailableResponse
             ) => {
               if (err.status === 'SERVICE_ERROR') {
-                this.responseError =
+                this.rfcFormService.responseError =
                   'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
               }
 
@@ -426,7 +433,7 @@ export class RfcDataFormComponent {
         .pipe(
           switchMapWithLoading<RFC | RFCWithData>(
             (value: GenerateRfcPmSuccessReponse) => {
-              if (this.dataStatus.dataIsRequired) {
+              if (this.isDataRequired()) {
                 // VALIDATE WITH DATA
 
                 return this.rfcService.validateRFCWithData$([
@@ -445,7 +452,7 @@ export class RfcDataFormComponent {
           ),
           tap((value) => {
             this.loading = value.loading;
-            if (this.dataStatus.dataIsRequired) {
+            if (this.rfcFormService.dataStatus.dataIsRequired) {
               // HANDLE WITH DATA RESPONSE
               if (value.data) {
                 const data = value.data as RFCWithData;
@@ -455,7 +462,7 @@ export class RfcDataFormComponent {
                   if (
                     rfcResult != 'RFC válido, y susceptible de recibir facturas'
                   ) {
-                    this.responseError = rfcResult + '.';
+                    this.rfcFormService.responseError = rfcResult + '.';
                   } else {
                     const response = data.response.rfcs[0];
                     this.storageService.setItem('rfc', response.rfc);
@@ -478,7 +485,7 @@ export class RfcDataFormComponent {
                   | ValidateRFCWithDataServiceUnavailableResponse;
 
                 if (error.status === 'SERVICE_ERROR') {
-                  this.responseError =
+                  this.rfcFormService.responseError =
                     'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
                   return;
                 }
@@ -535,7 +542,7 @@ export class RfcDataFormComponent {
                 | GenerateRfcPfServiceUnavailableResponse
             ) => {
               if (err.status === 'SERVICE_ERROR') {
-                this.responseError =
+                this.rfcFormService.responseError =
                   'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
               }
 
