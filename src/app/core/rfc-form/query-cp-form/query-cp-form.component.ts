@@ -98,10 +98,6 @@ export class QueryCpFormComponent {
   }
 
   onSubmit() {
-    if (this.queryCPForm.invalid) {
-      return;
-    }
-
     const queryCPFormValues = this.queryCPForm.value;
 
     if (this.queryCPForm.value) {
