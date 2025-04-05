@@ -18,12 +18,10 @@ export type ValidateRFCResult =
 export interface ValidateRFCSuccessResponse extends SuccessKibanResponse {
   request: ValidateRFCRequestBody;
   response: {
-    rfcs: [
-      {
-        result: ValidateRFCResult;
-        rfc: string;
-      }
-    ];
+    rfcs: {
+      result: ValidateRFCResult;
+      rfc: string;
+    }[];
   };
 }
 

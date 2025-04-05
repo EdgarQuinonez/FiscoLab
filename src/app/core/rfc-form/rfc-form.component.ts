@@ -14,7 +14,16 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { RfcService } from '@shared/services/rfc.service';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
-import { debounceTime, map, Observable, startWith, tap } from 'rxjs';
+import {
+  debounceTime,
+  filter,
+  map,
+  Observable,
+  of,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
@@ -49,6 +58,9 @@ import {
   ValidateRFCWithDataRequest,
   ValidateRfcCpQueryRequest,
   ValidateRFCServiceUnavailableResponse,
+  ValidateRFCResult,
+  ValidateRFCWithDataResult,
+  ValidateRFCWithDataSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
@@ -93,6 +105,7 @@ export class RfcFormComponent {
   });
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
   dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
@@ -176,7 +189,7 @@ export class RfcFormComponent {
     }
     this.loading = true;
 
-    if (this.rfcFormResponse$ === null) {
+    if (this.rfcFormResponse$ === null && this.finalResponse$ === null) {
       // needs to call API
       if (this.dataStatus.dataIsRequired) {
         // validation with data
@@ -187,78 +200,140 @@ export class RfcFormComponent {
         const formValue = this.rfcForm.value as RfcFormValue;
         this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue);
       }
+      // filters response
+      this.finalResponse$ = this.getFinalResponse$();
     }
 
-    // Handle rfc form response SUCCESS - VALID, SUCCESS - INVALID or ERROR (BAD REQUEST AND SERVICE_UNAVAILABLE)
-    this.rfcFormResponse$.subscribe((value) => {
-      this.rfcFormResponse$ = null; // Reset response in case of error (meaning user manually resubmitted the form)
-      this.loading = false;
-      if (value.data) {
-        // SUCCESS
-        if (value.data.status === 'SUCCESS') {
-          const response = value.data.response;
-          for (let rfc of response.rfcs) {
-            const result = rfc.result;
-            // VALID
-            if (result === 'RFC válido, y susceptible de recibir facturas') {
-              const formValue = this.rfcForm.value as
-                | RfcFormValue
-                | RfcFormDataValue;
+    // ACTUALLY REFLECT SUCCESS-VALID OR INVALID OR BAD REQUEST IN FORM.
+    this.finalResponse$?.subscribe((value) => {
+      if (!value) {
+        return;
+      }
+      if (value.status === 'SUCCESS') {
+        if (this.isRFCWithDataSuccess(value)) {
+          const response = value.response.rfcs[0];
+          if (
+            response.result === 'RFC válido, y susceptible de recibir facturas'
+          ) {
+            this.storageService.setItem('rfc', response.rfc);
+            this.storageService.setItem('result', response.result);
+            this.storageService.setItem('cp', response.cp);
+            this.storageService.setItem('nombre', response.nombre);
 
-              this.storageService.setItem('tipoSujeto', formValue.tipoSujeto);
-              this.storageService.setItem('rfc', rfc.rfc);
-              this.storageService.setItem('rfcResult', rfc.result);
+            this.router.navigateByUrl('/dashboard');
+          } else {
+            this.responseError = response.result;
+          }
+        } else {
+          const response = value.response.rfcs[0];
+          if (
+            response.result === 'RFC válido, y susceptible de recibir facturas'
+          ) {
+            this.storageService.setItem('rfc', response.rfc);
+            this.storageService.setItem('result', response.result);
 
-              this.router.navigateByUrl('/dashboard');
-              break;
-            } else if (
-              result ===
-              'El Código Postal no coincide con el registrado en el RFC'
-            ) {
-              // TODO: make this independent of onSubmit so autocompleteCP focuses on setting the cpControl value and submit focuses on giving feedback to the user or letting them in to the dashboard.
-              continue;
-            } else {
-              // INVALID
-              this.responseError = result;
-              break;
-            }
+            this.router.navigateByUrl('/dashboard');
+          } else {
+            this.responseError = response.result;
           }
         }
+      } else if (value.status === 'SERVICE_ERROR') {
+        this.responseError =
+          'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
-      // BAD REQUEST or SERVICE_UNAVAILABLE
-      if (value.error) {
+
+      // BAD REQUEST
+      if (typeof value.status === 'number') {
+        const error = value.error;
+
+        error.forEach((err) => {
+          const field = err.field.slice(0, -3); // strip down index from field
+          const code = err.code;
+
+          if (field === 'rfc') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get('rfc')?.setErrors({
+                rfc: 'Ingresa un RFC válido con homoclave.',
+              });
+            }
+          }
+
+          if (field === 'cp') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                cp: 'Ingresa un código postal válido.',
+              });
+            }
+          }
+        });
+      }
+
+      // After using the response set them to null in case of resubmitting form.
+      this.loading = false;
+      this.rfcFormResponse$ = null;
+      this.finalResponse$ = null;
+    });
+  }
+
+  getFinalResponse$() {
+    // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
+    if (!this.rfcFormResponse$) {
+      return of(null);
+    }
+    return this.rfcFormResponse$.pipe(
+      filter((value): value is LoadingState<RFC | RFCWithData> => !!value),
+      map((value) => {
+        const data = value.data;
         const error = value.error as
           | ValidateRFCBadRequestResponse
           | ValidateRFCWithDataBadRequestResponse
           | ValidateRFCServiceUnavailableResponse
           | ValidateRFCWithDataServiceUnavailableResponse;
 
-        if (error.status === 'SERVICE_ERROR') {
-          this.responseError = error.errorMessage;
-        } else {
-          error.error.forEach((err) => {
-            const field = err.field.slice(0, -3); // strip down index from field
-            const code = err.code;
+        if (data?.status === 'SUCCESS') {
+          if (this.isRFCWithDataSuccess(data)) {
+            const response = data.response;
+            const matched = response.rfcs.find(
+              (rfc) =>
+                rfc.result ===
+                  'RFC válido, y susceptible de recibir facturas' ||
+                rfc.result ===
+                  'El nombre, denominación o razón social no coincide con el registrado en el RFC' ||
+                rfc.result ===
+                  'RFC no registrado en el padrón de contribuyentes'
+            );
 
-            if (field === 'rfc') {
-              if (code === 'FORMAT_ERROR') {
-                this.rfcForm.get('rfc')?.setErrors({
-                  rfc: 'Ingresa un RFC válido con homoclave.',
-                });
-              }
-            }
+            return {
+              ...data,
+              response: {
+                rfcs: [matched ?? response.rfcs[response.rfcs.length - 1]],
+              },
+            };
+          } else {
+            // Assuming its RFC, only once result/rfc is expected.
+            const response = data.response;
 
-            if (field === 'cp') {
-              if (code === 'FORMAT_ERROR') {
-                this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-                  cp: 'Ingresa un código postal válido.',
-                });
-              }
-            }
-          });
+            return {
+              ...data,
+              response: { rfcs: [response.rfcs[0]] },
+            };
+          }
         }
-      }
-    });
+
+        // BAD REQUEST
+        if (error) {
+          return error;
+        }
+
+        return null;
+      })
+    );
+  }
+
+  isRFCWithDataSuccess(
+    data: RFC | RFCWithData
+  ): data is ValidateRFCWithDataSuccessResponse {
+    return 'request' in data && 'cp' in (data as any).response.rfcs[0];
   }
 
   // sets the CP on the field when autocomplete is successful - valid.

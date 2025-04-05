@@ -25,6 +25,7 @@ import { QueryCPFormValue } from './query-cp-form.interface';
   styleUrl: './query-cp-form.component.scss',
 })
 export class QueryCpFormComponent {
+  validateRfcLoading = input(false);
   queryCPSubmitted = output<QueryCPFormValue>();
 
   visible = false;
