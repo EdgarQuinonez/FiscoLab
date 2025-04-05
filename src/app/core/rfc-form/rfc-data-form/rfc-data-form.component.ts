@@ -14,6 +14,7 @@ import {
   GenerateRfcPmSuccessReponse,
   RFC,
   RFCWithData,
+  ValidateRfcCpQueryRequest,
   ValidateRFCSuccessResponse,
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
@@ -41,6 +42,12 @@ import { format } from 'date-fns';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { QueryCpFormComponent } from '../query-cp-form/query-cp-form.component';
+import { QueryCPFormValue } from '../query-cp-form/query-cp-form.interface';
+import { RfcFormValueWithCP } from '../rfc-form.interface';
+import { RfcFormService } from '../rfc-form.service';
 
 @Component({
   selector: 'app-rfc-data-form',
@@ -51,6 +58,9 @@ import { StorageService } from '@shared/services/storage.service';
     InputTextModule,
     TipoSujetoControlComponent,
     ReactiveFormsModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    QueryCpFormComponent,
   ],
   templateUrl: './rfc-data-form.component.html',
   styleUrl: './rfc-data-form.component.scss',
@@ -76,12 +86,15 @@ export class RfcDataFormComponent {
   loading = false;
 
   rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+
   dataStatus: { dataIsRequired: boolean } = { dataIsRequired: false };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
 
   constructor(
     private rfcService: RfcService,
+    private rfcFormService: RfcFormService,
     private router: Router,
     private storageService: StorageService
   ) {}
@@ -144,6 +157,98 @@ export class RfcDataFormComponent {
         });
       }
       this.tipoSujeto = value as TipoSujetoCode | null;
+    });
+  }
+
+  // sets the CP on the field when autocomplete is successful - valid.
+  autocompleteCP(eventData: QueryCPFormValue) {
+    // Triggering validation errors
+    if (
+      this.rfcForm.get('tipoSujeto')?.invalid ||
+      // this.rfcForm.get(['data', 'cp'])?.invalid ||
+      this.rfcForm.get(['rfc'])?.invalid
+    ) {
+      markAllAsDirty(this.rfcForm);
+      return;
+    }
+
+    if (
+      this.rfcForm.get('tipoSujeto')?.value === 'PF' ||
+      this.rfcForm.get('tipoSujeto')?.value === null
+    ) {
+      if (this.rfcForm.get(['data', 'pfData'])?.invalid) {
+        markAllAsDirty(this.rfcForm);
+        return;
+      }
+    } else if (this.rfcForm.get('tipoSujeto')?.value === 'PM') {
+      if (this.rfcForm.get(['data', 'pmData'])?.invalid) {
+        markAllAsDirty(this.rfcForm);
+
+        return;
+      }
+    }
+    this.loading = true;
+    const formValues = this.rfcForm.value as RfcFormValueWithCP;
+
+    const requestBody: ValidateRfcCpQueryRequest = {
+      rfc: formValues.rfc,
+      nombre:
+        formValues.tipoSujeto === 'PF'
+          ? `${formValues.data.pfData.nombre} ${formValues.data.pfData.apellido}`
+          : formValues.data.pmData.razonSocial,
+      estado: eventData.estado?.c_estado,
+      municipio: eventData.municipio?.c_mnpio,
+    };
+
+    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
+    this.finalResponse$ = this.getFinalResponse$();
+
+    this.finalResponse$.subscribe((value) => {
+      if (!value) {
+        return;
+      }
+      if (value.status === 'SUCCESS') {
+        if (this.isRFCWithDataSuccess(value)) {
+          const response = value.response.rfcs[0];
+          if (
+            response.result === 'RFC válido, y susceptible de recibir facturas'
+          ) {
+            this.rfcForm.get(['data', 'cp'] as const)?.setValue(response.cp);
+          } else {
+            this.responseError = response.result;
+          }
+        }
+      } else if (value.status === 'SERVICE_ERROR') {
+        this.responseError =
+          'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+      }
+
+      // BAD REQUEST
+      if (typeof value.status === 'number') {
+        const error = value.error;
+
+        error.forEach((err) => {
+          const field = err.field.slice(0, -3); // strip down index from field
+          const code = err.code;
+
+          if (field === 'rfc') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get('rfc')?.setErrors({
+                rfc: 'Ingresa un RFC válido con homoclave.',
+              });
+            }
+          }
+
+          if (field === 'cp') {
+            if (code === 'FORMAT_ERROR') {
+              this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+                cp: 'Ingresa un código postal válido.',
+              });
+            }
+          }
+        });
+      }
+      this.loading = false;
     });
   }
 
