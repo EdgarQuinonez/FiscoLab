@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { RfcFormValue, RfcFormDataValue } from './rfc-form.interface';
+import {
+  RfcFormValue,
+  RfcFormDataValue,
+  RfcDataFormValue,
+  RfcDataFormValueWithData,
+} from './rfc-form.interface';
 import {
   RFC,
   ValidateRFCSuccessResponse,
@@ -13,7 +18,7 @@ import {
   ValidateRFCWithDataSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import { filter, map, Observable, of, tap } from 'rxjs';
+import { filter, iif, map, Observable, of, tap } from 'rxjs';
 import { RfcService } from '@shared/services/rfc.service';
 import { StorageService } from '@shared/services/storage.service';
 import { Router } from '@angular/router';
@@ -57,29 +62,134 @@ export class RfcFormService {
                 : `${rfcFormValue.data.pfData.nombre} ${rfcFormValue.data.pfData.apellido}`,
           },
         ])
-      ),
-      tap((value) => {
-        if (value.data) {
-          if (value.data.status === 'SUCCESS') {
-            const response = value.data.response;
-            const result = response.rfcs[0].result;
-            // SUCCESS AND FOUND
-            if (result === 'RFC válido, y susceptible de recibir facturas') {
-              this.storageService.setItem(
-                'tipoSujeto',
-                rfcFormValue.tipoSujeto
-              );
-              this.storageService.setItem('rfc', response.rfcs[0].rfc);
-              this.storageService.setItem('rfcResult', result);
-              this.storageService.setItem('cp', response.rfcs[0].cp);
-              this.storageService.setItem('nombre', response.rfcs[0].nombre);
-
-              this.router.navigateByUrl('/dashboard');
-            }
-          }
-        }
-      })
+      )
     );
+  }
+
+  generateAndValidatePfRfc$(formValue: RfcDataFormValue) {
+    return this.rfcService
+      .generateRfcPF$({
+        nombres: formValue.data.pfData.nombres,
+        apellidoPaterno: formValue.data.pfData.apellidoPaterno,
+        apellidoMaterno: formValue.data.pfData.apellidoMaterno,
+        fechaNacimiento: formValue.data.pfData.fechaNacimiento,
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return new Observable((subscriber) => subscriber.next()).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFC$({ rfcs: [{ rfc: response.rfc }] })
+              ),
+              map((value) => {
+                return value;
+              })
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        })
+      );
+  }
+
+  generateAndValidatePmRfc$(formValue: RfcDataFormValue) {
+    return this.rfcService
+      .generateRfcPM$({
+        razonSocial: formValue.data.pmData.razonSocial,
+        fechaConstitucion: formValue.data.pmData.fechaConstitucion,
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return new Observable((subscriber) => subscriber.next()).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFC$({
+                  rfcs: [
+                    {
+                      rfc: response.rfc,
+                    },
+                  ],
+                })
+              ),
+              map((value) => {
+                return value;
+              })
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        })
+      );
+  }
+
+  generateAndValidatePfRfcWithData$(formValue: RfcDataFormValueWithData) {
+    return this.rfcService
+      .generateRfcPF$({
+        nombres: formValue.data.pfData.nombres,
+        apellidoPaterno: formValue.data.pfData.apellidoPaterno,
+        apellidoMaterno: formValue.data.pfData.apellidoMaterno,
+        fechaNacimiento: formValue.data.pfData.fechaNacimiento,
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return new Observable((subscriber) => subscriber.next()).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFCWithData$([
+                  {
+                    rfc: response.rfc,
+                    nombre: `${formValue.data.pfData.nombres} ${formValue.data.pfData.apellidoPaterno} ${formValue.data.pfData.apellidoMaterno}`,
+                    cp: formValue.data.cp,
+                  },
+                ])
+              ),
+              map((value) => {
+                return value;
+              })
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        })
+      );
+  }
+
+  generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
+    return this.rfcService
+      .generateRfcPM$({
+        razonSocial: formValue.data.pmData.razonSocial,
+        fechaConstitucion: formValue.data.pmData.fechaConstitucion,
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return new Observable((subscriber) => subscriber.next()).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFCWithData$([
+                  {
+                    rfc: response.rfc,
+                    nombre: formValue.data.pmData.razonSocial,
+                    cp: formValue.data.cp,
+                  },
+                ])
+              ),
+              map((value) => {
+                return value;
+              })
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        })
+      );
   }
 
   cpQuery$(requestBody: ValidateRfcCpQueryRequest) {
