@@ -1,4 +1,4 @@
-<p-button label="Autocompletar" icon="pi pi-check-square" iconPos="right" (click)="showPanel()" [loading]="validateRfcLoading()"  class="h-full"/>
+<p-button label="Autocompletar" icon="pi pi-check-square" iconPos="right" (click)="showPanel()" [loading]="validateRfcLoading()"  [disabled]="!dataIsRequired()"  class="h-full"/>
 <p-dialog header="Consulta de Código Postal" [modal]="true" [(visible)]="visible" styleClass="w-[27.5rem] overflow-hidden">
     <span class="p-text-secondary block mb-8">Selecciona el estado y municipio para reducir el tamaño de tu búsqueda.</span>
     

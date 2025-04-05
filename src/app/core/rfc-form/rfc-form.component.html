@@ -77,7 +77,7 @@
                                         <span>Código Postal: </span>                                                                                                                                                                              
                                         <p-inputgroup>
                                             <p-inputgroup-addon>
-                                                <app-query-cp-form [validateRfcLoading]="loading" (queryCPSubmitted)="autocompleteCP($event)" />
+                                                <app-query-cp-form [validateRfcLoading]="loading" [dataIsRequired]="dataStatus.dataIsRequired" (queryCPSubmitted)="autocompleteCP($event)" />
                                             </p-inputgroup-addon>
                                             <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
                                         </p-inputgroup>

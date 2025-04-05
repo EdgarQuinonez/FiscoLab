@@ -26,6 +26,7 @@ import { QueryCPFormValue } from './query-cp-form.interface';
 })
 export class QueryCpFormComponent {
   validateRfcLoading = input(false);
+  dataIsRequired = input(false);
   queryCPSubmitted = output<QueryCPFormValue>();
 
   visible = false;
@@ -106,5 +107,7 @@ export class QueryCpFormComponent {
     if (this.queryCPForm.value) {
       this.queryCPSubmitted.emit(queryCPFormValues);
     }
+
+    this.closePanel();
   }
 }

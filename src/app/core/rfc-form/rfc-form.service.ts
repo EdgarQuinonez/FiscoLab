@@ -89,7 +89,7 @@ export class RfcFormService {
         );
       }
 
-      for (let cp in queryResults) {
+      for (let cp of queryResults) {
         const rfcObj = {
           rfc: requestBody.rfc,
           nombre: requestBody.nombre,
@@ -103,6 +103,7 @@ export class RfcFormService {
     } else {
       // Iterate through all states and mnpios to retrieve all of their cps
     }
+
     return new Observable((subscriber) => subscriber.next()).pipe(
       switchMapWithLoading(() => this.rfcService.validateRFCWithData$(rfcs))
     );
