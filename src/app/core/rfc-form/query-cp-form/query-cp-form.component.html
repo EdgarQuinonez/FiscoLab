@@ -17,7 +17,7 @@
         <!-- </div> -->
         <div class="flex justify-end gap-2 absolute bottom-4 w-full">
             <p-button label="Cancelar" severity="secondary" (click)="closePanel()" />
-            <p-button type="submit" label="Enviar"/>
+            <p-button type="submit" label="Enviar" [disabled]="queryCPForm.invalid" />
         </div>
     </form>
     
