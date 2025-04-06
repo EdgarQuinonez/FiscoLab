@@ -24,6 +24,7 @@ import { StorageService } from '@shared/services/storage.service';
 import { Router } from '@angular/router';
 import cpCatalog from '@public/cp.catalog.json';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
+import { format } from 'date-fns/format';
 
 @Injectable({
   providedIn: 'root',
@@ -72,7 +73,10 @@ export class RfcFormService {
         nombres: formValue.data.pfData.nombres,
         apellidoPaterno: formValue.data.pfData.apellidoPaterno,
         apellidoMaterno: formValue.data.pfData.apellidoMaterno,
-        fechaNacimiento: formValue.data.pfData.fechaNacimiento,
+        fechaNacimiento: format(
+          formValue.data.pfData.fechaNacimiento,
+          'yyyy-MM-dd'
+        ),
       })
       .pipe(
         map((value) => {
@@ -98,7 +102,10 @@ export class RfcFormService {
     return this.rfcService
       .generateRfcPM$({
         razonSocial: formValue.data.pmData.razonSocial,
-        fechaConstitucion: formValue.data.pmData.fechaConstitucion,
+        fechaConstitucion: format(
+          formValue.data.pmData.fechaConstitucion,
+          'yyyy-MM-dd'
+        ),
       })
       .pipe(
         map((value) => {
@@ -127,12 +134,16 @@ export class RfcFormService {
   }
 
   generateAndValidatePfRfcWithData$(formValue: RfcDataFormValueWithData) {
+    format;
     return this.rfcService
       .generateRfcPF$({
         nombres: formValue.data.pfData.nombres,
         apellidoPaterno: formValue.data.pfData.apellidoPaterno,
         apellidoMaterno: formValue.data.pfData.apellidoMaterno,
-        fechaNacimiento: formValue.data.pfData.fechaNacimiento,
+        fechaNacimiento: format(
+          formValue.data.pfData.fechaNacimiento,
+          'yyyy-MM-dd'
+        ),
       })
       .pipe(
         map((value) => {
@@ -164,7 +175,10 @@ export class RfcFormService {
     return this.rfcService
       .generateRfcPM$({
         razonSocial: formValue.data.pmData.razonSocial,
-        fechaConstitucion: formValue.data.pmData.fechaConstitucion,
+        fechaConstitucion: format(
+          formValue.data.pmData.fechaConstitucion,
+          'yyyy-MM-dd'
+        ),
       })
       .pipe(
         map((value) => {

@@ -57,9 +57,11 @@ import { QueryCPFormValue } from '../query-cp-form/query-cp-form.interface';
 import {
   RfcDataFormFormGroup,
   RfcDataFormPFDataFormGroup,
+  RfcDataFormPfDataValue,
   RfcDataFormPMDataFormGroup,
   RfcDataFormValue,
   RfcDataFormValueWithData,
+  RfcFormDataValue,
   RfcFormFormGroup,
   RfcFormPFDataFormGroup,
   RfcFormPMDataFormGroup,
@@ -114,7 +116,7 @@ export class RfcDataFormComponent {
   });
 
   generateRfcResponse$: Observable<
-    GenerateRfcPf | GenerateRfcPm | RFCWithData | RFC
+    GenerateRfcPf | GenerateRfcPm | Observable<LoadingState<RFCWithData | RFC>>
   > | null = null;
 
   loading = false;
@@ -299,17 +301,38 @@ export class RfcDataFormComponent {
 
     this.loading = true;
 
-    const formValue = this.rfcForm.value;
+    // Get form value with proper typing (non-nullable)
+    const formValue = this.rfcForm.value as RfcDataFormValue;
+
     if (formValue.tipoSujeto === 'PF') {
       if (this.rfcFormService.dataStatus.dataIsRequired) {
-        this.rfcFormService.generateAndValidatePfRfcWithData$();
+        const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
+        this.generateRfcResponse$ =
+          this.rfcFormService.generateAndValidatePfRfcWithData$(requestBody);
       } else {
+        const requestBody = this.rfcForm.value as RfcDataFormValue;
+
+        this.generateRfcResponse$ =
+          this.rfcFormService.generateAndValidatePfRfc$(requestBody);
       }
     } else if (formValue.tipoSujeto === 'PM') {
       if (this.rfcFormService.dataStatus.dataIsRequired) {
+        const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
+
+        this.generateRfcResponse$ =
+          this.rfcFormService.generateAndValidatePmRfcWithData$(requestBody);
       } else {
+        const requestBody = this.rfcForm.value as RfcDataFormValue;
+
+        this.generateRfcResponse$ =
+          this.rfcFormService.generateAndValidatePmRfc$(requestBody);
       }
     }
+
+    // TODO: generateRfcResponse must have either a generateRFCBadREquest or service error, or LoadingState<RFCs>
+    // So first of all check if
+
+    this.generateRfcResponse$?.pipe();
 
     // if (rfcFormValue.tipoSujeto === 'PF') {
     //   this.rfcFormService;

@@ -109,10 +109,10 @@ export interface RfcDataFormPfDataValue {
   nombres: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  fechaNacimiento: string;
+  fechaNacimiento: Date;
 }
 
 export interface RfcDataFormPmDataValue {
-  fechaConstitucion: string;
+  fechaConstitucion: Date;
   razonSocial: string;
 }
