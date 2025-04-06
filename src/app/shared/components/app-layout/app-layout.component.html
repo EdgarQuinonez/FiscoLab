@@ -1,0 +1,13 @@
+<div class="layout-wrapper">
+  <div>
+    <app-topbar *ngIf="tipoTopBar === 'main'"></app-topbar>
+  </div>
+  <div class="layout-main-container">
+    <div class="sidebar-container">
+      <app-sidebar></app-sidebar>
+    </div>
+    <div class="pages-container">
+      <router-outlet />
+    </div>
+  </div>
+</div>

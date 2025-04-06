@@ -1,40 +1,74 @@
-<app-topbar></app-topbar>
-<p-card styleClass="w-128">
+<ng-container *ngIf="tipoSujeto === 'PF'; else PM">
+  <p-card styleClass="w-full h-full shadow-2xl">
     <ng-template #header>
-        <div class="flex items-center justify-center p-8">
-            <!-- SAT collection -->
-            <p-image [src]="imagePath.satLogo" alt="Logo del SAT" width="128"/>     
-            <h1 class="w-full">
-                Colección del SAT
-            </h1>
-        </div>        
+      <div class="flex items-center justify-center p-8">
+        <p-image [src]="imagePath.satLogo" alt="Logo del SAT" width="128" />
+        <h1 class="w-full">
+          Colección del SAT
+        </h1>
+      </div>
     </ng-template>
     <ng-template #title>
-        Servicios:
+      Servicios:
     </ng-template>
-    
+    <div class="grid grid-cols-3 gap-2 h-full">
+      <a routerLink="/sat/rfc-pf">
+        <p-button aria-label="RFC" variant="outlined" styleClass="w-full h-32">
+          <div class="flex flex-col">
+            <span class="font-bold text-xl">RFC</span>
+            <i class="pi pi-user mt-2"></i>
+          </div>
+        </p-button>
+      </a>
+      <a>
+        <span>Generar RFC</span>
+      </a>
+      <a>
+        <span>Generar RFC</span>
+      </a>
+    </div>
+    <ng-template #footer>
+      <div></div>
+    </ng-template>
+  </p-card>
+</ng-container>
+<ng-template #PM>
+  <p-card styleClass="w-128 mt-4">
+    <h1> Persona Moral</h1>
+    <ng-template #header>
+      <div class="flex items-center justify-center p-8">
+        <p-image [src]="imagePath.satLogo" alt="Logo del SAT" width="128" />
+        <h1 class="w-full">
+          Colección del SAT
+        </h1>
+      </div>
+    </ng-template>
+    <ng-template #title>
+      Servicios:
+    </ng-template>
+
 
     <div class="grid grid-cols-3 gap-2 h-full">
 
-        <a routerLink="/sat/rfc-pf">
-            <p-button aria-label="RFC" variant="outlined" styleClass="w-full h-32">
-                    <div class="flex flex-col">
-                        <span class="font-bold text-xl">RFC</span>
-                        <i class="pi pi-user mt-2"></i>
-                    </div>
-            </p-button>
-        </a>
-        
-        <a>
-            <span>Generar RFC</span>
-        </a>    
-        <a>
-            <span>Generar RFC</span>
-        </a>    
+      <a routerLink="/sat/rfc-pf">
+        <p-button aria-label="RFC" variant="outlined" styleClass="w-full h-32">
+          <div class="flex flex-col">
+            <span class="font-bold text-xl">RFC</span>
+            <i class="pi pi-user mt-2"></i>
+          </div>
+        </p-button>
+      </a>
+
+      <a>
+        <span>Generar RFC</span>
+      </a>
+      <a>
+        <span>Generar RFC</span>
+      </a>
 
     </div>
 
     <ng-template #footer>
-        <div></div>
+      <div></div>
     </ng-template>
-</p-card>
+  </p-card>
