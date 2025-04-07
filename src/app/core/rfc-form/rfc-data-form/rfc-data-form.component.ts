@@ -11,6 +11,8 @@ import {
   GenerateRfcPfServiceUnavailableResponse,
   GenerateRfcPfSuccessResponse,
   GenerateRfcPm,
+  GenerateRfcPmBadRequestResponse,
+  GenerateRfcPmServiceUnavailableResponse,
   GenerateRfcPmSuccessReponse,
   RFC,
   RFCWithData,
@@ -27,6 +29,8 @@ import { MessageModule } from 'primeng/message';
 import {
   catchError,
   debounceTime,
+  finalize,
+  iif,
   map,
   Observable,
   of,
@@ -115,8 +119,18 @@ export class RfcDataFormComponent {
     }),
   });
 
+  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+  dataStatus!: { dataIsRequired: boolean };
+  responseError: string | null = null;
+  tipoSujeto: TipoSujetoCode | null = null;
+
   generateRfcResponse$: Observable<
-    GenerateRfcPf | GenerateRfcPm | Observable<LoadingState<RFCWithData | RFC>>
+    | GenerateRfcPfBadRequestResponse
+    | GenerateRfcPfServiceUnavailableResponse
+    | GenerateRfcPmBadRequestResponse
+    | GenerateRfcPmServiceUnavailableResponse
+    | Observable<LoadingState<RFCWithData | RFC>>
   > | null = null;
 
   loading = false;
@@ -136,32 +150,39 @@ export class RfcDataFormComponent {
   }
 
   subscribeToDataGroupValueChanges() {
-    const dataGroup: RfcDataFormFormGroup['data'] = this.rfcForm.get(
+    const dataGroup: RfcFormFormGroup['data'] = this.rfcForm.get(
       'data'
     ) as FormGroup;
+    const cpControl = this.rfcForm.get(['data', 'cp'] as const);
 
     dataGroup?.valueChanges
       .pipe(
         debounceTime(200),
         map((value) => {
-          if (checkAllValuesNull(value)) {
-            return { dataIsRequired: false };
+          if (!value.cp) {
+            return {
+              dataIsRequired: false,
+            };
           }
 
-          return { dataIsRequired: true };
+          return {
+            dataIsRequired: true,
+          };
         }),
-        startWith({ dataIsRequired: false })
+        startWith({
+          dataIsRequired: false,
+        })
       )
       .subscribe((value) => {
-        this.rfcFormService.dataStatus = value;
-        if (this.rfcFormService.dataStatus.dataIsRequired) {
-          addTreeValidators(dataGroup, Validators.required);
+        if (value.dataIsRequired) {
+          cpControl?.addValidators(Validators.required);
         } else {
-          removeTreeValidators(dataGroup, Validators.required);
-          markAllAsPristine(dataGroup);
+          cpControl?.removeValidators(Validators.required);
+          cpControl?.markAsPristine();
         }
 
         updateTreeValidity(this.rfcForm, { emitEvent: false });
+        this.dataStatus = value;
       });
   }
 
@@ -182,18 +203,24 @@ export class RfcDataFormComponent {
         enableAll(pfDataGroup);
         pmDataGroup.reset();
       }
-      this.rfcFormService.tipoSujeto = value;
+      this.tipoSujeto = value;
     });
+  }
+
+  isAutocompleteReady() {
+    const pmDataGroup = this.rfcForm.get(['data', 'pmData']);
+    const pfDataGroup = this.rfcForm.get(['data', 'pfData']);
+    const tipoSujetoControl = this.rfcForm.get('tipoSujeto');
+    return !!(
+      tipoSujetoControl?.valid &&
+      (pmDataGroup?.valid || pfDataGroup?.valid)
+    );
   }
 
   // sets the CP on the field when autocomplete is successful - valid.
   autocompleteCP(eventData: QueryCPFormValue) {
     // Triggering validation errors
-    if (
-      this.rfcForm.get('tipoSujeto')?.invalid ||
-      // this.rfcForm.get(['data', 'cp'])?.invalid ||
-      this.rfcForm.get(['rfc'])?.invalid
-    ) {
+    if (!this.isAutocompleteReady()) {
       markAllAsDirty(this.rfcForm);
       return;
     }
@@ -226,12 +253,12 @@ export class RfcDataFormComponent {
       municipio: eventData.municipio?.c_mnpio,
     };
 
-    this.rfcFormService.rfcFormResponse$ =
-      this.rfcFormService.cpQuery$(requestBody);
-    this.rfcFormService.finalResponse$ =
-      this.rfcFormService.getFinalResponse$();
+    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
+    this.finalResponse$ = this.rfcFormService.getFinalResponse$(
+      this.rfcFormResponse$
+    );
 
-    this.rfcFormService.finalResponse$.subscribe((value) => {
+    this.finalResponse$?.subscribe((value) => {
       if (!value) {
         return;
       }
@@ -243,11 +270,11 @@ export class RfcDataFormComponent {
           ) {
             this.rfcForm.get(['data', 'cp'] as const)?.setValue(response.cp);
           } else {
-            this.rfcFormService.responseError = response.result;
+            this.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.rfcFormService.responseError =
+        this.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -258,14 +285,6 @@ export class RfcDataFormComponent {
         error.forEach((err) => {
           const field = err.field.slice(0, -3); // strip down index from field
           const code = err.code;
-
-          if (field === 'rfc') {
-            if (code === 'FORMAT_ERROR') {
-              this.rfcForm.get('rfc')?.setErrors({
-                rfc: 'Ingresa un RFC válido con homoclave.',
-              });
-            }
-          }
 
           if (field === 'cp') {
             if (code === 'FORMAT_ERROR') {
@@ -280,340 +299,408 @@ export class RfcDataFormComponent {
     });
   }
 
-  getTipoSujeto() {
-    return this.rfcFormService.tipoSujeto;
-  }
+  isGenerateResponseError(
+    generateResponse:
+      | GenerateRfcPf
+      | GenerateRfcPm
+      | Observable<LoadingState<RFCWithData | RFC>>
+      | null
+  ): generateResponse is
+    | GenerateRfcPfBadRequestResponse
+    | GenerateRfcPfServiceUnavailableResponse
+    | GenerateRfcPmBadRequestResponse
+    | GenerateRfcPmServiceUnavailableResponse {
+    if (!generateResponse || generateResponse instanceof Observable) {
+      return false;
+    }
 
-  isDataRequired() {
-    return this.rfcFormService.dataStatus.dataIsRequired;
-  }
-
-  getResponseError() {
-    return this.rfcFormService.responseError;
+    return true;
   }
 
   onSubmit() {
-    this.rfcFormService.responseError = null;
-    if (this.rfcForm.invalid) {
+    this.responseError = null;
+
+    if (!this.rfcForm.valid) {
       markAllAsDirty(this.rfcForm);
       return;
     }
 
     this.loading = true;
 
-    // Get form value with proper typing (non-nullable)
     const formValue = this.rfcForm.value as RfcDataFormValue;
 
-    if (formValue.tipoSujeto === 'PF') {
-      if (this.rfcFormService.dataStatus.dataIsRequired) {
-        const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
-        this.generateRfcResponse$ =
-          this.rfcFormService.generateAndValidatePfRfcWithData$(requestBody);
-      } else {
-        const requestBody = this.rfcForm.value as RfcDataFormValue;
-
-        this.generateRfcResponse$ =
-          this.rfcFormService.generateAndValidatePfRfc$(requestBody);
-      }
-    } else if (formValue.tipoSujeto === 'PM') {
-      if (this.rfcFormService.dataStatus.dataIsRequired) {
-        const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
-
-        this.generateRfcResponse$ =
-          this.rfcFormService.generateAndValidatePmRfcWithData$(requestBody);
-      } else {
-        const requestBody = this.rfcForm.value as RfcDataFormValue;
-
-        this.generateRfcResponse$ =
-          this.rfcFormService.generateAndValidatePmRfc$(requestBody);
+    if (!this.generateRfcResponse$) {
+      if (formValue.tipoSujeto === 'PF') {
+        this.generateRfcResponse$ = this.dataStatus.dataIsRequired
+          ? this.rfcFormService.generateAndValidatePfRfcWithData$(
+              this.rfcForm.value as RfcDataFormValueWithData
+            )
+          : this.rfcFormService.generateAndValidatePfRfc$(formValue);
+      } else if (formValue.tipoSujeto === 'PM') {
+        this.generateRfcResponse$ = this.dataStatus.dataIsRequired
+          ? this.rfcFormService.generateAndValidatePmRfcWithData$(
+              this.rfcForm.value as RfcDataFormValueWithData
+            )
+          : this.rfcFormService.generateAndValidatePmRfc$(formValue);
       }
     }
 
-    // TODO: generateRfcResponse must have either a generateRFCBadREquest or service error, or LoadingState<RFCs>
-    // So first of all check if
+    this.generateRfcResponse$
+      ?.pipe(
+        // Step 1: Handle generate RFC response
+        tap((generateResponse) => {
+          if (this.isGenerateResponseError(generateResponse)) {
+            this.handleGenerateErrors(generateResponse);
+            throw new Error('Generation failed'); // Stop the stream
+          }
+          this.rfcFormResponse$ = generateResponse;
+        }),
+        // Step 2: If generation succeeded, validate the RFC
+        switchMap(() =>
+          this.rfcFormService.getFinalResponse$(this.rfcFormResponse$!)
+        ),
+        // Step 3: Handle the final validated response
+        tap((finalResponse) => {
+          this.loading = false;
+          console.log('FINAL RESPONSE: ', finalResponse);
+          if (!finalResponse) return;
 
-    this.generateRfcResponse$?.pipe();
-
-    // if (rfcFormValue.tipoSujeto === 'PF') {
-    //   this.rfcFormService;
-    //   this.rfcService
-    //     .generateRfcPF$({
-    //       nombres: rfcFormValue.pfDataForm.nombres,
-    //       apellidoPaterno: rfcFormValue.pfDataForm.apellidoPaterno,
-    //       apellidoMaterno: rfcFormValue.pfDataForm.apellidoMaterno,
-    //       fechaNacimiento: format(
-    //         rfcFormValue.pfDataForm.fechaNacimiento,
-    //         'yyyy-MM-dd'
-    //       ),
-    //     })
-    //     .pipe(
-    //       switchMapWithLoading<RFC | RFCWithData>(
-    //         (value: GenerateRfcPfSuccessResponse) => {
-    //           if (this.isDataRequired()) {
-    //             // VALIDATE WITH DATA
-
-    //             return this.rfcService.validateRFCWithData$([
-    //               {
-    //                 rfc: value.response.rfc,
-    //                 cp: rfcFormValue.data.cp,
-    //                 nombre: `${rfcFormValue.pfDataForm.nombres} ${rfcFormValue.pfDataForm.apellidoPaterno} ${rfcFormValue.pfDataForm.apellidoMaterno}`,
-    //               },
-    //             ]);
-    //           } else {
-    //             return this.rfcService.validateRFC$({
-    //               rfcs: [{ rfc: value.response.rfc }],
-    //             });
-    //           }
-    //         }
-    //       ),
-    //       tap((value) => {
-    //         this.loading = value.loading;
-    //         if (this.rfcFormService.dataStatus.dataIsRequired) {
-    //           // HANDLE WITH DATA RESPONSE
-    //           if (value.data) {
-    //             const data = value.data as RFCWithData;
-    //             if (data.status === 'SUCCESS') {
-    //               const rfcResult = data.response.rfcs[0].result;
-    //               // RFC not valid.
-    //               if (
-    //                 rfcResult != 'RFC válido, y susceptible de recibir facturas'
-    //               ) {
-    //                 this.rfcFormService.responseError = rfcResult + '.';
-    //               } else {
-    //                 const response = data.response.rfcs[0];
-    //                 this.storageService.setItem('rfc', response.rfc);
-    //                 this.storageService.setItem('rfcResult', response.result);
-    //                 this.storageService.setItem(
-    //                   'tipoSujeto',
-    //                   rfcFormValue.tipoSujeto
-    //                 );
-    //                 this.storageService.setItem('cp', response.cp);
-    //                 this.storageService.setItem('nombre', response.nombre);
-
-    //                 this.router.navigateByUrl('/dashboard');
-    //               }
-    //             }
-    //           }
-
-    //           if (value.error) {
-    //             const error = value.error as
-    //               | ValidateRFCWithDataBadRequestResponse
-    //               | ValidateRFCWithDataServiceUnavailableResponse;
-
-    //             if (error.status === 'SERVICE_ERROR') {
-    //               this.rfcFormService.responseError =
-    //                 'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-    //               return;
-    //             }
-
-    //             // BAD REQUEST
-    //             error.error.forEach((err) => {
-    //               const field = err.field.slice(0, -3); // strip down index from field
-    //               const code = err.code;
-
-    //               // if (field === 'rfc') {
-    //               //   if (code === 'FORMAT_ERROR') {
-    //               //     this.rfcForm.get('rfc')?.setErrors({
-    //               //       rfc: 'Ingresa un RFC válido con homoclave.',
-    //               //     });
-    //               //   }
-    //               // }
-
-    //               if (field === 'cp') {
-    //                 if (code === 'FORMAT_ERROR') {
-    //                   this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-    //                     cp: 'Ingresa un código postal válido.',
-    //                   });
-    //                 }
-    //               }
-    //             });
-    //           }
-    //         } else {
-    //           if (value.data) {
-    //             const response = (value.data as ValidateRFCSuccessResponse)
-    //               .response;
-    //             if (
-    //               response.rfcs[0].result ===
-    //               'RFC válido, y susceptible de recibir facturas'
-    //             ) {
-    //               this.storageService.setItem(
-    //                 'tipoSujeto',
-    //                 rfcFormValue.tipoSujeto
-    //               );
-    //               this.storageService.setItem('rfc', response.rfcs[0].rfc);
-    //               this.storageService.setItem(
-    //                 'rfcResult',
-    //                 response.rfcs[0].result
-    //               );
-
-    //               this.router.navigateByUrl('/dashboard');
-    //             }
-    //           }
-    //         }
-    //       }),
-    //       catchError(
-    //         (
-    //           err:
-    //             | GenerateRfcPfBadRequestResponse
-    //             | GenerateRfcPfServiceUnavailableResponse
-    //         ) => {
-    //           if (err.status === 'SERVICE_ERROR') {
-    //             this.rfcFormService.responseError =
-    //               'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-    //           }
-
-    //           if (err.status === 400) {
-    //             // HANDLE BAD REQUEST
-
-    //             err.error.forEach((err) => {
-    //               const control = this.rfcForm.get(['pfDataForm', err.field]);
-    //               if (err.code === 'FORMAT_ERROR') {
-    //                 control?.setErrors({
-    //                   [err.field]: 'No uses caracteres especiales.',
-    //                 });
-    //               }
-    //             });
-
-    //             this.loading = false;
-    //           }
-
-    //           return of(err);
-    //         }
-    //       )
-    //     )
-    //     .subscribe();
-    // }
-
-    // if (rfcFormValue.tipoSujeto === 'PM') {
-    //   this.rfcService
-    //     .generateRfcPM$({
-    //       razonSocial: rfcFormValue.pmDataForm.razonSocial,
-    //       fechaConstitucion: format(
-    //         rfcFormValue.pmDataForm.fechaConstitucion,
-    //         'yyyy-MM-dd'
-    //       ),
-    //     })
-    //     .pipe(
-    //       switchMapWithLoading<RFC | RFCWithData>(
-    //         (value: GenerateRfcPmSuccessReponse) => {
-    //           if (this.isDataRequired()) {
-    //             // VALIDATE WITH DATA
-
-    //             return this.rfcService.validateRFCWithData$([
-    //               {
-    //                 rfc: value.response.rfc,
-    //                 cp: rfcFormValue.data.cp,
-    //                 nombre: rfcFormValue.pmDataForm.razonSocial,
-    //               },
-    //             ]);
-    //           } else {
-    //             return this.rfcService.validateRFC$({
-    //               rfcs: [{ rfc: value.response.rfc }],
-    //             });
-    //           }
-    //         }
-    //       ),
-    //       tap((value) => {
-    //         this.loading = value.loading;
-    //         if (this.rfcFormService.dataStatus.dataIsRequired) {
-    //           // HANDLE WITH DATA RESPONSE
-    //           if (value.data) {
-    //             const data = value.data as RFCWithData;
-    //             if (data.status === 'SUCCESS') {
-    //               const rfcResult = data.response.rfcs[0].result;
-    //               // RFC not valid.
-    //               if (
-    //                 rfcResult != 'RFC válido, y susceptible de recibir facturas'
-    //               ) {
-    //                 this.rfcFormService.responseError = rfcResult + '.';
-    //               } else {
-    //                 const response = data.response.rfcs[0];
-    //                 this.storageService.setItem('rfc', response.rfc);
-    //                 this.storageService.setItem('rfcResult', response.result);
-    //                 this.storageService.setItem(
-    //                   'tipoSujeto',
-    //                   rfcFormValue.tipoSujeto
-    //                 );
-    //                 this.storageService.setItem('cp', response.cp);
-    //                 this.storageService.setItem('nombre', response.nombre);
-
-    //                 this.router.navigateByUrl('/dashboard');
-    //               }
-    //             }
-    //           }
-
-    //           if (value.error) {
-    //             const error = value.error as
-    //               | ValidateRFCWithDataBadRequestResponse
-    //               | ValidateRFCWithDataServiceUnavailableResponse;
-
-    //             if (error.status === 'SERVICE_ERROR') {
-    //               this.rfcFormService.responseError =
-    //                 'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-    //               return;
-    //             }
-
-    //             // BAD REQUEST
-    //             error.error.forEach((err) => {
-    //               const field = err.field.slice(0, -3); // strip down index from field
-    //               const code = err.code;
-
-    //               // if (field === 'rfc') {
-    //               //   if (code === 'FORMAT_ERROR') {
-    //               //     this.rfcForm.get('rfc')?.setErrors({
-    //               //       rfc: 'Ingresa un RFC válido con homoclave.',
-    //               //     });
-    //               //   }
-    //               // }
-
-    //               if (field === 'cp') {
-    //                 if (code === 'FORMAT_ERROR') {
-    //                   this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-    //                     cp: 'Ingresa un código postal válido.',
-    //                   });
-    //                 }
-    //               }
-    //             });
-    //           }
-    //         } else {
-    //           if (value.data) {
-    //             const response = (value.data as ValidateRFCSuccessResponse)
-    //               .response;
-    //             if (
-    //               response.rfcs[0].result ===
-    //               'RFC válido, y susceptible de recibir facturas'
-    //             ) {
-    //               this.storageService.setItem(
-    //                 'tipoSujeto',
-    //                 rfcFormValue.tipoSujeto
-    //               );
-    //               this.storageService.setItem('rfc', response.rfcs[0].rfc);
-    //               this.storageService.setItem(
-    //                 'rfcResult',
-    //                 response.rfcs[0].result
-    //               );
-
-    //               this.router.navigateByUrl('/dashboard');
-    //             }
-    //           }
-    //         }
-    //       }),
-    //       catchError(
-    //         (
-    //           err:
-    //             | GenerateRfcPfBadRequestResponse
-    //             | GenerateRfcPfServiceUnavailableResponse
-    //         ) => {
-    //           if (err.status === 'SERVICE_ERROR') {
-    //             this.rfcFormService.responseError =
-    //               'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-    //           }
-
-    //           return of(err);
-    //         }
-    //       )
-    //     )
-    //     .subscribe();
-    // }
+          if (finalResponse.status === 'SUCCESS') {
+            this.handleSuccessResponse(finalResponse);
+          } else if (finalResponse.status === 'SERVICE_ERROR') {
+            this.responseError =
+              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+          } else if (typeof finalResponse.status === 'number') {
+            this.handleValidationErrors(finalResponse);
+          }
+        }),
+        // Clean up after completion
+        finalize(() => {
+          this.generateRfcResponse$ = null;
+          this.rfcFormResponse$ = null;
+          this.finalResponse$ = null;
+        })
+      )
+      .subscribe({
+        error: () => {
+          this.loading = false;
+        },
+      });
   }
+
+  private handleGenerateErrors(response: GenerateRfcPf | GenerateRfcPm) {
+    if (response.status === 'SERVICE_ERROR') {
+      this.responseError =
+        'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+    } else if (typeof response.status === 'number') {
+      response.error.forEach((err) => {
+        const field = err.field.slice(0, -3);
+        const code = err.code;
+
+        if (field === 'cp') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+              cp: 'Ingresa un código postal válido.',
+            });
+          }
+          return;
+        }
+
+        // Handle PM fields
+        if (field === 'fechaConstitucion') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pmData', 'fechaConstitucion'] as const)
+              ?.setErrors({
+                format:
+                  'La fecha de constitución debe estar en formato yyyy-MM-dd',
+              });
+          }
+          return;
+        }
+
+        if (field === 'razonSocial') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pmData', 'razonSocial'] as const)
+              ?.setErrors({
+                format: 'La razón social debe contener solo caracteres válidos',
+              });
+          }
+          return;
+        }
+
+        // Handle PF fields
+        if (field === 'fechaNacimiento') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pfData', 'fechaNacimiento'] as const)
+              ?.setErrors({
+                format:
+                  'La fecha de nacimiento debe estar en formato yyyy-MM-dd',
+              });
+          }
+          return;
+        }
+
+        if (field === 'nombres') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pfData', 'nombres'] as const)
+              ?.setErrors({
+                format: 'El nombre debe contener solo caracteres válidos',
+              });
+          }
+          return;
+        }
+
+        if (field === 'apellidoPaterno') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pfData', 'apellidoPaterno'] as const)
+              ?.setErrors({
+                format:
+                  'El apellido paterno debe contener solo caracteres válidos',
+              });
+          }
+          return;
+        }
+
+        if (field === 'apellidoMaterno') {
+          if (code === 'FORMAT_ERROR') {
+            this.rfcForm
+              .get(['data', 'pfData', 'apellidoMaterno'] as const)
+              ?.setErrors({
+                format:
+                  'El apellido materno debe contener solo caracteres válidos',
+              });
+          }
+          return;
+        }
+      });
+    }
+  }
+
+  private handleSuccessResponse(response: RFC | RFCWithData) {
+    if (response.status === 'SUCCESS') {
+      const rfcData = response.response.rfcs[0];
+      this.storageService.setItem('rfc', rfcData.rfc);
+      this.storageService.setItem('result', rfcData.result);
+
+      if ('cp' in rfcData && 'nombre' in rfcData) {
+        this.storageService.setItem('cp', rfcData.cp);
+        this.storageService.setItem('nombre', rfcData.nombre);
+      }
+
+      if (rfcData.result === 'RFC válido, y susceptible de recibir facturas') {
+        this.router.navigateByUrl('/dashboard');
+      } else {
+        this.responseError = rfcData.result;
+      }
+    }
+  }
+
+  private handleValidationErrors(response: any) {
+    const error = response.error;
+    error.forEach((err: any) => {
+      if (err.field === 'cp' && err.code === 'FORMAT_ERROR') {
+        this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+          cp: 'Ingresa un código postal válido.',
+        });
+      }
+    });
+  }
+
+  // onSubmit() {
+  //   this.responseError = null;
+  //   // if both pfData and pmData are invalid it means whichever is currently active is invalid so this should trigger markAllasDirty
+  //   if (!this.rfcForm.valid) {
+  //     markAllAsDirty(this.rfcForm);
+  //     return;
+  //   }
+
+  //   this.loading = true;
+
+  //   // Get form value with proper typing (non-nullable)
+  //   const formValue = this.rfcForm.value as RfcDataFormValue;
+  //   if (this.generateRfcResponse$ === null) {
+  //     if (formValue.tipoSujeto === 'PF') {
+  //       if (this.dataStatus.dataIsRequired) {
+  //         const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
+  //         this.generateRfcResponse$ =
+  //           this.rfcFormService.generateAndValidatePfRfcWithData$(requestBody);
+  //       } else {
+  //         const requestBody = this.rfcForm.value as RfcDataFormValue;
+
+  //         this.generateRfcResponse$ =
+  //           this.rfcFormService.generateAndValidatePfRfc$(requestBody);
+  //       }
+  //     } else if (formValue.tipoSujeto === 'PM') {
+  //       if (this.dataStatus.dataIsRequired) {
+  //         const requestBody = this.rfcForm.value as RfcDataFormValueWithData;
+
+  //         this.generateRfcResponse$ =
+  //           this.rfcFormService.generateAndValidatePmRfcWithData$(requestBody);
+  //       } else {
+  //         const requestBody = this.rfcForm.value as RfcDataFormValue;
+
+  //         this.generateRfcResponse$ =
+  //           this.rfcFormService.generateAndValidatePmRfc$(requestBody);
+  //       }
+  //     }
+  //   }
+
+  //   if (this.rfcFormResponse$ === null || this.finalResponse$ === null) {
+  //     // Handle possible error on generateRfc api calls or set rfcFormResponse and finalResponse
+  //     this.generateRfcResponse$
+  //       ?.pipe(
+  //         map((value) => {
+  //           if (this.isGenerateResponseError(value)) {
+  //             // handle error display right here
+  //             if (value.status === 'SERVICE_ERROR') {
+  //               this.responseError =
+  //                 'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+  //             } else if (typeof value.status === 'number') {
+  //               // BAD REQUEST
+  //               const error = value.error;
+
+  //               error.forEach((err) => {
+  //                 const field = err.field.slice(0, -3); // strip down index from field
+  //                 const code = err.code;
+
+  //                 // Handle PM (moral persona) errors
+  //                 if (field === 'fechaConstitucion') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pmData', 'fechaConstitucion'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'La fecha de constitución debe estar en formato yyyy-MM-dd',
+  //                       });
+  //                   }
+  //                 } else if (field === 'razonSocial') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pmData', 'razonSocial'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'La razón social debe contener solo caracteres válidos',
+  //                       });
+  //                   }
+  //                 }
+  //                 // Handle PF (persona física) errors
+  //                 else if (field === 'fechaNacimiento') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pfData', 'fechaNacimiento'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'La fecha de nacimiento debe estar en formato yyyy-MM-dd',
+  //                       });
+  //                   }
+  //                 } else if (field === 'nombres') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pfData', 'nombres'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'El nombre debe contener solo caracteres válidos',
+  //                       });
+  //                   }
+  //                 } else if (field === 'apellidoPaterno') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pfData', 'apellidoPaterno'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'El apellido paterno debe contener solo caracteres válidos',
+  //                       });
+  //                   }
+  //                 } else if (field === 'apellidoMaterno') {
+  //                   if (code === 'FORMAT_ERROR') {
+  //                     this.rfcForm
+  //                       .get(['data', 'pfData', 'apellidoMaterno'])
+  //                       ?.setErrors({
+  //                         format:
+  //                           'El apellido materno debe contener solo caracteres válidos',
+  //                       });
+  //                   }
+  //                 }
+  //               });
+  //             }
+  //           } else {
+  //             this.rfcFormResponse$ = value;
+  //             this.finalResponse$ = this.rfcFormService.getFinalResponse$(
+  //               this.rfcFormResponse$
+  //             );
+
+  //           }
+  //         })
+  //       )
+  //       .subscribe();
+  //   }
+
+  //   this.finalResponse$?.subscribe((value) => {
+  //     this.loading = false;
+  //     console.log(value);
+  //     if (!value) {
+  //       return;
+  //     }
+  //     if (value.status === 'SUCCESS') {
+  //       if (this.rfcFormService.isRFCWithDataSuccess(value)) {
+  //         const response = value.response.rfcs[0];
+  //         if (
+  //           response.result === 'RFC válido, y susceptible de recibir facturas'
+  //         ) {
+  //           this.storageService.setItem('rfc', response.rfc);
+  //           this.storageService.setItem('result', response.result);
+  //           this.storageService.setItem('cp', response.cp);
+  //           this.storageService.setItem('nombre', response.nombre);
+
+  //           this.router.navigateByUrl('/dashboard');
+  //         } else {
+  //           this.responseError = response.result;
+  //         }
+  //       } else {
+  //         const response = value.response.rfcs[0];
+  //         if (
+  //           response.result === 'RFC válido, y susceptible de recibir facturas'
+  //         ) {
+  //           this.storageService.setItem('rfc', response.rfc);
+  //           this.storageService.setItem('result', response.result);
+
+  //           this.router.navigateByUrl('/dashboard');
+  //         } else {
+  //           this.responseError = response.result;
+  //         }
+  //       }
+  //     } else if (value.status === 'SERVICE_ERROR') {
+  //       this.responseError =
+  //         'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
+  //     }
+
+  //     // BAD REQUEST
+  //     if (typeof value.status === 'number') {
+  //       const error = value.error;
+
+  //       error.forEach((err) => {
+  //         const field = err.field.slice(0, -3); // strip down index from field
+  //         const code = err.code;
+
+  //         if (field === 'cp') {
+  //           if (code === 'FORMAT_ERROR') {
+  //             this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+  //               cp: 'Ingresa un código postal válido.',
+  //             });
+  //           }
+  //         }
+  //       });
+  //     }
+
+  //     // After using the response set them to null in case of resubmitting form.
+  //     this.generateRfcResponse$ = null;
+  //     this.rfcFormResponse$ = null;
+  //     this.finalResponse$ = null;
+  //   });
+  // }
 }

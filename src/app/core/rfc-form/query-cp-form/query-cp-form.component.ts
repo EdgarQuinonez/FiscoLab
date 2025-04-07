@@ -26,11 +26,8 @@ import { QueryCPFormValue } from './query-cp-form.interface';
 })
 export class QueryCpFormComponent {
   validateRfcLoading = input(false);
-  dataIsRequired = input(false);
   queryCPSubmitted = output<QueryCPFormValue>();
-
   visible = false;
-  // loading = false;
 
   estados = [...estadosCatalog];
   // clave y nombre

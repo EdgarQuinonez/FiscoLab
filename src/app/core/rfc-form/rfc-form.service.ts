@@ -16,9 +16,11 @@ import {
   ValidateRFCWithDataRequest,
   ValidateRFCServiceUnavailableResponse,
   ValidateRFCWithDataSuccessResponse,
+  GenerateRfcPfBadRequestResponse,
+  GenerateRfcPfServiceUnavailableResponse,
 } from '@shared/services/rfc.service.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
-import { filter, iif, map, Observable, of, tap } from 'rxjs';
+import { catchError, filter, iif, map, Observable, of, tap } from 'rxjs';
 import { RfcService } from '@shared/services/rfc.service';
 import { StorageService } from '@shared/services/storage.service';
 import { Router } from '@angular/router';
@@ -36,14 +38,8 @@ export class RfcFormService {
     private router: Router
   ) {}
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
-  dataStatus!: { dataIsRequired: boolean };
-  responseError: string | null = null;
-  tipoSujeto: TipoSujetoCode | null = null;
-
   validateRFC$(rfcFormValue: RfcFormValue) {
-    return new Observable((subscriber) => subscriber.next()).pipe(
+    return of(null).pipe(
       switchMapWithLoading<RFC>(() =>
         this.rfcService.validateRFC$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
       )
@@ -51,7 +47,7 @@ export class RfcFormService {
   }
 
   validateRFCWithData$(rfcFormValue: RfcFormDataValue) {
-    return new Observable((subscriber) => subscriber.next()).pipe(
+    return of(null).pipe(
       switchMapWithLoading<RFCWithData>(() =>
         this.rfcService.validateRFCWithData$([
           {
@@ -83,17 +79,25 @@ export class RfcFormService {
           if (value.status === 'SUCCESS') {
             // RFC generated successfully.
             const response = value.response;
-            return new Observable((subscriber) => subscriber.next()).pipe(
+            return of(null).pipe(
               switchMapWithLoading(() =>
                 this.rfcService.validateRFC$({ rfcs: [{ rfc: response.rfc }] })
-              ),
-              map((value) => {
-                return value;
-              })
+              )
+              // map((value) => {
+              //   return value;
+              // })
             );
           }
           // assuming bad request or service error
           return value;
+        }),
+        catchError((err) => {
+          console.log('ERROR: ', err);
+          return of(
+            err as
+              | GenerateRfcPfBadRequestResponse
+              | GenerateRfcPfServiceUnavailableResponse
+          );
         })
       );
   }
@@ -112,7 +116,7 @@ export class RfcFormService {
           if (value.status === 'SUCCESS') {
             // RFC generated successfully.
             const response = value.response;
-            return new Observable((subscriber) => subscriber.next()).pipe(
+            return of(null).pipe(
               switchMapWithLoading(() =>
                 this.rfcService.validateRFC$({
                   rfcs: [
@@ -150,7 +154,7 @@ export class RfcFormService {
           if (value.status === 'SUCCESS') {
             // RFC generated successfully.
             const response = value.response;
-            return new Observable((subscriber) => subscriber.next()).pipe(
+            return of(null).pipe(
               switchMapWithLoading(() =>
                 this.rfcService.validateRFCWithData$([
                   {
@@ -159,15 +163,22 @@ export class RfcFormService {
                     cp: formValue.data.cp,
                   },
                 ])
-              ),
-              map((value) => {
-                return value;
-              })
+              )
+              // map((value) => {
+              //   return value;
+              // })
             );
           }
           // assuming bad request or service error
           return value;
-        })
+        }),
+        catchError((err) =>
+          of(
+            err as
+              | GenerateRfcPfBadRequestResponse
+              | GenerateRfcPfServiceUnavailableResponse
+          )
+        )
       );
   }
 
@@ -185,7 +196,7 @@ export class RfcFormService {
           if (value.status === 'SUCCESS') {
             // RFC generated successfully.
             const response = value.response;
-            return new Observable((subscriber) => subscriber.next()).pipe(
+            return of(null).pipe(
               switchMapWithLoading(() =>
                 this.rfcService.validateRFCWithData$([
                   {
@@ -237,17 +248,19 @@ export class RfcFormService {
       // Iterate through all states and mnpios to retrieve all of their cps
     }
 
-    return new Observable((subscriber) => subscriber.next()).pipe(
+    return of(null).pipe(
       switchMapWithLoading(() => this.rfcService.validateRFCWithData$(rfcs))
     );
   }
 
-  getFinalResponse$() {
+  getFinalResponse$(
+    validateRfcResponse: Observable<LoadingState<RFC | RFCWithData>> | null
+  ) {
     // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
-    if (!this.rfcFormResponse$) {
+    if (!validateRfcResponse) {
       return of(null);
     }
-    return this.rfcFormResponse$.pipe(
+    return validateRfcResponse.pipe(
       filter((value): value is LoadingState<RFC | RFCWithData> => !!value),
       map((value) => {
         const data = value.data;

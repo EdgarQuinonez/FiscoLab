@@ -40,7 +40,7 @@ export class RfcFisicaComponent {
     private storageService: StorageService
   ) {}
   // ngOnInit() {
-  //   this.results$ = new Observable((subscriber) => subscriber.next()).pipe(
+  //   this.results$ = of(null).pipe(
   //     switchMapWithLoading<RFC>(() => {
   //       const dataJson = this.storageService.getItem('personalData');
   //       if (!dataJson) {
@@ -82,7 +82,7 @@ export class RfcFisicaComponent {
   // }
 
   getPersonalDataOnClick() {
-    this.personalData$ = new Observable((subscriber) => subscriber.next()).pipe(
+    this.personalData$ = of(null).pipe(
       switchMapWithLoading(() => {
         const rfc = this.storageService.getItem('rfc');
         if (typeof rfc != 'string' || rfc === 'undefined') {

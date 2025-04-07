@@ -34,10 +34,10 @@
                             </label>
                         
                             <ng-container formGroupName="data">
-                                @if (getTipoSujeto() === "PM") {
+                                @if (tipoSujeto === "PM") {
                                     <label class="flex flex-col w-full" formGroupName="pmData">
                                         <span>Razón Social: </span>                                                                                                                                                                              
-                                        <input type="text" formControlName="razonSocial" [placeholder]="isDataRequired() ? '' : '(Opcional)'" pInputText />
+                                        <input type="text" formControlName="razonSocial" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
                                         @if (rfcForm.get(['data', 'pmData', 'razonSocial'])?.hasError('razonSocial')) {                            
                                             <p-message severity="error" variant="simple" size="small">
                                                 {{ rfcForm.get(['data', 'pmData', 'razonSocial'])?.getError('razonSocial') }}
@@ -49,11 +49,11 @@
                                             </p-message>
                                         } 
                                     </label>    
-                                } @else if (getTipoSujeto() === "PF" || getTipoSujeto() === null) {                                        
+                                } @else if (tipoSujeto === "PF" || tipoSujeto === null) {                                        
                                     <div class="flex w-full gap-1" formGroupName="pfData">
                                         <label class="flex flex-col w-full">
                                             <span>Nombre(s):</span>                                                                                                                                                                              
-                                            <input type="text" formControlName="nombre" [placeholder]="isDataRequired() ? '' : '(Opcional)'"  pInputText />                                    
+                                            <input type="text" formControlName="nombre" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'"  pInputText />                                    
                                             @if (rfcForm.get(['data', 'pfData', 'nombre'])?.hasError("required") && (rfcForm.get(['data', 'pfData', 'nombre'])?.dirty || rfcForm.get(['data', 'pfData', 'nombre'])?.touched)) {
                                                 <p-message severity="error" variant="simple" size="small">
                                                     El campo es requerido.
@@ -62,7 +62,7 @@
                                         </label>                             
                                         <label class="flex flex-col w-full">
                                             <span>Apellido:</span>                                                                                                                                                                              
-                                            <input type="text" formControlName="apellido" [placeholder]="isDataRequired() ? '' : '(Opcional)'" pInputText />                                     
+                                            <input type="text" formControlName="apellido" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />                                     
                                             @if (rfcForm.get(['data', 'pfData', 'apellido'])?.hasError("required") && (rfcForm.get(['data', 'pfData', 'apellido'])?.dirty || rfcForm.get(['data', 'pfData', 'apellido'])?.touched)) {
                                                 <p-message severity="error" variant="simple" size="small">
                                                     El campo es requerido.
@@ -77,9 +77,9 @@
                                         <span>Código Postal: </span>                                                                                                                                                                              
                                         <p-inputgroup>
                                             <p-inputgroup-addon>
-                                                <app-query-cp-form [validateRfcLoading]="loading" [dataIsRequired]="isDataRequired()" (queryCPSubmitted)="autocompleteCP($event)" />
+                                                <app-query-cp-form [validateRfcLoading]="loading" (queryCPSubmitted)="autocompleteCP($event)" />
                                             </p-inputgroup-addon>
-                                            <input type="text" formControlName="cp" [placeholder]="isDataRequired() ? '' : '(Opcional)'" pInputText />
+                                            <input type="text" formControlName="cp" [placeholder]="dataStatus.dataIsRequired ? '' : '(Opcional)'" pInputText />
                                         </p-inputgroup>
                                         @if (rfcForm.get(['data', 'cp'])?.hasError('cp')) {                            
                                             <p-message severity="error" variant="simple" size="small">
@@ -97,9 +97,9 @@
                             </ng-container>                                                             
                         
                             <div class="flex w-full justify-between absolute bottom-[0.5rem]">
-                                @if (getResponseError()) {
+                                @if (responseError) {
                                     <p-message severity="error">
-                                        {{ getResponseError() }}
+                                        {{ responseError }}
                                     </p-message>
                                 } @else {
                                     <div></div>
