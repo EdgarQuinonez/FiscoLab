@@ -357,20 +357,21 @@ export class RfcDataFormComponent {
         }),
         // Step 2: If generation succeeded, validate the RFC
         switchMap(() =>
-          this.rfcFormService.getFinalResponse$(this.rfcFormResponse$!)
+          this.rfcFormService.getFinalResponse$(this.rfcFormResponse$)
         ),
         // Step 3: Handle the final validated response
         tap((finalResponse) => {
           this.loading = false;
-          console.log('FINAL RESPONSE: ', finalResponse);
           if (!finalResponse) return;
-
+          
+          console.log("final response: ", finalResponse)
           if (finalResponse.status === 'SUCCESS') {
             this.handleSuccessResponse(finalResponse);
           } else if (finalResponse.status === 'SERVICE_ERROR') {
             this.responseError =
               'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
           } else if (typeof finalResponse.status === 'number') {
+            console.log("validation errors")
             this.handleValidationErrors(finalResponse);
           }
         }),
@@ -394,17 +395,8 @@ export class RfcDataFormComponent {
         'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
     } else if (typeof response.status === 'number') {
       response.error.forEach((err) => {
-        const field = err.field.slice(0, -3);
+        const field = err.field;
         const code = err.code;
-
-        if (field === 'cp') {
-          if (code === 'FORMAT_ERROR') {
-            this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-              cp: 'Ingresa un código postal válido.',
-            });
-          }
-          return;
-        }
 
         // Handle PM fields
         if (field === 'fechaConstitucion') {
@@ -412,22 +404,10 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pmData', 'fechaConstitucion'] as const)
               ?.setErrors({
-                format:
-                  'La fecha de constitución debe estar en formato yyyy-MM-dd',
+                fechaConstitucion:
+                  'La fecha debe estar en formato yyyy-MM-dd',
               });
           }
-          return;
-        }
-
-        if (field === 'razonSocial') {
-          if (code === 'FORMAT_ERROR') {
-            this.rfcForm
-              .get(['data', 'pmData', 'razonSocial'] as const)
-              ?.setErrors({
-                format: 'La razón social debe contener solo caracteres válidos',
-              });
-          }
-          return;
         }
 
         // Handle PF fields
@@ -436,11 +416,10 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'fechaNacimiento'] as const)
               ?.setErrors({
-                format:
-                  'La fecha de nacimiento debe estar en formato yyyy-MM-dd',
+                fechaNacimiento:
+                  'Debe estar en formato yyyy-MM-dd',
               });
           }
-          return;
         }
 
         if (field === 'nombres') {
@@ -448,10 +427,9 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'nombres'] as const)
               ?.setErrors({
-                format: 'El nombre debe contener solo caracteres válidos',
+                nombres: 'No debe contener caracteres especiales',
               });
           }
-          return;
         }
 
         if (field === 'apellidoPaterno') {
@@ -459,11 +437,10 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'apellidoPaterno'] as const)
               ?.setErrors({
-                format:
-                  'El apellido paterno debe contener solo caracteres válidos',
+                apellidoPaterno:
+                  'No debe contener caracteres especiales',
               });
           }
-          return;
         }
 
         if (field === 'apellidoMaterno') {
@@ -471,11 +448,10 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'apellidoMaterno'] as const)
               ?.setErrors({
-                format:
-                  'El apellido materno debe contener solo caracteres válidos',
+                apellidoMaterno:
+                  'No debe contener caracteres especiales',
               });
           }
-          return;
         }
       });
     }
