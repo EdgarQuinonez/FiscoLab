@@ -255,6 +255,7 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
     );
   }
 
+  // TODO: Analyze why getFinalResponse doesn't seem to return RfcWithData errors
   getFinalResponse$(
     validateRfcResponse: Observable<LoadingState<RFC | RFCWithData>> | null
   ) {
@@ -290,7 +291,7 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
               response: {
                 rfcs: [matched ?? response.rfcs[response.rfcs.length - 1]],
               },
-            };
+            } as ValidateRFCWithDataSuccessResponse;
           } else {
             // Assuming its RFC, only once result/rfc is expected.
             const response = data.response;
@@ -298,7 +299,7 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
             return {
               ...data,
               response: { rfcs: [response.rfcs[0]] },
-            };
+            } as ValidateRFCSuccessResponse;
           }
         }
 

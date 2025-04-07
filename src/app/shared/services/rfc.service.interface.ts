@@ -90,7 +90,7 @@ export interface ValidateRFCWithDataServiceUnavailableResponse
 
 export type RFCWithData =
   | ValidateRFCWithDataSuccessResponse
-  | ValidateRFCBadRequestResponse
+  | ValidateRFCWithDataBadRequestResponse
   | ValidateRFCWithDataServiceUnavailableResponse;
 
 export interface GenerateRfcPfRequest {

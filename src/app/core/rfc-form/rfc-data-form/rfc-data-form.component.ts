@@ -476,15 +476,26 @@ export class RfcDataFormComponent {
     }
   }
 
-  private handleValidationErrors(response: any) {
-    const error = response.error;
-    error.forEach((err: any) => {
-      if (err.field === 'cp' && err.code === 'FORMAT_ERROR') {
-        this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-          cp: 'Ingresa un código postal válido.',
-        });
-      }
-    });
+  private handleValidationErrors(response: RFC | RFCWithData) {
+    if (typeof response.status === "number") {
+      const error = response.error
+      error.forEach(err => {
+        if (err.code === 'FORMAT_ERROR') {
+          if (err.field === 'cp') {
+            this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+              cp: "Ingresa un código postal válido"
+            })
+          }
+        }
+      })
+    }
+    // error.forEach((err: any) => {
+    //   if (err.field === 'cp' && err.code === 'FORMAT_ERROR') {
+    //     this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
+    //       cp: 'Ingresa un código postal válido.',
+    //     });
+    //   }
+    // });
   }
 
   // onSubmit() {
