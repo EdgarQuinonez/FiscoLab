@@ -1,21 +1,15 @@
-<app-header />
+<p-card styleClass="w-full h-full">
+  <div class="flex flex-col items-center justify-center gap-2">
+    @if (queryMethod === "curp") {
+    <app-curp></app-curp>
+    <p-button label="Continuar con RFC" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text"
+      (onClick)="changeQueryMethod('rfc')" />
+    }
 
-<div class="flex items-center justify-center flex-col flex-1">    
-    <span class="font-bold text-center text-5xl py-12">
-        Potenciando a los Contadores.
-    </span>                
-    <p-card>
-        <div class="flex flex-col items-center justify-center gap-2 w-[47rem] h-[39.525rem]">
-            @if (queryMethod === "curp") {
-                <app-curp></app-curp>
-                <p-button label="Continuar con RFC" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text" (onClick)="changeQueryMethod('rfc')"/>
-            }
-
-            @if (queryMethod === "rfc") {
-                <app-rfc-form></app-rfc-form>
-                <p-button label="Continuar con CURP" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text" (onClick)="changeQueryMethod('curp')"/>
-            }
-
-        </div>
-    </p-card>
-</div>
+    @if (queryMethod === "rfc") {
+    <app-rfc-form></app-rfc-form>
+    <p-button label="Continuar con CURP" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text"
+      (onClick)="changeQueryMethod('curp')" />
+    }
+  </div>
+</p-card>
