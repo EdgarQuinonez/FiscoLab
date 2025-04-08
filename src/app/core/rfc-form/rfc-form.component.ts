@@ -12,19 +12,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { RfcService } from '@shared/services/rfc.service';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
 import {
   debounceTime,
-  filter,
   map,
   Observable,
-  of,
   startWith,
-  switchMap,
-  tap,
 } from 'rxjs';
-import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
@@ -51,16 +45,7 @@ import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
 import {
   RFC,
   RFCWithData,
-  ValidateRFCSuccessResponse,
-  ValidateRFCBadRequestResponse,
-  ValidateRFCWithDataBadRequestResponse,
-  ValidateRFCWithDataServiceUnavailableResponse,
-  ValidateRFCWithDataRequest,
   ValidateRfcCpQueryRequest,
-  ValidateRFCServiceUnavailableResponse,
-  ValidateRFCResult,
-  ValidateRFCWithDataResult,
-  ValidateRFCWithDataSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';

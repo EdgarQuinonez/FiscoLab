@@ -255,7 +255,6 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
     );
   }
 
-  // TODO: Analyze why getFinalResponse doesn't seem to return RfcWithData errors
   getFinalResponse$(
     validateRfcResponse: Observable<LoadingState<RFC | RFCWithData>> | null
   ) {
