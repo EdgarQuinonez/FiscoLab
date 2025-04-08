@@ -5,16 +5,25 @@ import { BadgeModule } from 'primeng/badge';
 import { RippleModule } from 'primeng/ripple';
 import { AvatarModule } from 'primeng/avatar';
 import { CommonModule } from '@angular/common';
+import { StorageService } from '@shared/services/storage.service';
+import { ButtonModule } from 'primeng/button';
 
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, MenuModule, BadgeModule, RippleModule, AvatarModule],
+  imports: [CommonModule, MenuModule, ButtonModule, BadgeModule, RippleModule, AvatarModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss'
 })
 export class SidebarComponent {
+
   items: MenuItem[] | undefined;
+  tipoPersona: 'PF' | 'PM' | null = null
+
+  constructor(private storageService: StorageService){
+    this.tipoPersona = (this.storageService.getItem("tipoPersona")) as "PF" | "PM"
+  }
+
 
   ngOnInit() {
     this.items = [
@@ -26,6 +35,7 @@ export class SidebarComponent {
         items: [
           {
             label: 'Buro de credito',
+            routerLink: '/bc-pf',
             icon: 'pi pi-plus',
           },
           {

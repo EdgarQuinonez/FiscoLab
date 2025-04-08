@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { CurpComponent } from '@core/curp/curp.component';
 import { RfcFormComponent } from '@core/rfc-form/rfc-form.component';
-import { HeaderComponent } from '@shared/components/header/header.component';
-import { TopbarComponent } from '@shared/components/topbar/topbar.component';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 
@@ -11,7 +9,6 @@ import { CardModule } from 'primeng/card';
   imports: [
     ButtonModule,
     CurpComponent,
-    HeaderComponent,
     CardModule,
     RfcFormComponent,
   ],
