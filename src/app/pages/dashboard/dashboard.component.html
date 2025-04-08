@@ -1,5 +1,5 @@
 <ng-container *ngIf="tipoSujeto === 'PF'; else PM">
-  <p-card styleClass="w-full h-full shadow-2xl">
+  <p-card [style]="{ 'border-radius': '0px' }" div="w-full h-full rounded-none">
     <ng-template #header>
       <div class="flex items-center justify-center p-8">
         <p-image [src]="imagePath.satLogo" alt="Logo del SAT" width="128" />
