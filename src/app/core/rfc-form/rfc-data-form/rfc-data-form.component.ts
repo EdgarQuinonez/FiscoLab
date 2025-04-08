@@ -363,15 +363,15 @@ export class RfcDataFormComponent {
         tap((finalResponse) => {
           this.loading = false;
           if (!finalResponse) return;
-          
-          console.log("final response: ", finalResponse)
+
+          console.log('final response: ', finalResponse);
           if (finalResponse.status === 'SUCCESS') {
             this.handleSuccessResponse(finalResponse);
           } else if (finalResponse.status === 'SERVICE_ERROR') {
             this.responseError =
               'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
           } else if (typeof finalResponse.status === 'number') {
-            console.log("validation errors")
+            console.log('validation errors');
             this.handleValidationErrors(finalResponse);
           }
         }),
@@ -404,8 +404,7 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pmData', 'fechaConstitucion'] as const)
               ?.setErrors({
-                fechaConstitucion:
-                  'La fecha debe estar en formato yyyy-MM-dd',
+                fechaConstitucion: 'La fecha debe estar en formato yyyy-MM-dd',
               });
           }
         }
@@ -416,8 +415,7 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'fechaNacimiento'] as const)
               ?.setErrors({
-                fechaNacimiento:
-                  'Debe estar en formato yyyy-MM-dd',
+                fechaNacimiento: 'Debe estar en formato yyyy-MM-dd',
               });
           }
         }
@@ -437,8 +435,7 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'apellidoPaterno'] as const)
               ?.setErrors({
-                apellidoPaterno:
-                  'No debe contener caracteres especiales',
+                apellidoPaterno: 'No debe contener caracteres especiales',
               });
           }
         }
@@ -448,8 +445,7 @@ export class RfcDataFormComponent {
             this.rfcForm
               .get(['data', 'pfData', 'apellidoMaterno'] as const)
               ?.setErrors({
-                apellidoMaterno:
-                  'No debe contener caracteres especiales',
+                apellidoMaterno: 'No debe contener caracteres especiales',
               });
           }
         }
@@ -462,6 +458,12 @@ export class RfcDataFormComponent {
       const rfcData = response.response.rfcs[0];
       this.storageService.setItem('rfc', rfcData.rfc);
       this.storageService.setItem('result', rfcData.result);
+      if (this.rfcForm.value.tipoSujeto) {
+        this.storageService.setItem(
+          'tipoSujeto',
+          this.rfcForm.value.tipoSujeto
+        );
+      }
 
       if ('cp' in rfcData && 'nombre' in rfcData) {
         this.storageService.setItem('cp', rfcData.cp);
@@ -477,17 +479,17 @@ export class RfcDataFormComponent {
   }
 
   private handleValidationErrors(response: RFC | RFCWithData) {
-    if (typeof response.status === "number") {
-      const error = response.error
-      error.forEach(err => {
+    if (typeof response.status === 'number') {
+      const error = response.error;
+      error.forEach((err) => {
         if (err.code === 'FORMAT_ERROR') {
-          if (err.field === 'cp') {
+          if (err.field.slice(0, -3) === 'cp') {
             this.rfcForm.get(['data', 'cp'] as const)?.setErrors({
-              cp: "Ingresa un código postal válido"
-            })
+              cp: 'Ingresa un código postal válido',
+            });
           }
         }
-      })
+      });
     }
     // error.forEach((err: any) => {
     //   if (err.field === 'cp' && err.code === 'FORMAT_ERROR') {

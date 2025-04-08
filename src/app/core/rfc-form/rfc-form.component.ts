@@ -226,6 +226,12 @@ export class RfcFormComponent {
             this.storageService.setItem('result', response.result);
             this.storageService.setItem('cp', response.cp);
             this.storageService.setItem('nombre', response.nombre);
+            if (this.rfcForm.value.tipoSujeto) {
+              this.storageService.setItem(
+                'tipoSujeto',
+                this.rfcForm.value.tipoSujeto
+              );
+            }
 
             this.router.navigateByUrl('/dashboard');
           } else {
