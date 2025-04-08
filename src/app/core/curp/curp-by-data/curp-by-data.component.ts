@@ -139,6 +139,7 @@ export class CurpByDataComponent {
                 'personalData',
                 JSON.stringify(response)
               );
+              this.storageService.setItem('tipoSujeto', 'PF');
             }
             // TODO: Handle NOT_VALID, NOT_FOUND
             if (response.status === 'NOT_FOUND') {

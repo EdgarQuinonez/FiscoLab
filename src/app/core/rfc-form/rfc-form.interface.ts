@@ -63,3 +63,56 @@ export interface RfcFormPfDataValue {
 export interface RfcFormPmDataValue {
   razonSocial: string;
 }
+
+// ------ RFC DATA FORM
+
+export interface RfcDataFormFormGroup {
+  tipoSujeto: FormControl<TipoSujetoCode | null>;
+  data: FormGroup<{
+    pfData: FormGroup<RfcDataFormPFDataFormGroup>;
+    pmData: FormGroup<RfcDataFormPMDataFormGroup>;
+    cp: FormControl<string | null>;
+  }>;
+}
+
+export interface RfcDataFormPFDataFormGroup {
+  nombres: FormControl<string | null>;
+  apellidoPaterno: FormControl<string | null>;
+  apellidoMaterno: FormControl<string | null>;
+  fechaNacimiento: FormControl<Date | null>;
+}
+
+export interface RfcDataFormPMDataFormGroup {
+  fechaConstitucion: FormControl<Date | null>;
+  razonSocial: FormControl<string | null>;
+}
+
+export interface RfcDataFormValue {
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    pfData: RfcDataFormPfDataValue;
+    pmData: RfcDataFormPmDataValue;
+    cp: null;
+  };
+}
+
+export interface RfcDataFormValueWithData {
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    pfData: RfcDataFormPfDataValue;
+    pmData: RfcDataFormPmDataValue;
+    cp: string;
+  };
+}
+
+export interface RfcDataFormPfDataValue {
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  fechaNacimiento: Date;
+}
+
+export interface RfcDataFormPmDataValue {
+  fechaConstitucion: Date;
+  razonSocial: string;
+}

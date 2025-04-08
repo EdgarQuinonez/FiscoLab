@@ -104,6 +104,12 @@ export class RfcFormComponent {
     }),
   });
 
+  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+  dataStatus!: { dataIsRequired: boolean };
+  responseError: string | null = null;
+  tipoSujeto: TipoSujetoCode | null = null;
+
   constructor(
     private router: Router,
     private storageService: StorageService,
@@ -128,16 +134,21 @@ export class RfcFormComponent {
         debounceTime(200),
         map((value) => {
           if (checkAllValuesNull(value)) {
-            return { dataIsRequired: false };
+            return {
+              dataIsRequired: false,
+            };
           }
 
-          return { dataIsRequired: true };
+          return {
+            dataIsRequired: true,
+          };
         }),
-        startWith({ dataIsRequired: false })
+        startWith({
+          dataIsRequired: false,
+        })
       )
       .subscribe((value) => {
-        this.rfcFormService.dataStatus = value;
-        if (this.rfcFormService.dataStatus.dataIsRequired) {
+        if (value.dataIsRequired) {
           addTreeValidators(dataGroup, Validators.required);
         } else {
           removeTreeValidators(dataGroup, Validators.required);
@@ -145,6 +156,7 @@ export class RfcFormComponent {
         }
 
         updateTreeValidity(this.rfcForm, { emitEvent: false });
+        this.dataStatus = value;
       });
   }
 
@@ -170,40 +182,37 @@ export class RfcFormComponent {
         enableAll(pfDataGroup);
         pmDataGroup.reset();
       }
-      this.rfcFormService.tipoSujeto = value;
+      this.tipoSujeto = value;
     });
   }
 
   onSubmit() {
-    this.rfcFormService.responseError = null;
+    this.responseError = null;
     if (this.rfcForm.invalid) {
       markAllAsDirty(this.rfcForm);
       return;
     }
     this.loading = true;
 
-    if (
-      this.rfcFormService.rfcFormResponse$ === null &&
-      this.rfcFormService.finalResponse$ === null
-    ) {
+    if (this.rfcFormResponse$ === null && this.finalResponse$ === null) {
       // needs to call API
-      if (this.rfcFormService.dataStatus.dataIsRequired) {
+      if (this.dataStatus.dataIsRequired) {
         // validation with data
         const formValue = this.rfcForm.value as RfcFormDataValue;
-        this.rfcFormService.rfcFormResponse$ =
+        this.rfcFormResponse$ =
           this.rfcFormService.validateRFCWithData$(formValue);
       } else {
         const formValue = this.rfcForm.value as RfcFormValue;
-        this.rfcFormService.rfcFormResponse$ =
-          this.rfcFormService.validateRFC$(formValue);
+        this.rfcFormResponse$ = this.rfcFormService.validateRFC$(formValue);
       }
       // filters response
-      this.rfcFormService.finalResponse$ =
-        this.rfcFormService.getFinalResponse$();
+      this.finalResponse$ = this.rfcFormService.getFinalResponse$(
+        this.rfcFormResponse$
+      );
     }
 
     // ACTUALLY REFLECT SUCCESS-VALID OR INVALID OR BAD REQUEST IN FORM.
-    this.rfcFormService.finalResponse$?.subscribe((value) => {
+    this.finalResponse$?.subscribe((value) => {
       if (!value) {
         return;
       }
@@ -217,10 +226,16 @@ export class RfcFormComponent {
             this.storageService.setItem('result', response.result);
             this.storageService.setItem('cp', response.cp);
             this.storageService.setItem('nombre', response.nombre);
+            if (this.rfcForm.value.tipoSujeto) {
+              this.storageService.setItem(
+                'tipoSujeto',
+                this.rfcForm.value.tipoSujeto
+              );
+            }
 
             this.router.navigateByUrl('/dashboard');
           } else {
-            this.rfcFormService.responseError = response.result;
+            this.responseError = response.result;
           }
         } else {
           const response = value.response.rfcs[0];
@@ -232,11 +247,11 @@ export class RfcFormComponent {
 
             this.router.navigateByUrl('/dashboard');
           } else {
-            this.rfcFormService.responseError = response.result;
+            this.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.rfcFormService.responseError =
+        this.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -268,38 +283,44 @@ export class RfcFormComponent {
 
       // After using the response set them to null in case of resubmitting form.
       this.loading = false;
-      this.rfcFormService.rfcFormResponse$ = null;
-      this.rfcFormService.finalResponse$ = null;
+      this.rfcFormResponse$ = null;
+      this.finalResponse$ = null;
     });
+  }
+
+  // true when rest of the fields but cp are valid
+  isAutocompleteReady() {
+    const pmDataGroup = this.rfcForm.get(['data', 'pmData']);
+    const pfDataGroup = this.rfcForm.get(['data', 'pfData']);
+    const rfcControl = this.rfcForm.get('rfc');
+    const tipoSujetoControl = this.rfcForm.get('tipoSujeto');
+    return !!(
+      tipoSujetoControl?.valid &&
+      rfcControl?.valid &&
+      this.dataStatus.dataIsRequired &&
+      (pmDataGroup?.valid || pfDataGroup?.valid)
+    );
   }
 
   // sets the CP on the field when autocomplete is successful - valid.
   autocompleteCP(eventData: QueryCPFormValue) {
     // Triggering validation errors
-    if (
-      this.rfcForm.get('tipoSujeto')?.invalid ||
-      // this.rfcForm.get(['data', 'cp'])?.invalid ||
-      this.rfcForm.get(['rfc'])?.invalid
-    ) {
+    if (!this.isAutocompleteReady()) {
+      // TODO: Currently there's no intuitive way to remove validators if user decides that he didn't want to autocomplete nor validate with data.
+      this.dataStatus = { dataIsRequired: true };
+      const dataGroup: RfcFormFormGroup['data'] = this.rfcForm.get(
+        'data'
+      ) as FormGroup;
+      const cpControl = this.rfcForm.get(['data', 'cp'] as const);
+
+      addTreeValidators(dataGroup, Validators.required);
+      updateTreeValidity(this.rfcForm, { emitEvent: false });
+
       markAllAsDirty(this.rfcForm);
+      cpControl?.markAsPristine(); // USER FEEDBACK, AUTOCOMPLETE DOESN'T REQUIRE cpcontrol to have a value
       return;
     }
 
-    if (
-      this.rfcForm.get('tipoSujeto')?.value === 'PF' ||
-      this.rfcForm.get('tipoSujeto')?.value === null
-    ) {
-      if (this.rfcForm.get(['data', 'pfData'])?.invalid) {
-        markAllAsDirty(this.rfcForm);
-        return;
-      }
-    } else if (this.rfcForm.get('tipoSujeto')?.value === 'PM') {
-      if (this.rfcForm.get(['data', 'pmData'])?.invalid) {
-        markAllAsDirty(this.rfcForm);
-
-        return;
-      }
-    }
     this.loading = true;
     const formValues = this.rfcForm.value as RfcFormValueWithCP;
 
@@ -313,12 +334,12 @@ export class RfcFormComponent {
       municipio: eventData.municipio?.c_mnpio,
     };
 
-    this.rfcFormService.rfcFormResponse$ =
-      this.rfcFormService.cpQuery$(requestBody);
-    this.rfcFormService.finalResponse$ =
-      this.rfcFormService.getFinalResponse$();
+    this.rfcFormResponse$ = this.rfcFormService.cpQuery$(requestBody);
+    this.finalResponse$ = this.rfcFormService.getFinalResponse$(
+      this.rfcFormResponse$
+    );
 
-    this.rfcFormService.finalResponse$.subscribe((value) => {
+    this.finalResponse$?.subscribe((value) => {
       if (!value) {
         return;
       }
@@ -330,11 +351,11 @@ export class RfcFormComponent {
           ) {
             this.rfcForm.get(['data', 'cp'] as const)?.setValue(response.cp);
           } else {
-            this.rfcFormService.responseError = response.result;
+            this.responseError = response.result;
           }
         }
       } else if (value.status === 'SERVICE_ERROR') {
-        this.rfcFormService.responseError =
+        this.responseError =
           'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
       }
 
@@ -365,18 +386,6 @@ export class RfcFormComponent {
       }
       this.loading = false;
     });
-  }
-
-  getTipoSujeto() {
-    return this.rfcFormService.tipoSujeto;
-  }
-
-  isDataRequired() {
-    return this.rfcFormService.dataStatus.dataIsRequired;
-  }
-
-  getResponseError() {
-    return this.rfcFormService.responseError;
   }
 
   handleAutoCompleteCPClick() {

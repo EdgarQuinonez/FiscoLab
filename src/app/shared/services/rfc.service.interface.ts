@@ -8,7 +8,7 @@ import {
 } from '@shared/types';
 
 export interface ValidateRFCRequestBody {
-  rfcs: [{ rfc: string }];
+  rfcs: { rfc: string }[];
 }
 
 export type ValidateRFCResult =
@@ -90,7 +90,7 @@ export interface ValidateRFCWithDataServiceUnavailableResponse
 
 export type RFCWithData =
   | ValidateRFCWithDataSuccessResponse
-  | ValidateRFCBadRequestResponse
+  | ValidateRFCWithDataBadRequestResponse
   | ValidateRFCWithDataServiceUnavailableResponse;
 
 export interface GenerateRfcPfRequest {
