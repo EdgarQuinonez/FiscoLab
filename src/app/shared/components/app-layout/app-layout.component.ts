@@ -9,21 +9,25 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 
 @Component({
   selector: 'app-app-layout',
-  imports: [RouterOutlet, ToastModule, TopbarComponent, CommonModule, SidebarComponent],
+  imports: [
+    RouterOutlet,
+    ToastModule,
+    TopbarComponent,
+    CommonModule,
+    SidebarComponent,
+  ],
   templateUrl: './app-layout.component.html',
-  styleUrl: './app-layout.component.scss'
+  styleUrl: './app-layout.component.scss',
 })
 export class AppLayoutComponent {
-
-  tipoTopBar: "landing" | "main" = "landing"
-  constructor(private router: Router, private route: ActivatedRoute) {
-    this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => {
-        let child = this.route.firstChild;
-
-        const topBar = child!.snapshot.data["topBar"];
-        this.tipoTopBar = topBar || 'landing';
-      });
-  }
+  // tipoTopBar: "landing" | "main" = "landing"
+  // constructor(private router: Router, private route: ActivatedRoute) {
+  //   this.router.events
+  //     .pipe(filter(event => event instanceof NavigationEnd))
+  //     .subscribe(() => {
+  //       let child = this.route.firstChild;
+  //       const topBar = child!.snapshot.data["topBar"];
+  //       this.tipoTopBar = topBar || 'landing';
+  //     });
+  // }
 }

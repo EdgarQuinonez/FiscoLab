@@ -1,15 +1,1 @@
-<p-card styleClass="w-full h-full">
-  <div class="flex flex-col items-center justify-center gap-2">
-    @if (queryMethod === "curp") {
-    <app-curp></app-curp>
-    <p-button label="Continuar con RFC" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text"
-      (onClick)="changeQueryMethod('rfc')" />
-    }
-
-    @if (queryMethod === "rfc") {
-    <app-rfc-form></app-rfc-form>
-    <p-button label="Continuar con CURP" icon="pi pi-arrow-right" size="large" iconPos="right" variant="text"
-      (onClick)="changeQueryMethod('curp')" />
-    }
-  </div>
-</p-card>
+<app-main-form></app-main-form>
