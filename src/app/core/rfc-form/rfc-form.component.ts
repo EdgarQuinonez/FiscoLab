@@ -43,7 +43,7 @@ import {
 } from '@shared/utils/forms';
 import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
 import {
-  RFC,
+  Rfc,
   RFCWithData,
   ValidateRfcCpQueryRequest,
 } from '@shared/services/rfc.service.interface';
@@ -89,8 +89,8 @@ export class RfcFormComponent {
     }),
   });
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+  rfcFormResponse$: Observable<LoadingState<Rfc | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | Rfc | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
   dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;

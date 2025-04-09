@@ -9,7 +9,7 @@ import {
   GenerateRfcPmRequest,
   ObtainPersonalDataPfRFC,
   ObtainPersonalDataPfRFCSuccessResponse,
-  RFC,
+  Rfc,
   RFCWithData,
   ValidateRfcCpQueryRequest,
   ValidateRFCRequestBody,
@@ -34,7 +34,7 @@ export class RfcService {
       testCaseId: '663567bb713cf2110a1106ce',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`;
-    return this.http.post<RFC>(endpoint, requestBody);
+    return this.http.post<Rfc>(endpoint, requestBody);
   }
 
   validateRFCWithData$(rfcs: ValidateRFCWithDataRequest['rfcs']) {

@@ -45,7 +45,7 @@ export interface ValidateRFCServiceUnavailableResponse
   request: ValidateRFCRequestBody;
 }
 
-export type RFC =
+export type Rfc =
   | ValidateRFCSuccessResponse
   | ValidateRFCBadRequestResponse
   | ValidateRFCServiceUnavailableResponse;
