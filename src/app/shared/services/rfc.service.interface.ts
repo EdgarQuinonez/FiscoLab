@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   SuccessKibanResponse,
   ServiceUnavailableResponse,
-  KibanBadRequestCodeResponse,
+  KibanBadRequestCode,
   ClavesEstados,
   ClavesMunicipios,
 } from '@shared/types';
@@ -110,7 +110,7 @@ export interface GenerateRfcPfSuccessResponse extends SuccessKibanResponse {
 export interface GenerateRfcPfBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: KibanBadRequestCodeResponse;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }
@@ -161,7 +161,7 @@ export interface GenerateRfcPmSuccessReponse extends SuccessKibanResponse {
 export interface GenerateRfcPmBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: KibanBadRequestCodeResponse;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }

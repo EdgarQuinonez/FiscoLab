@@ -29,7 +29,7 @@ import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 export class RfcService {
   constructor(private http: HttpClient) {}
 
-  validateRFC$(requestBody: ValidateRFCRequestBody) {
+  validateRfc$(requestBody: ValidateRFCRequestBody) {
     const params = {
       testCaseId: '663567bb713cf2110a1106ce',
     };

@@ -25,6 +25,7 @@ import {
 })
 export class TipoSujetoControlComponent {
   ngControl = injectNgControl();
+  isRfc = input(false)
 
   tipoSujetoOptions = [
     {

@@ -6,7 +6,7 @@ import { LandingComponent } from '@pages/landing/landing.component';
 import { AppLayoutComponent } from '@shared/components/app-layout/app-layout.component';
 
 export const routes: Routes = [
-  { path: 'entry', component: LandingComponent, data: { topBar: 'main' } },
+  { path: 'home', component: LandingComponent, data: { topBar: 'main' } },
   {
     path: '',
     component: AppLayoutComponent,

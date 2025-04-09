@@ -41,9 +41,10 @@ export class RfcFormService {
   ) {}
 
   validateRFC$(rfcFormValue: RfcFormValue) {
+    // TODO: MOVED TO main.form.service. Handle removal.
     return of(null).pipe(
       switchMapWithLoading<RFC>(() =>
-        this.rfcService.validateRFC$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
+        this.rfcService.validateRfc$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
       )
     );
   }
@@ -83,7 +84,7 @@ export class RfcFormService {
             const response = value.response;
             return of(null).pipe(
               switchMapWithLoading(() =>
-                this.rfcService.validateRFC$({ rfcs: [{ rfc: response.rfc }] })
+                this.rfcService.validateRfc$({ rfcs: [{ rfc: response.rfc }] })
               )
             );
           }
@@ -116,7 +117,7 @@ generateAndValidatePmRfc$(formValue: RfcDataFormValue) {
           const response = value.response;
           return of(null).pipe(
             switchMapWithLoading(() =>
-              this.rfcService.validateRFC$({
+              this.rfcService.validateRfc$({
                 rfcs: [
                   {
                     rfc: response.rfc,

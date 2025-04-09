@@ -11,18 +11,15 @@
         </div>
         <label class="flex flex-col items-center justify-center w-full">
             <p-message variant="simple" severity="contrast" class="mb-2">
-                Ingresa aquí la CURP o el RFC
+                Ingresa aquí la CURP o el RFC con homoclave
             </p-message>
             <p-card class="w-full">
-                
                 <div>
-            
                     <div class="flex items-center mb-2">
-                
                         <input formControlName="clave" type="text" class="w-full focus:outline-none" placeholder="ej. QURE021108HCHXMDA9 o QURE021108RI4">
                         <p-button  type="submit" ariaLabel="Continuar" icon="pi pi-chevron-right" [rounded]="true"/>
                     </div>
-                    <app-tipo-sujeto-control formControlName="tipoSujeto"></app-tipo-sujeto-control>
+                    <app-tipo-sujeto-control [isRfc]="queryMethod === 'rfc'" formControlName="tipoSujeto"></app-tipo-sujeto-control>
                 </div>
             </p-card>
         </label>
