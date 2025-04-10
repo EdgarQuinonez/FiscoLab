@@ -27,7 +27,6 @@ export class CurpFoundAndValidValidator implements AsyncValidator {
         catchError(
           (err: CurpBadRequestResponse | CurpServiceUnavailableResponse) => {
             // Emit HTTP errors or SERVICE_ERROR
-            // TODO: might add additional field so that I can include code to display custom message in template instead.
             return of({
               curp: {
                 message:

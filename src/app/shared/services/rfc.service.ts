@@ -9,7 +9,7 @@ import {
   GenerateRfcPmRequest,
   ObtainPersonalDataPfRFC,
   ObtainPersonalDataPfRFCSuccessResponse,
-  RFC,
+  Rfc,
   RFCWithData,
   ValidateRfcCpQueryRequest,
   ValidateRFCRequestBody,
@@ -29,12 +29,12 @@ import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 export class RfcService {
   constructor(private http: HttpClient) {}
 
-  validateRFC$(requestBody: ValidateRFCRequestBody) {
+  validateRfc$(requestBody: ValidateRFCRequestBody) {
     const params = {
       testCaseId: '663567bb713cf2110a1106ce',
     };
     const endpoint = `${environment.apiUrl}/sat/rfc_validate?testCaseId=${params.testCaseId}`;
-    return this.http.post<RFC>(endpoint, requestBody);
+    return this.http.post<Rfc>(endpoint, requestBody);
   }
 
   validateRFCWithData$(rfcs: ValidateRFCWithDataRequest['rfcs']) {

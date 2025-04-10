@@ -1,0 +1,27 @@
+<div class="flex items-center justify-between w-full px-12">
+    <span>Historial de Clientes</span>
+    <i class="pi pi-history"></i>    
+</div>
+<div>
+
+    <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input type="text"  placeholder="Buscar..." pInputText>
+    </p-iconfield>
+</div>
+@if (filteredClients.length > 0) {
+
+    <ul>
+        @for (item of filteredClients; track $index) {
+
+            <li>
+                <p-button [label]="item.name" [icon]="item.tipoSujeto === 'PF' ? 'pi pi-user' : 'pi pi-user-group'"/>            
+            </li>
+            
+        }
+    </ul>
+} @else {
+    <span>
+        No se encontraron clientes.
+    </span>
+}

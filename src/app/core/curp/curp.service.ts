@@ -9,6 +9,7 @@ import { StorageService } from '@shared/services/storage.service';
   providedIn: 'root',
 })
 export class CurpService {
+  // TODO: Delete this file as a duplicate has been created on the shared/services directory.
   curpResponse: Curp | null = null;
 
   constructor(
@@ -43,6 +44,7 @@ export class CurpService {
     return this.http.post<CurpByData>(endpoint, personalData);
   }
 
+  // TODO: Deprecation. errors and success for curp validation will be handled curp-form component onSubmit method instead of using AsyncValidators.
   setCurpResponse(curpResponse: Curp) {
     this.curpResponse = curpResponse;
   }

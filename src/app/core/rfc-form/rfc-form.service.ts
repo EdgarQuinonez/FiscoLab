@@ -6,9 +6,9 @@ import {
   RfcDataFormValueWithData,
 } from './rfc-form.interface';
 import {
-  RFC,
+  Rfc,
   ValidateRFCSuccessResponse,
-  ValidateRFCBadRequestResponse,
+  ValidateRfcBadRequestResponse,
   RFCWithData,
   ValidateRFCWithDataBadRequestResponse,
   ValidateRFCWithDataServiceUnavailableResponse,
@@ -41,9 +41,10 @@ export class RfcFormService {
   ) {}
 
   validateRFC$(rfcFormValue: RfcFormValue) {
+    // TODO: MOVED TO main.form.service. Handle removal.
     return of(null).pipe(
-      switchMapWithLoading<RFC>(() =>
-        this.rfcService.validateRFC$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
+      switchMapWithLoading<Rfc>(() =>
+        this.rfcService.validateRfc$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
       )
     );
   }
@@ -79,11 +80,11 @@ export class RfcFormService {
       .pipe(
         map((value) => {
           if (value.status === 'SUCCESS') {
-            // RFC generated successfully.
+            // Rfc generated successfully.
             const response = value.response;
             return of(null).pipe(
               switchMapWithLoading(() =>
-                this.rfcService.validateRFC$({ rfcs: [{ rfc: response.rfc }] })
+                this.rfcService.validateRfc$({ rfcs: [{ rfc: response.rfc }] })
               )
             );
           }
@@ -100,124 +101,124 @@ export class RfcFormService {
       );
   }
 
-generateAndValidatePmRfc$(formValue: RfcDataFormValue) {
-  return this.rfcService
-    .generateRfcPM$({
-      razonSocial: formValue.data.pmData.razonSocial,
-      fechaConstitucion: format(
-        formValue.data.pmData.fechaConstitucion,
-        'yyyy-MM-dd'
-      ),
-    })
-    .pipe(
-      map((value) => {
-        if (value.status === 'SUCCESS') {
-          // RFC generated successfully.
-          const response = value.response;
-          return of(null).pipe(
-            switchMapWithLoading(() =>
-              this.rfcService.validateRFC$({
-                rfcs: [
+  generateAndValidatePmRfc$(formValue: RfcDataFormValue) {
+    return this.rfcService
+      .generateRfcPM$({
+        razonSocial: formValue.data.pmData.razonSocial,
+        fechaConstitucion: format(
+          formValue.data.pmData.fechaConstitucion,
+          'yyyy-MM-dd'
+        ),
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return of(null).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRfc$({
+                  rfcs: [
+                    {
+                      rfc: response.rfc,
+                    },
+                  ],
+                })
+              )
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        }),
+        catchError((err) => {
+          return of(
+            err as
+              | GenerateRfcPmBadRequestResponse
+              | GenerateRfcPmServiceUnavailableResponse
+          );
+        })
+      );
+  }
+
+  generateAndValidatePfRfcWithData$(formValue: RfcDataFormValueWithData) {
+    return this.rfcService
+      .generateRfcPF$({
+        nombres: formValue.data.pfData.nombres,
+        apellidoPaterno: formValue.data.pfData.apellidoPaterno,
+        apellidoMaterno: formValue.data.pfData.apellidoMaterno,
+        fechaNacimiento: format(
+          formValue.data.pfData.fechaNacimiento,
+          'yyyy-MM-dd'
+        ),
+      })
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return of(null).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFCWithData$([
                   {
                     rfc: response.rfc,
+                    nombre: `${formValue.data.pfData.nombres} ${formValue.data.pfData.apellidoPaterno} ${formValue.data.pfData.apellidoMaterno}`,
+                    cp: formValue.data.cp,
                   },
-                ],
-              })
-            )
+                ])
+              )
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        }),
+        catchError((err) => {
+          return of(
+            err as
+              | GenerateRfcPfBadRequestResponse
+              | GenerateRfcPfServiceUnavailableResponse
           );
-        }
-        // assuming bad request or service error
-        return value;
-      }),
-      catchError((err) => {
-        return of(
-          err as
-            | GenerateRfcPmBadRequestResponse
-            | GenerateRfcPmServiceUnavailableResponse
-        );
-      })
-    );
-}
+        })
+      );
+  }
 
-generateAndValidatePfRfcWithData$(formValue: RfcDataFormValueWithData) {
-  return this.rfcService
-    .generateRfcPF$({
-      nombres: formValue.data.pfData.nombres,
-      apellidoPaterno: formValue.data.pfData.apellidoPaterno,
-      apellidoMaterno: formValue.data.pfData.apellidoMaterno,
-      fechaNacimiento: format(
-        formValue.data.pfData.fechaNacimiento,
-        'yyyy-MM-dd'
-      ),
-    })
-    .pipe(
-      map((value) => {
-        if (value.status === 'SUCCESS') {
-          // RFC generated successfully.
-          const response = value.response;
-          return of(null).pipe(
-            switchMapWithLoading(() =>
-              this.rfcService.validateRFCWithData$([
-                {
-                  rfc: response.rfc,
-                  nombre: `${formValue.data.pfData.nombres} ${formValue.data.pfData.apellidoPaterno} ${formValue.data.pfData.apellidoMaterno}`,
-                  cp: formValue.data.cp,
-                },
-              ])
-            )
-          );
-        }
-        // assuming bad request or service error
-        return value;
-      }),
-      catchError((err) => {
-        return of(
-          err as
-            | GenerateRfcPfBadRequestResponse
-            | GenerateRfcPfServiceUnavailableResponse
-        );
+  generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
+    return this.rfcService
+      .generateRfcPM$({
+        razonSocial: formValue.data.pmData.razonSocial,
+        fechaConstitucion: format(
+          formValue.data.pmData.fechaConstitucion,
+          'yyyy-MM-dd'
+        ),
       })
-    );
-}
-
-generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
-  return this.rfcService
-    .generateRfcPM$({
-      razonSocial: formValue.data.pmData.razonSocial,
-      fechaConstitucion: format(
-        formValue.data.pmData.fechaConstitucion,
-        'yyyy-MM-dd'
-      ),
-    })
-    .pipe(
-      map((value) => {
-        if (value.status === 'SUCCESS') {
-          // RFC generated successfully.
-          const response = value.response;
-          return of(null).pipe(
-            switchMapWithLoading(() =>
-              this.rfcService.validateRFCWithData$([
-                {
-                  rfc: response.rfc,
-                  nombre: formValue.data.pmData.razonSocial,
-                  cp: formValue.data.cp,
-                },
-              ])
-            )
+      .pipe(
+        map((value) => {
+          if (value.status === 'SUCCESS') {
+            // RFC generated successfully.
+            const response = value.response;
+            return of(null).pipe(
+              switchMapWithLoading(() =>
+                this.rfcService.validateRFCWithData$([
+                  {
+                    rfc: response.rfc,
+                    nombre: formValue.data.pmData.razonSocial,
+                    cp: formValue.data.cp,
+                  },
+                ])
+              )
+            );
+          }
+          // assuming bad request or service error
+          return value;
+        }),
+        catchError((err) => {
+          return of(
+            err as
+              | GenerateRfcPmBadRequestResponse
+              | GenerateRfcPmServiceUnavailableResponse
           );
-        }
-        // assuming bad request or service error
-        return value;
-      }),
-      catchError((err) => {
-        return of(
-          err as
-            | GenerateRfcPmBadRequestResponse
-            | GenerateRfcPmServiceUnavailableResponse
-        );
-      })
-    );
-}
+        })
+      );
+  }
 
   cpQuery$(requestBody: ValidateRfcCpQueryRequest) {
     const rfcs: ValidateRFCWithDataRequest['rfcs'] = [];
@@ -255,20 +256,19 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
     );
   }
 
-  // TODO: Analyze why getFinalResponse doesn't seem to return RfcWithData errors
   getFinalResponse$(
-    validateRfcResponse: Observable<LoadingState<RFC | RFCWithData>> | null
+    validateRfcResponse: Observable<LoadingState<Rfc | RFCWithData>> | null
   ) {
     // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
     if (!validateRfcResponse) {
       return of(null);
     }
     return validateRfcResponse.pipe(
-      filter((value): value is LoadingState<RFC | RFCWithData> => !!value),
+      filter((value): value is LoadingState<Rfc | RFCWithData> => !!value),
       map((value) => {
         const data = value.data;
         const error = value.error as
-          | ValidateRFCBadRequestResponse
+          | ValidateRfcBadRequestResponse
           | ValidateRFCWithDataBadRequestResponse
           | ValidateRFCServiceUnavailableResponse
           | ValidateRFCWithDataServiceUnavailableResponse;
@@ -314,7 +314,7 @@ generateAndValidatePmRfcWithData$(formValue: RfcDataFormValueWithData) {
   }
 
   isRFCWithDataSuccess(
-    data: RFC | RFCWithData
+    data: Rfc | RFCWithData
   ): data is ValidateRFCWithDataSuccessResponse {
     return 'request' in data && 'cp' in (data as any).response.rfcs[0];
   }

@@ -12,19 +12,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TabsModule } from 'primeng/tabs';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { SelectButtonModule } from 'primeng/selectbutton';
-import { RfcService } from '@shared/services/rfc.service';
 import { LoadingState, TipoSujetoCode } from '@shared/types';
 import {
   debounceTime,
-  filter,
   map,
   Observable,
-  of,
   startWith,
-  switchMap,
-  tap,
 } from 'rxjs';
-import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { MessageModule } from 'primeng/message';
@@ -49,18 +43,9 @@ import {
 } from '@shared/utils/forms';
 import { RfcDataFormComponent } from './rfc-data-form/rfc-data-form.component';
 import {
-  RFC,
+  Rfc,
   RFCWithData,
-  ValidateRFCSuccessResponse,
-  ValidateRFCBadRequestResponse,
-  ValidateRFCWithDataBadRequestResponse,
-  ValidateRFCWithDataServiceUnavailableResponse,
-  ValidateRFCWithDataRequest,
   ValidateRfcCpQueryRequest,
-  ValidateRFCServiceUnavailableResponse,
-  ValidateRFCResult,
-  ValidateRFCWithDataResult,
-  ValidateRFCWithDataSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcFormService } from './rfc-form.service';
 import { QueryCpFormComponent } from './query-cp-form/query-cp-form.component';
@@ -104,8 +89,8 @@ export class RfcFormComponent {
     }),
   });
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+  rfcFormResponse$: Observable<LoadingState<Rfc | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | Rfc | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
   dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;

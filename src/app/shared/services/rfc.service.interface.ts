@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   SuccessKibanResponse,
   ServiceUnavailableResponse,
-  KibanBadRequestCodeResponse,
+  KibanBadRequestCode,
   ClavesEstados,
   ClavesMunicipios,
 } from '@shared/types';
@@ -25,15 +25,10 @@ export interface ValidateRFCSuccessResponse extends SuccessKibanResponse {
   };
 }
 
-type ValidateRFCBadRequestCode =
-  | 'REQUIRED_FIELD_ERROR'
-  | 'FORMAT_ERROR'
-  | 'EMPTY_ERROR';
-
-export interface ValidateRFCBadRequestResponse extends HttpErrorResponse {
+export interface ValidateRfcBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: ValidateRFCBadRequestCode;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }
@@ -45,9 +40,9 @@ export interface ValidateRFCServiceUnavailableResponse
   request: ValidateRFCRequestBody;
 }
 
-export type RFC =
+export type Rfc =
   | ValidateRFCSuccessResponse
-  | ValidateRFCBadRequestResponse
+  | ValidateRfcBadRequestResponse
   | ValidateRFCServiceUnavailableResponse;
 
 export type ValidateRFCWithDataResult =
@@ -76,7 +71,7 @@ export interface ValidateRFCWithDataBadRequestResponse
   extends HttpErrorResponse {
   error: [
     {
-      code: ValidateRFCBadRequestCode;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }
@@ -110,7 +105,7 @@ export interface GenerateRfcPfSuccessResponse extends SuccessKibanResponse {
 export interface GenerateRfcPfBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: KibanBadRequestCodeResponse;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }
@@ -161,7 +156,7 @@ export interface GenerateRfcPmSuccessReponse extends SuccessKibanResponse {
 export interface GenerateRfcPmBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: KibanBadRequestCodeResponse;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }

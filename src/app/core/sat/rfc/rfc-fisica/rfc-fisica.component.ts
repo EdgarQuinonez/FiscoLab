@@ -11,9 +11,9 @@ import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
 import { CastPipe } from '@shared/pipes/cast.pipe';
 import {
-  RFC,
+  Rfc,
   ValidateRFCSuccessResponse,
-  ValidateRFCBadRequestResponse,
+  ValidateRfcBadRequestResponse,
   ObtainPersonalDataPfRFCSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcService } from '@shared/services/rfc.service';
@@ -25,14 +25,14 @@ import { RfcService } from '@shared/services/rfc.service';
   styleUrl: './rfc-fisica.component.scss',
 })
 export class RfcFisicaComponent {
-  results$!: Observable<LoadingState<RFC>>;
+  results$!: Observable<LoadingState<Rfc>>;
   personalData$: Observable<
     LoadingState<ObtainPersonalDataPfRFCSuccessResponse>
   > | null = null;
   nombres: string | null = null;
 
   SuccessInterface!: ValidateRFCSuccessResponse;
-  BadRequestInterface!: ValidateRFCBadRequestResponse;
+  BadRequestInterface!: ValidateRfcBadRequestResponse;
 
   constructor(
     private rfcService: RfcService,
