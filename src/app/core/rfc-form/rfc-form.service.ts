@@ -6,7 +6,7 @@ import {
   RfcDataFormValueWithData,
 } from './rfc-form.interface';
 import {
-  RFC,
+  Rfc,
   ValidateRFCSuccessResponse,
   ValidateRfcBadRequestResponse,
   RFCWithData,
@@ -43,7 +43,7 @@ export class RfcFormService {
   validateRFC$(rfcFormValue: RfcFormValue) {
     // TODO: MOVED TO main.form.service. Handle removal.
     return of(null).pipe(
-      switchMapWithLoading<RFC>(() =>
+      switchMapWithLoading<Rfc>(() =>
         this.rfcService.validateRfc$({ rfcs: [{ rfc: rfcFormValue.rfc }] })
       )
     );
@@ -80,7 +80,7 @@ export class RfcFormService {
       .pipe(
         map((value) => {
           if (value.status === 'SUCCESS') {
-            // RFC generated successfully.
+            // Rfc generated successfully.
             const response = value.response;
             return of(null).pipe(
               switchMapWithLoading(() =>
@@ -257,14 +257,14 @@ export class RfcFormService {
   }
 
   getFinalResponse$(
-    validateRfcResponse: Observable<LoadingState<RFC | RFCWithData>> | null
+    validateRfcResponse: Observable<LoadingState<Rfc | RFCWithData>> | null
   ) {
     // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
     if (!validateRfcResponse) {
       return of(null);
     }
     return validateRfcResponse.pipe(
-      filter((value): value is LoadingState<RFC | RFCWithData> => !!value),
+      filter((value): value is LoadingState<Rfc | RFCWithData> => !!value),
       map((value) => {
         const data = value.data;
         const error = value.error as
@@ -314,7 +314,7 @@ export class RfcFormService {
   }
 
   isRFCWithDataSuccess(
-    data: RFC | RFCWithData
+    data: Rfc | RFCWithData
   ): data is ValidateRFCWithDataSuccessResponse {
     return 'request' in data && 'cp' in (data as any).response.rfcs[0];
   }

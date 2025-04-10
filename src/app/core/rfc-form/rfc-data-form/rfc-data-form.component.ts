@@ -12,7 +12,7 @@ import {
   GenerateRfcPm,
   GenerateRfcPmBadRequestResponse,
   GenerateRfcPmServiceUnavailableResponse,
-  RFC,
+  Rfc,
   RFCWithData,
   ValidateRfcCpQueryRequest,
 } from '@shared/services/rfc.service.interface';
@@ -101,8 +101,8 @@ export class RfcDataFormComponent {
     }),
   });
 
-  rfcFormResponse$: Observable<LoadingState<RFC | RFCWithData>> | null = null;
-  finalResponse$: Observable<RFCWithData | RFC | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
+  rfcFormResponse$: Observable<LoadingState<Rfc | RFCWithData>> | null = null;
+  finalResponse$: Observable<RFCWithData | Rfc | null> | null = null; // should store only the final result of the validation rfc SUCCES - INVALID, SUCCESS - VALID, BAD REQUEST AND SERVICE_ERROR
   dataStatus!: { dataIsRequired: boolean };
   responseError: string | null = null;
   tipoSujeto: TipoSujetoCode | null = null;
@@ -112,7 +112,7 @@ export class RfcDataFormComponent {
     | GenerateRfcPfServiceUnavailableResponse
     | GenerateRfcPmBadRequestResponse
     | GenerateRfcPmServiceUnavailableResponse
-    | Observable<LoadingState<RFCWithData | RFC>>
+    | Observable<LoadingState<RFCWithData | Rfc>>
   > | null = null;
 
   loading = false;
@@ -285,7 +285,7 @@ export class RfcDataFormComponent {
     generateResponse:
       | GenerateRfcPf
       | GenerateRfcPm
-      | Observable<LoadingState<RFCWithData | RFC>>
+      | Observable<LoadingState<RFCWithData | Rfc>>
       | null
   ): generateResponse is
     | GenerateRfcPfBadRequestResponse
@@ -329,7 +329,7 @@ export class RfcDataFormComponent {
 
     this.generateRfcResponse$
       ?.pipe(
-        // Step 1: Handle generate RFC response
+        // Step 1: Handle generate Rfc response
         tap((generateResponse) => {
           if (this.isGenerateResponseError(generateResponse)) {
             this.handleGenerateErrors(generateResponse);
@@ -337,7 +337,7 @@ export class RfcDataFormComponent {
           }
           this.rfcFormResponse$ = generateResponse;
         }),
-        // Step 2: If generation succeeded, validate the RFC
+        // Step 2: If generation succeeded, validate the Rfc
         switchMap(() =>
           this.rfcFormService.getFinalResponse$(this.rfcFormResponse$)
         ),
@@ -433,7 +433,7 @@ export class RfcDataFormComponent {
     }
   }
 
-  private handleSuccessResponse(response: RFC | RFCWithData) {
+  private handleSuccessResponse(response: Rfc | RFCWithData) {
     if (response.status === 'SUCCESS') {
       const rfcData = response.response.rfcs[0];
       this.storageService.setItem('rfc', rfcData.rfc);
@@ -458,7 +458,7 @@ export class RfcDataFormComponent {
     }
   }
 
-  private handleValidationErrors(response: RFC | RFCWithData) {
+  private handleValidationErrors(response: Rfc | RFCWithData) {
     if (typeof response.status === 'number') {
       const error = response.error;
       error.forEach((err) => {
@@ -471,6 +471,5 @@ export class RfcDataFormComponent {
         }
       });
     }
-
   }
 }
