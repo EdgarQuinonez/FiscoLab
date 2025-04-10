@@ -1,4 +1,11 @@
-import { Component, computed, forwardRef, input, output } from '@angular/core';
+import {
+  Component,
+  computed,
+  forwardRef,
+  input,
+  model,
+  output,
+} from '@angular/core';
 import {
   FormControlStatus,
   FormGroup,
@@ -25,7 +32,7 @@ import {
 })
 export class TipoSujetoControlComponent {
   ngControl = injectNgControl();
-  isRfc = input(false)
+  isRfc = input(false);
 
   tipoSujetoOptions = [
     {
@@ -39,4 +46,21 @@ export class TipoSujetoControlComponent {
       icon: 'pi pi-users',
     },
   ];
+
+  ngOnChanges() {
+    this.toggleControl();
+  }
+
+  // disable/enable control and set control value based on isRfc
+  toggleControl() {
+    const isRfc = computed(() => this.isRfc());
+    if (isRfc()) {
+      this.ngControl.control.setValue(null);
+      this.ngControl.control.enable();
+    } else {
+      // Input is curp or empty
+      this.ngControl.control.setValue('PF');
+      this.ngControl.control.disable();
+    }
+  }
 }

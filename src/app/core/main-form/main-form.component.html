@@ -1,7 +1,7 @@
 
 
 <app-client-side-bar></app-client-side-bar>
-<div class="w-full h-full flex items-center justify-center">
+<div class="w-full h-full flex flex-col items-center justify-center">
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-[50rem] flex flex-col justify-center items-center flex-col">
         <div class="py-2">
@@ -27,4 +27,11 @@
             <p-button type="button" [link]="true" label="Calcular la CURP o el RFC"/>            
         </div>
     </form>
+
+    @if (responseError || form.get('clave')?.hasError('clave')) {
+
+        <p-message severity="error" class="max-w-[50rem]">
+            {{ responseError || form.get('clave')?.getError('clave')}}
+        </p-message>
+    }
 </div>
