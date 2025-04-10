@@ -1,12 +1,55 @@
-import { SuccessKibanResponse, KibanBadRequestCode, ServiceUnavailableResponse } from '@types'
-import { HttpErrorResponse } from '@angular/common/http'
+import {
+  SuccessKibanResponse,
+  KibanBadRequestCode,
+  ServiceUnavailableResponse,
+} from '@types';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export type Gender = 'HOMBRE' | 'MUJER' | 'NO BINARIO';
 export type GenderCode = 'H' | 'M' | 'X';
+export type CurpStatusCode =
+  | 'AN' // Alta Normal
+  | 'AH' // Alta con homonimia
+  | 'RCC' // Registro de cambio afectando a CURP
+  | 'RCN' // Registro de cambio no afectando a CURP
+  | 'BAP' // Baja por documento apócrifo
+  | 'BSU' // Baja sin uso
+  | 'BD' // Baja por defunción
+  | 'BDM' // Baja administrativa
+  | 'BDP' // Baja por adopción
+  | 'BJD'; // Baja Judicial
 
+export type CurpStatusDescription =
+  | 'Alta Normal'
+  | 'Alta con homonimia'
+  | 'Registro de cambio afectando a CURP'
+  | 'Registro de cambio no afectando a CURP'
+  | 'Baja por documento apócrifo'
+  | 'Baja sin uso'
+  | 'Baja por defunción'
+  | 'Baja administrativa'
+  | 'Baja por adopción'
+  | 'Baja Judicial';
+
+export type CurpStatusMap = {
+  [code in CurpStatusCode]: CurpStatusDescription;
+};
+
+export const CURP_STATUS_MAP: CurpStatusMap = {
+  AN: 'Alta Normal',
+  AH: 'Alta con homonimia',
+  RCC: 'Registro de cambio afectando a CURP',
+  RCN: 'Registro de cambio no afectando a CURP',
+  BAP: 'Baja por documento apócrifo',
+  BSU: 'Baja sin uso',
+  BD: 'Baja por defunción',
+  BDM: 'Baja administrativa',
+  BDP: 'Baja por adopción',
+  BJD: 'Baja Judicial',
+};
 
 export interface ValidateCurpRequest {
-    curp: string
+  curp: string;
 }
 
 export interface ValidateCurpFoundResponse {
@@ -64,17 +107,16 @@ export interface ValidateCurpNotValidResponse {
   segundoApellido: string;
   sexo: Gender;
   status: 'NOT_VALID';
-  statusCurp: string;
-  statusCurpDescripcion: string;
+  statusCurp: CurpStatusCode;
+  statusCurpDescripcion: CurpStatusDescription;
 }
 
-
 export interface ValidateCurpSuccessResponse extends SuccessKibanResponse {
-      response:
-        | ValidateCurpFoundResponse
-        | ValidateCurpNotFoundResponse
-        | ValidateCurpNotValidResponse;
-      request: ValidateCurpRequest;
+  response:
+    | ValidateCurpFoundResponse
+    | ValidateCurpNotFoundResponse
+    | ValidateCurpNotValidResponse;
+  request: ValidateCurpRequest;
 }
 
 export interface ValidateCurpBadRequestResponse extends HttpErrorResponse {
@@ -92,4 +134,7 @@ export interface ValidateCurpServiceUnavailableResponse
   request: ValidateCurpRequest;
 }
 
-export type Curp = ValidateCurpSuccessResponse | ValidateCurpBadRequestResponse | ValidateCurpServiceUnavailableResponse
+export type Curp =
+  | ValidateCurpSuccessResponse
+  | ValidateCurpBadRequestResponse
+  | ValidateCurpServiceUnavailableResponse;

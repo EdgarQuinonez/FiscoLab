@@ -25,15 +25,10 @@ export interface ValidateRFCSuccessResponse extends SuccessKibanResponse {
   };
 }
 
-type ValidateRFCBadRequestCode =
-  | 'REQUIRED_FIELD_ERROR'
-  | 'FORMAT_ERROR'
-  | 'EMPTY_ERROR';
-
-export interface ValidateRFCBadRequestResponse extends HttpErrorResponse {
+export interface ValidateRfcBadRequestResponse extends HttpErrorResponse {
   error: [
     {
-      code: ValidateRFCBadRequestCode;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }
@@ -47,7 +42,7 @@ export interface ValidateRFCServiceUnavailableResponse
 
 export type Rfc =
   | ValidateRFCSuccessResponse
-  | ValidateRFCBadRequestResponse
+  | ValidateRfcBadRequestResponse
   | ValidateRFCServiceUnavailableResponse;
 
 export type ValidateRFCWithDataResult =
@@ -76,7 +71,7 @@ export interface ValidateRFCWithDataBadRequestResponse
   extends HttpErrorResponse {
   error: [
     {
-      code: ValidateRFCBadRequestCode;
+      code: KibanBadRequestCode;
       field: string;
       message: string;
     }

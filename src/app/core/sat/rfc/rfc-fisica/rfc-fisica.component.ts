@@ -13,7 +13,7 @@ import { CastPipe } from '@shared/pipes/cast.pipe';
 import {
   RFC,
   ValidateRFCSuccessResponse,
-  ValidateRFCBadRequestResponse,
+  ValidateRfcBadRequestResponse,
   ObtainPersonalDataPfRFCSuccessResponse,
 } from '@shared/services/rfc.service.interface';
 import { RfcService } from '@shared/services/rfc.service';
@@ -32,7 +32,7 @@ export class RfcFisicaComponent {
   nombres: string | null = null;
 
   SuccessInterface!: ValidateRFCSuccessResponse;
-  BadRequestInterface!: ValidateRFCBadRequestResponse;
+  BadRequestInterface!: ValidateRfcBadRequestResponse;
 
   constructor(
     private rfcService: RfcService,
