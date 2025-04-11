@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -8,5 +8,5 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './select-form-button.component.scss',
 })
 export class SelectFormButtonComponent {
-  selectedForm: 'curp' | 'rfc' = 'curp';
+  selectedForm = model<'curp' | 'rfc'>('curp');
 }

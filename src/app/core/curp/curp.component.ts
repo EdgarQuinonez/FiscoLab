@@ -26,7 +26,7 @@ import {
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@types';
 import { CurpFoundAndValidValidator } from './curp.validator';
-import { CurpByDataComponent } from './curp-by-data/curp-by-data.component';
+// import { CurpByDataComponent } from './curp-by-data/curp-by-data.component';
 import { TabsModule } from 'primeng/tabs';
 import { MessageModule } from 'primeng/message';
 import { CardModule } from 'primeng/card';
@@ -39,7 +39,7 @@ import { CardModule } from 'primeng/card';
     ButtonModule,
     InputGroupModule,
     InputGroupAddonModule,
-    CurpByDataComponent,
+    // CurpByDataComponent,
     TabsModule,
     MessageModule,
   ],
