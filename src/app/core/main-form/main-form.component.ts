@@ -34,6 +34,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { MainDataFormComponent } from './main-data-form/main-data-form.component';
 
 @Component({
   selector: 'app-main-form',
@@ -46,6 +47,7 @@ import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/load
     ClientSideBarComponent,
     SplitterModule,
     LoadingSpinnerComponent,
+    MainDataFormComponent,
   ],
   templateUrl: './main-form.component.html',
   styleUrl: './main-form.component.scss',
@@ -72,6 +74,7 @@ export class MainFormComponent {
   });
 
   queryMethod: 'rfc' | 'curp' = 'curp'; // Enable/Disable tipoSujeto ctrl. Choose API calls to make.
+  formType: 'clave' | 'data' = 'clave'; // chooses "tab" to show form.
 
   ngOnInit() {
     this.subscribeToClaveValueChanges();
