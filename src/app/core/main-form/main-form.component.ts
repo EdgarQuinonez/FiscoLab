@@ -33,6 +33,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
+import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-main-form',
@@ -44,6 +45,7 @@ import { StorageService } from '@shared/services/storage.service';
     CardModule,
     ClientSideBarComponent,
     SplitterModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './main-form.component.html',
   styleUrl: './main-form.component.scss',
