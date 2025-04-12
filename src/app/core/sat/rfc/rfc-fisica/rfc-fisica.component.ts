@@ -6,7 +6,6 @@ import { StorageService } from '@shared/services/storage.service';
 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { CurpFoundResponseData } from '@core/curp/curp.interface';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@shared/types';
 import { CastPipe } from '@shared/pipes/cast.pipe';

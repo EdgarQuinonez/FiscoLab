@@ -60,7 +60,6 @@ export class MainFormComponent {
   ) {}
 
   loading = false;
-  responseError: string | null = null;
   validationResponse$: Observable<
     null | LoadingState<Curp> | LoadingState<Rfc>
   > | null = null;
@@ -107,7 +106,7 @@ export class MainFormComponent {
   }
 
   onSubmit() {
-    this.responseError = null;
+    this.mainFormService.responseError = null;
     if (this.form.invalid) {
       markAllAsDirty(this.form);
       return;
@@ -124,7 +123,8 @@ export class MainFormComponent {
       .pipe(
         tap((value) => {
           if (value === null) {
-            this.responseError = 'No es posible validar sin un dato ingresado.';
+            this.mainFormService.responseError =
+              'No es posible validar sin un dato ingresado.';
             return;
           }
 
@@ -133,13 +133,8 @@ export class MainFormComponent {
             return;
           }
 
-          // if (value.data === null || value.data === undefined) {
-          //   this.responseError = 'Validation returned no data';
-          //   return;
-          // }
-
           if (value.data?.status === 'SERVICE_ERROR') {
-            this.responseError =
+            this.mainFormService.responseError =
               'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
             return;
           }
@@ -152,7 +147,7 @@ export class MainFormComponent {
                 response.result !==
                 'RFC válido, y susceptible de recibir facturas'
               ) {
-                this.responseError = response.result;
+                this.mainFormService.responseError = response.result;
                 return;
               }
 
@@ -180,14 +175,14 @@ export class MainFormComponent {
             }
 
             if (response.status === 'NOT_VALID') {
-              this.responseError = `La CURP no es válida: ${
+              this.mainFormService.responseError = `La CURP no es válida: ${
                 response.statusCurp
               }: ${CURP_STATUS_MAP[response.statusCurp]}`;
               return;
             }
 
             if (response.status === 'NOT_FOUND') {
-              this.responseError =
+              this.mainFormService.responseError =
                 'La CURP no fue encontrada en los registros de la RENAPO.';
               return;
             }
@@ -209,11 +204,12 @@ export class MainFormComponent {
         // just in case Service errors are thrown as http errors
         try {
           const errorData = error.error as ServiceUnavailableResponse;
-          this.responseError =
+          this.mainFormService.responseError =
             errorData.errorMessage ||
             'Service unavailable. Please try again later.';
         } catch (e) {
-          this.responseError = 'Service unavailable. Please try again later.';
+          this.mainFormService.responseError =
+            'Service unavailable. Please try again later.';
         }
       } else if (error.status === 400) {
         const errorData = error as
@@ -239,13 +235,18 @@ export class MainFormComponent {
             }
           });
         } else {
-          this.responseError =
+          this.mainFormService.responseError =
             error.message || 'An error occurred during validation';
         }
       } else {
-        this.responseError = error.message || 'An unexpected error occurred';
+        this.mainFormService.responseError =
+          error.message || 'An unexpected error occurred';
       }
     }
+  }
+
+  getResponseError() {
+    return this.mainFormService.responseError;
   }
 
   private isRfcResponse(response: any): response is Rfc {

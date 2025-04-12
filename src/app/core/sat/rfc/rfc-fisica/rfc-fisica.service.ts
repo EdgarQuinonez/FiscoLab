@@ -3,9 +3,8 @@ import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment.development';
 import { StorageService } from '@shared/services/storage.service';
 
-import { CurpService } from '@core/curp/curp.service';
 import { lastValueFrom, Observable, switchMap, pipe, first } from 'rxjs';
-import { CurpFoundResponseData } from '@core/curp/curp.interface';
+
 import { RfcService } from '@shared/services/rfc.service';
 import { GenerateRfcPfRequest } from '@shared/services/rfc.service.interface';
 
@@ -16,7 +15,7 @@ export class RfcFisicaService {
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
-    private curpService: CurpService,
+    // private curpService: CurpService,
     private rfcService: RfcService
   ) {}
 

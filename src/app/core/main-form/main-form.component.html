@@ -55,9 +55,9 @@
         </div>        
 
     
-    @if (responseError || form.get('clave')?.hasError('clave')) {
+    @if (getResponseError() || form.get('clave')?.hasError('clave')) {
         <p-message severity="error" class="max-w-[50rem]">
-            {{ responseError || form.get('clave')?.getError('clave')}}
+            {{ getResponseError() || form.get('clave')?.getError('clave')}}
         </p-message>
     }
 </div>

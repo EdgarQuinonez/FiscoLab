@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { GenderCode } from '@core/curp/curp.interface';
+import { GenderCode } from '@shared/services/curp.service.interface';
 import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
@@ -15,9 +15,20 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { MessageModule } from 'primeng/message';
 import { SelectModule } from 'primeng/select';
 import curpCatalog from '@public/curp.catalog.json';
-import { ClavesEntidades } from '@shared/types';
+import { ClavesEntidades, ServiceUnavailableResponse } from '@shared/types';
 import { InputTextModule } from 'primeng/inputtext';
 import { FluidModule } from 'primeng/fluid';
+import { markAllAsDirty } from '@shared/utils/forms';
+import { CurpDataFormValue } from '@core/main-form/main-form.interface';
+import { tap } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  CURP_STATUS_MAP,
+  ValidateCurpDataBadRequestResponse,
+} from '@shared/services/curp.service.interface';
+import { Router } from '@angular/router';
+import { StorageService } from '@shared/services/storage.service';
+import { MainFormService } from '@core/main-form/main-form.service';
 @Component({
   selector: 'app-curp-data-form',
   imports: [
@@ -37,13 +48,16 @@ export class CurpDataFormComponent {
   form = new FormGroup({
     nombres: new FormControl('', Validators.required),
     primerApellido: new FormControl('', Validators.required),
-    segundoApellido: new FormControl('', Validators.required),
+    segundoApellido: new FormControl(''),
     fechaNacimiento: new FormControl<Date | null>(null, Validators.required),
     claveEntidad: new FormControl<{
       name: string;
       code: string;
     } | null>(null, Validators.required),
-    sexo: new FormControl<GenderCode | null>(null, Validators.required),
+    sexo: new FormControl<{ name: string; code: string } | null>(
+      null,
+      Validators.required
+    ),
   });
 
   gender: {
@@ -60,6 +74,12 @@ export class CurpDataFormComponent {
     name: string;
     code: string;
   }[] = [];
+
+  constructor(
+    private mainFormService: MainFormService,
+    private router: Router,
+    private storageService: StorageService
+  ) {}
 
   ngOnInit() {
     // init gender
@@ -78,7 +98,6 @@ export class CurpDataFormComponent {
     }
   }
 
-  responseError: string | null = null;
   loading = false;
 
   searchEntidad(e: AutoCompleteCompleteEvent) {
@@ -89,83 +108,132 @@ export class CurpDataFormComponent {
     );
   }
 
-  onSubmit() {}
-  // onSubmit() {
-  //   if (this.dataForm.invalid) {
-  //     markAllAsDirty(this.dataForm);
-  //     return;
-  //   }
+  onSubmit() {
+    if (this.form.invalid) {
+      markAllAsDirty(this.form);
+      return;
+    }
 
-  //   this.loading = true;
-  //   this.responseError = null;
+    this.loading = true;
+    this.mainFormService.responseError = null;
 
-  //   const data = this.dataForm.value;
+    const formValue = this.form.value as CurpDataFormValue;
 
-  //   const requestBody: CurpValidateByDataRequest = {
-  //     primerApellido: data.primerApellido as string,
-  //     segundoApellido: data.segundoApellido,
-  //     nombres: data.nombres as string,
-  //     fechaNacimiento: format(data.fechaNacimiento as Date, 'yyyy-MM-dd'),
-  //     claveEntidad: (data.claveEntidad as { name: string; code: string }).code,
-  //     sexo: (data.sexo as { name: string; code: string }).code,
-  //   };
+    this.mainFormService
+      .validateCurpData$(formValue)
+      .pipe(
+        tap((value) => {
+          {
+            if (value === null) {
+              this.mainFormService.responseError =
+                'No es posible validar sin un dato ingresado.';
 
-  //   this.validateCurpResponse$ = new Observable((subscriber) => {
-  //     subscriber.next();
-  //   }).pipe(
-  //     switchMapWithLoading<CurpByData>(() =>
-  //       this.curpService.validateCurpByData$(requestBody)
-  //     ),
-  //     tap((value) => {
-  //       this.loading = value.loading;
-  //       if (value.data) {
-  //         if (value.data.status === 'SUCCESS') {
-  //           const response = value.data.response;
-  //           if (response.status === 'FOUND') {
-  //             this.router.navigateByUrl('dashboard');
+              return;
+            }
 
-  //             this.storageService.setItem('curp', response.curp);
-  //             this.storageService.setItem(
-  //               'personalData',
-  //               JSON.stringify(response)
-  //             );
-  //             this.storageService.setItem('tipoSujeto', 'PF');
-  //           }
-  //           // TODO: Handle NOT_VALID, NOT_FOUND
-  //           if (response.status === 'NOT_FOUND') {
-  //             this.responseError =
-  //               'No se pudo encontrar una CURP asociada en el sistema de la RENAPO.';
-  //           }
+            if (value.error) {
+              this.handleErrorResponse(value.error);
+              return;
+            }
 
-  //           if (response.status === 'NOT_VALID') {
-  //             this.responseError = `La CURP asociada es inválida. Código: ${response.statusCurp}.`;
-  //           }
-  //         }
-  //       }
+            if (value.data?.status === 'SERVICE_ERROR') {
+              this.mainFormService.responseError =
+                'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
 
-  //       if (value.error) {
-  //         const error = value.error as
-  //           | CurpBadRequestResponse
-  //           | CurpValidateByDataServiceUnavailableResponse;
-  //         if (error.status === 'SERVICE_ERROR') {
-  //           this.responseError =
-  //             'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-  //           return;
-  //         }
+              return;
+            }
 
-  //         // BAD REQUEST
-  //         error.error.forEach((error) => {
-  //           this.dataForm.get(error.field)?.setErrors({
-  //             [error.field]:
-  //               error.code === 'FORMAT_ERROR'
-  //                 ? 'No utilices caracteres especiales ni números.'
-  //                 : 'El campo es requerido.',
-  //           });
-  //         });
-  //       }
-  //     })
-  //   );
+            // HANDLE SUCCESS CASES
+            if (value.data?.status === 'SUCCESS') {
+              const response = value.data.response;
 
-  //   this.validateCurpResponse$.subscribe();
-  // }
+              if (response.status === 'FOUND') {
+                this.router.navigateByUrl('dashboard');
+
+                this.storageService.setItem('tipoSujeto', 'PF'); // Only PF have curps.
+                this.storageService.setItem('curp', response.curp);
+                this.storageService.setItem(
+                  'personalData',
+                  JSON.stringify(response)
+                );
+              }
+
+              if (response.status === 'NOT_VALID') {
+                this.mainFormService.responseError = `La CURP no es válida: ${
+                  response.statusCurp
+                }: ${CURP_STATUS_MAP[response.statusCurp]}`;
+
+                return;
+              }
+
+              if (response.status === 'NOT_FOUND') {
+                this.mainFormService.responseError =
+                  'La CURP no fue encontrada en los registros de la RENAPO.';
+
+                return;
+              }
+            }
+          }
+        })
+      )
+      .subscribe((value) => {
+        this.loading = value.loading;
+      });
+  }
+
+  private handleErrorResponse(error: Error): void {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 503) {
+        // just in case Service errors are thrown as http errors
+
+        const errorData = error.error as ServiceUnavailableResponse;
+        this.mainFormService.responseError =
+          errorData.errorMessage ||
+          'Service unavailable. Please try again later.';
+      } else if (error.status === 400) {
+        const errorData = error as ValidateCurpDataBadRequestResponse;
+
+        if (Array.isArray(errorData.error)) {
+          errorData.error.forEach((err) => {
+            let errMsg;
+
+            switch (err.field) {
+              case 'claveEntidad':
+                errMsg = 'Ingresa una clave de entidad válida.';
+                break;
+              case 'fechaNacimiento':
+                errMsg =
+                  'Ingresa una fecha de nacimiento válida en formato yyyy-MM-dd.';
+                break;
+              case 'nombres':
+                errMsg = 'No incluyas caracteres especiales.';
+                break;
+              case 'primerApellido':
+                errMsg = 'No incluyas caracteres especiales.';
+                break;
+              case 'segundoApellido':
+                errMsg = 'No incluyas caracteres especiales.';
+                break;
+              case 'sexo':
+                errMsg = 'Ingresa un valor de sexo válido (H, M o X).';
+                break;
+              default:
+                // Default message for unknown fields
+                errMsg = 'El valor ingresado no es válido.';
+            }
+
+            this.form.get(err.field)?.setErrors({
+              [err.field]: errMsg,
+            });
+          });
+        } else {
+          this.mainFormService.responseError =
+            error.message || 'An error occurred during validation';
+        }
+      } else {
+        this.mainFormService.responseError =
+          error.message || 'An unexpected error occurred';
+      }
+    }
+  }
 }
