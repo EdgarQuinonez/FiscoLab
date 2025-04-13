@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { TipoSujetoControlComponent } from '@core/rfc-form/tipo-sujeto-control/tipo-sujeto-control.component';
+import { TipoSujetoControlComponent } from '@shared/components/tipo-sujeto-control/tipo-sujeto-control.component';
 import {
   LoadingState,
   ServiceUnavailableResponse,
@@ -133,12 +133,6 @@ export class MainFormComponent {
             return;
           }
 
-          if (value.data?.status === 'SERVICE_ERROR') {
-            this.mainFormService.responseError =
-              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-            return;
-          }
-
           if (this.isRfcResponse(value.data)) {
             if (value.data.status === 'SUCCESS') {
               const response = value.data.response.rfcs[0];
@@ -201,7 +195,6 @@ export class MainFormComponent {
   private handleErrorResponse(error: Error): void {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 503) {
-        // just in case Service errors are thrown as http errors
         try {
           const errorData = error.error as ServiceUnavailableResponse;
           this.mainFormService.responseError =
@@ -247,6 +240,10 @@ export class MainFormComponent {
 
   getResponseError() {
     return this.mainFormService.responseError;
+  }
+
+  isLoading() {
+    return this.mainFormService.loading;
   }
 
   private isRfcResponse(response: any): response is Rfc {

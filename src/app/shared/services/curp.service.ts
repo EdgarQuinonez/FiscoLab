@@ -16,9 +16,9 @@ export class CurpService {
   validateCurpData$(personalData: ValidateCurpDataRequest) {
     const params = {
       // FOUND
-      // testCaseId: '663567bb713cf2110a1106b3',
+      testCaseId: '663567bb713cf2110a1106b3',
       // NOT_FOUND
-      testCaseId: '663567bb713cf2110a1106b4',
+      // testCaseId: '663567bb713cf2110a1106b4',
       // INVALID_CURP
       // testCaseId: '663567bb713cf2110a1106b5',
     };

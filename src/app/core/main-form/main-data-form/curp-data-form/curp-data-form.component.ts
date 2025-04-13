@@ -98,8 +98,6 @@ export class CurpDataFormComponent {
     }
   }
 
-  loading = false;
-
   searchEntidad(e: AutoCompleteCompleteEvent) {
     const query = e.query.toLowerCase();
 
@@ -114,7 +112,7 @@ export class CurpDataFormComponent {
       return;
     }
 
-    this.loading = true;
+    this.mainFormService.loading = true;
     this.mainFormService.responseError = null;
 
     const formValue = this.form.value as CurpDataFormValue;
@@ -133,13 +131,6 @@ export class CurpDataFormComponent {
 
             if (value.error) {
               this.handleErrorResponse(value.error);
-              return;
-            }
-
-            if (value.data?.status === 'SERVICE_ERROR') {
-              this.mainFormService.responseError =
-                'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
-
               return;
             }
 
@@ -177,15 +168,13 @@ export class CurpDataFormComponent {
         })
       )
       .subscribe((value) => {
-        this.loading = value.loading;
+        this.mainFormService.loading = value.loading;
       });
   }
 
   private handleErrorResponse(error: Error): void {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 503) {
-        // just in case Service errors are thrown as http errors
-
         const errorData = error.error as ServiceUnavailableResponse;
         this.mainFormService.responseError =
           errorData.errorMessage ||

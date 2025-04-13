@@ -20,3 +20,23 @@ export interface CurpDataFormValue {
     code: string;
   };
 }
+
+export interface RfcDataFormPfDataValue {
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
+  fechaNacimiento: Date;
+}
+
+export interface RfcDataFormPmDataValue {
+  fechaConstitucion: Date;
+  razonSocial: string;
+}
+
+export interface RfcDataFormValue {
+  tipoSujeto: TipoSujetoCode;
+  data: {
+    pfData: RfcDataFormPfDataValue;
+    pmData: RfcDataFormPmDataValue;
+  };
+}

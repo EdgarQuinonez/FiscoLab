@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import cpCatalog from '@public/cp.catalog.json';
 import curpCatalog from '@public/curp.catalog.json';
 

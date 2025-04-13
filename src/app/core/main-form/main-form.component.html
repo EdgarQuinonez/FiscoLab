@@ -5,7 +5,7 @@
 
 <div class="w-full h-full flex flex-col items-center justify-center relative">
 
-    @if (loading) {
+    @if (isLoading()) {
         <app-loading-spinner></app-loading-spinner>
     }
     
@@ -55,9 +55,9 @@
         </div>        
 
     
-    @if (getResponseError() || form.get('clave')?.hasError('clave')) {
-        <p-message severity="error" class="max-w-[50rem]">
-            {{ getResponseError() || form.get('clave')?.getError('clave')}}
-        </p-message>
-    }
-</div>
+        @if (getResponseError() || form.get('clave')?.hasError('clave')) {
+            <p-message severity="error" [life]="3000" class="max-w-[50rem] absolute left-[0.5rem] bottom-[1rem]">
+                {{ getResponseError() || form.get('clave')?.getError('clave')}}
+            </p-message>
+        }
+    </div>
