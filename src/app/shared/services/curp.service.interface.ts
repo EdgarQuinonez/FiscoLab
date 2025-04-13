@@ -123,7 +123,7 @@ export interface ValidateCurpBadRequestResponse extends HttpErrorResponse {
   error: [
     {
       code: KibanBadRequestCode;
-      field: string;
+      field: string; // TODO: Instead of hardcoding here maybe it is good idea to have keys from the request obj maybe. Only problem would be indexes.
       message: string;
     }
   ];
@@ -138,3 +138,35 @@ export type Curp =
   | ValidateCurpSuccessResponse
   | ValidateCurpBadRequestResponse
   | ValidateCurpServiceUnavailableResponse;
+
+export interface ValidateCurpDataRequest {
+  claveEntidad: string;
+  fechaNacimiento: string; // yyyy-MM-dd format
+  nombres: string;
+  primerApellido: string;
+  segundoApellido?: string | null;
+  sexo: string; // H, M, X;
+}
+
+export interface ValidateCurpDataSuccessResponse
+  extends Omit<ValidateCurpSuccessResponse, 'request'> {
+  request: ValidateCurpDataRequest;
+}
+
+export interface ValidateCurpDataBadRequestResponse extends HttpErrorResponse {
+  error: {
+    code: KibanBadRequestCode;
+    field: string;
+    message: string;
+  }[];
+}
+
+export interface ValidateCurpDataServiceUnavailableResponse
+  extends ServiceUnavailableResponse {
+  request: ValidateCurpDataRequest;
+}
+
+export type CurpData =
+  | ValidateCurpDataSuccessResponse
+  | ValidateCurpDataBadRequestResponse
+  | ValidateCurpDataServiceUnavailableResponse;

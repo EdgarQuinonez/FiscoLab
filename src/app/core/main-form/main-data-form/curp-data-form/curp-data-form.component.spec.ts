@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { QueryCpFormComponent } from './query-cp-form.component';
+import { CurpDataFormComponent } from './curp-data-form.component';
 
-describe('QueryCpFormComponent', () => {
-  let component: QueryCpFormComponent;
-  let fixture: ComponentFixture<QueryCpFormComponent>;
+describe('CurpDataFormComponent', () => {
+  let component: CurpDataFormComponent;
+  let fixture: ComponentFixture<CurpDataFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [QueryCpFormComponent]
+      imports: [CurpDataFormComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(QueryCpFormComponent);
+    fixture = TestBed.createComponent(CurpDataFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

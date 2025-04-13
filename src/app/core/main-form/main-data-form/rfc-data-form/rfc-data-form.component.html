@@ -1,0 +1,112 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-2 h-full w-full relative">    
+    <label class="self-center">
+        <app-tipo-sujeto-control formControlName="tipoSujeto" />                            
+        @if (form.get('tipoSujeto')?.hasError("required") && (form.get('tipoSujeto')?.dirty || form.get('tipoSujeto')?.touched)) {
+            <p-message severity="error" variant="simple" size="small" >
+                Selecciona un tipo de sujeto contable.
+            </p-message>
+        } 
+    </label>
+
+    <ng-container formGroupName="data">
+        @if (getTipoSujeto() === "PF" || getTipoSujeto() === null) {        
+            <ng-container formGroupName="pfData">
+        
+                <div class="flex gap-1 justify-start">
+                    <label class="flex flex-col items-start justify-start w-full">
+                        <span>Primer apellido: </span>
+                        <input class="w-full" type="text" formControlName="apellidoPaterno" pInputText>
+            
+                        @if (form.get(['data', 'pfData', 'apellidoPaterno'])?.hasError('required') && (form.get(['data', 'pfData', 'apellidoPaterno'])?.touched || form.get(['data', 'pfData', 'apellidoPaterno'])?.dirty)) {
+                            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                        } 
+            
+                        @if (form.get(['data', 'pfData', 'apellidoPaterno'])?.hasError('apellidoPaterno')) {
+                            <p-message severity="error" variant="simple" size="small">
+                                {{ form.get(['data', 'pfData', 'apellidoPaterno'])?.getError('apellidoPaterno')}}
+                            </p-message>    
+                        }
+                    </label>
+                    <label class="flex flex-col items-start w-full">
+                        <!-- NOT REQUIRED -->
+                        <span>Segundo apellido: </span>
+                        <input class="w-full" type="text" formControlName="apellidoMaterno" placeholder="(Opcional)" pInputText>        
+            
+                        @if (form.get(['data', 'pfData', 'apellidoMaterno'])?.hasError('apellidoMaterno')) {
+                            <p-message severity="error" variant="simple" size="small">
+                                {{ form.get(['data', 'pfData', 'apellidoMaterno'])?.getError('apellidoMaterno')}}
+                            </p-message>    
+                        }
+                    </label>        
+                </div>    
+                
+                <div class="flex gap-1 justify-start">
+                    <label class="flex flex-col items-start justify-start w-full">
+                        <span>Nombre(s): </span>
+                        <input type="text" class="w-full" formControlName="nombres" pInputText>
+                
+                        @if (form.get(['data', 'pfData', 'nombres'])?.hasError('required') && (form.get(['data', 'pfData', 'nombres'])?.touched || form.get(['data', 'pfData', 'nombres'])?.dirty)) {
+                            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                        } 
+                
+                        @if (form.get(['data', 'pfData', 'nombres'])?.hasError('nombres')) {
+                            <p-message severity="error" variant="simple" size="small">
+                                {{ form.get(['data', 'pfData', 'nombres'])?.getError('nombres')}}
+                            </p-message>    
+                        }
+                    </label>        
+                    <label class="flex flex-col items-start justify-start w-full">
+                        <span>Fecha de nacimiento: </span>
+                        <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaNacimiento" fluid />
+                
+                        @if (form.get(['data', 'pfData', 'fechaNacimiento'])?.hasError('required') && (form.get(['data', 'pfData', 'fechaNacimiento'])?.touched || form.get(['data', 'pfData', 'fechaNacimiento'])?.dirty)) {
+                            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                        }
+                    </label>
+                </div>
+            </ng-container>
+        }
+
+        @if (getTipoSujeto() === "PM") {
+            <ng-container formGroupName="pmData">
+    
+                <label class="flex flex-col w-full">
+                    <span>Razón Social: </span>                                                                                                                                                                              
+                    <input type="text" formControlName="razonSocial" pInputText />
+                    <!-- Validation errors -->
+                    @if (form.get(['data', 'pmData', 'razonSocial'])?.hasError('razonSocial')) {                            
+                        <p-message severity="error" variant="simple" size="small" >
+                            {{ form.get(['data', 'pmData', 'razonSocial'])?.getError('razonSocial')}}
+                        </p-message>                                                                                    
+                    }
+            
+                    @if (form.get(['data', 'pmData', 'razonSocial'])?.hasError("required") && (form.get(['data', 'pmData', 'razonSocial'])?.dirty || form.get(['data', 'pmData', 'razonSocial'])?.touched)) {
+                        <p-message severity="error" variant="simple" size="small" >
+                            El campo es requerido.
+                        </p-message>
+                    } 
+                </label> 
+    
+                <div class="flex gap-1">     
+                    <label class="flex flex-col items-start justify-center w-full">
+                        <span>Fecha de constitución: </span>
+                        <p-datepicker placeholder="dd-mm-yyyy"  dateFormat="dd-mm-yy" [showIcon]="true" [iconDisplay]="'input'" formControlName="fechaConstitucion" fluid />
+                
+                        @if (form.get(['data', 'pmData', 'fechaConstitucion'])?.hasError('required') && (form.get(['data', 'pmData', 'fechaConstitucion'])?.touched || form.get(['data', 'pmData', 'fechaConstitucion'])?.dirty)) {
+                            <p-message severity="error" variant="simple" size="small">El campo es requerido.</p-message>
+                        }
+                    </label>
+                    <div class="w-full">
+        
+                    </div>
+                </div>
+    
+            </ng-container>
+        }
+    </ng-container> 
+    
+    <div class="w-1/2 self-end flex items-center justify-end">
+
+        <p-button icon="pi pi-search" iconPos="right"  label="Buscar" aria-label="Search" type="submit"/>
+    </div>
+</form>

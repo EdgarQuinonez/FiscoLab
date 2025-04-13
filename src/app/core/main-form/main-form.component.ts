@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { TipoSujetoControlComponent } from '@core/rfc-form/tipo-sujeto-control/tipo-sujeto-control.component';
+import { TipoSujetoControlComponent } from '@shared/components/tipo-sujeto-control/tipo-sujeto-control.component';
 import {
   LoadingState,
   ServiceUnavailableResponse,
@@ -34,6 +34,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { StorageService } from '@shared/services/storage.service';
 import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/loading-spinner.component';
+import { MainDataFormComponent } from './main-data-form/main-data-form.component';
 
 @Component({
   selector: 'app-main-form',
@@ -46,6 +47,7 @@ import { LoadingSpinnerComponent } from '@shared/components/loading-spinner/load
     ClientSideBarComponent,
     SplitterModule,
     LoadingSpinnerComponent,
+    MainDataFormComponent,
   ],
   templateUrl: './main-form.component.html',
   styleUrl: './main-form.component.scss',
@@ -58,7 +60,6 @@ export class MainFormComponent {
   ) {}
 
   loading = false;
-  responseError: string | null = null;
   validationResponse$: Observable<
     null | LoadingState<Curp> | LoadingState<Rfc>
   > | null = null;
@@ -72,6 +73,7 @@ export class MainFormComponent {
   });
 
   queryMethod: 'rfc' | 'curp' = 'curp'; // Enable/Disable tipoSujeto ctrl. Choose API calls to make.
+  formType: 'clave' | 'data' = 'clave'; // chooses "tab" to show form.
 
   ngOnInit() {
     this.subscribeToClaveValueChanges();
@@ -104,7 +106,7 @@ export class MainFormComponent {
   }
 
   onSubmit() {
-    this.responseError = null;
+    this.mainFormService.responseError = null;
     if (this.form.invalid) {
       markAllAsDirty(this.form);
       return;
@@ -121,23 +123,13 @@ export class MainFormComponent {
       .pipe(
         tap((value) => {
           if (value === null) {
-            this.responseError = 'No es posible validar sin un dato ingresado.';
+            this.mainFormService.responseError =
+              'No es posible validar sin un dato ingresado.';
             return;
           }
 
           if (value.error) {
             this.handleErrorResponse(value.error);
-            return;
-          }
-
-          // if (value.data === null || value.data === undefined) {
-          //   this.responseError = 'Validation returned no data';
-          //   return;
-          // }
-
-          if (value.data?.status === 'SERVICE_ERROR') {
-            this.responseError =
-              'Lamentamos el inconveniente. El servicio no se encuentra disponible en este momento. Intenta más tarde.';
             return;
           }
 
@@ -149,7 +141,7 @@ export class MainFormComponent {
                 response.result !==
                 'RFC válido, y susceptible de recibir facturas'
               ) {
-                this.responseError = response.result;
+                this.mainFormService.responseError = response.result;
                 return;
               }
 
@@ -177,14 +169,14 @@ export class MainFormComponent {
             }
 
             if (response.status === 'NOT_VALID') {
-              this.responseError = `La CURP no es válida: ${
+              this.mainFormService.responseError = `La CURP no es válida: ${
                 response.statusCurp
               }: ${CURP_STATUS_MAP[response.statusCurp]}`;
               return;
             }
 
             if (response.status === 'NOT_FOUND') {
-              this.responseError =
+              this.mainFormService.responseError =
                 'La CURP no fue encontrada en los registros de la RENAPO.';
               return;
             }
@@ -203,14 +195,14 @@ export class MainFormComponent {
   private handleErrorResponse(error: Error): void {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 503) {
-        // just in case Service errors are thrown as http errors
         try {
           const errorData = error.error as ServiceUnavailableResponse;
-          this.responseError =
+          this.mainFormService.responseError =
             errorData.errorMessage ||
             'Service unavailable. Please try again later.';
         } catch (e) {
-          this.responseError = 'Service unavailable. Please try again later.';
+          this.mainFormService.responseError =
+            'Service unavailable. Please try again later.';
         }
       } else if (error.status === 400) {
         const errorData = error as
@@ -236,13 +228,22 @@ export class MainFormComponent {
             }
           });
         } else {
-          this.responseError =
+          this.mainFormService.responseError =
             error.message || 'An error occurred during validation';
         }
       } else {
-        this.responseError = error.message || 'An unexpected error occurred';
+        this.mainFormService.responseError =
+          error.message || 'An unexpected error occurred';
       }
     }
+  }
+
+  getResponseError() {
+    return this.mainFormService.responseError;
+  }
+
+  isLoading() {
+    return this.mainFormService.loading;
   }
 
   private isRfcResponse(response: any): response is Rfc {

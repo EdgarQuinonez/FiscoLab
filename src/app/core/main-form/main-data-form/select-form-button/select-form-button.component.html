@@ -1,0 +1,15 @@
+<label class="inline-flex cursor-pointer select-none items-center justify-center rounded-button-border-radius bg-transparent px-button-padding-x py-button-padding-y font-sans text-base transition-all duration-[var(--app-button-transition-duration)] hover:bg-button-text-primary-hover-background focus:outline-none"
+       [class.text-button-text-primary-color]="selectedForm() === 'curp'"
+       [class.text-radio-button-text-not-selected-color]="selectedForm() !== 'curp'">
+    <input type="radio" name="selectedForm" value="curp" [(ngModel)]="selectedForm" class="appearance-none">
+    <span class="flex items-center justify-center gap-button-gap">CURP</span>
+</label>
+
+<i class="pi pi-arrows-h"></i>
+
+<label class="inline-flex cursor-pointer select-none items-center justify-center rounded-button-border-radius bg-transparent px-button-padding-x py-button-padding-y font-sans text-base transition-all duration-[var(--app-button-transition-duration)] hover:bg-button-text-primary-hover-background focus:outline-none"
+       [class.text-button-text-primary-color]="selectedForm() === 'rfc'"
+       [class.text-radio-button-text-not-selected-color]="selectedForm() !== 'rfc'">
+    <input type="radio" name="selectedForm" value="rfc" [(ngModel)]="selectedForm" class="appearance-none">
+    <span class="flex items-center justify-center gap-button-gap">RFC</span>
+</label>

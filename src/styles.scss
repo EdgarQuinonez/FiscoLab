@@ -2,6 +2,20 @@
 @use "tailwindcss";
 @plugin "tailwindcss-primeui";
 
+@theme {
+  /* Text Button Variables */
+  --color-button-text-primary-color: var(--p-button-text-primary-color);
+  --color-button-text-primary-hover-background: var(--p-button-text-primary-hover-background);
+  --color-radio-button-text-not-selected-color: var(--p-surface-900);
+  
+  /* General Button Variables */
+  --spacing-button-padding-y: var(--p-button-padding-y);
+  --spacing-button-padding-x: var(--p-button-padding-x);
+  --radius-button-border-radius: var(--p-button-border-radius);
+  --app-button-transition-duration: var(--p-button-transition-duration);
+  --spacing-button-gap: var(--p-button-gap);
+}
+
 html {
     box-sizing: border-box;
     font-size: 16px;

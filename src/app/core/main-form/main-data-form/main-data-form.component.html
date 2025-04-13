@@ -1,0 +1,8 @@
+<app-select-form-button [(selectedForm)]="selectedForm" ></app-select-form-button>
+    @if (selectedForm === 'curp') {
+        <app-curp-data-form></app-curp-data-form>
+    } @else if (selectedForm === 'rfc') {
+        <app-rfc-data-form></app-rfc-data-form>
+    }
+
+

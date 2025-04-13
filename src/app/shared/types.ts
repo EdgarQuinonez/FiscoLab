@@ -1,4 +1,6 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import cpCatalog from '@public/cp.catalog.json';
+import curpCatalog from '@public/curp.catalog.json';
 
 export interface SuccessKibanResponse {
   id: string;
@@ -33,9 +35,9 @@ export type KibanBadRequestCode =
   | 'EMPTY_ERROR'
   | 'REQUIRED_FIELD_ERROR';
 
-
-export type ClavesEstados = keyof typeof cpCatalog
+export type ClavesEstados = keyof typeof cpCatalog;
 export type ClavesMunicipios = keyof (typeof cpCatalog)[keyof typeof cpCatalog];
+export type ClavesEntidades = keyof (typeof curpCatalog)['STATES'];
 
 // LOCAL STORAGE KEYS
 // rfc

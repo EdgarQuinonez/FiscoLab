@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RfcFormComponent } from './rfc-form.component';
+import { MainDataFormComponent } from './main-data-form.component';
 
-describe('RfcFormComponent', () => {
-  let component: RfcFormComponent;
-  let fixture: ComponentFixture<RfcFormComponent>;
+describe('MainDataFormComponent', () => {
+  let component: MainDataFormComponent;
+  let fixture: ComponentFixture<MainDataFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RfcFormComponent]
+      imports: [MainDataFormComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RfcFormComponent);
+    fixture = TestBed.createComponent(MainDataFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -5,74 +5,59 @@
 
 <div class="w-full h-full flex flex-col items-center justify-center relative">
 
-    @if (loading) {
+    @if (isLoading()) {
         <app-loading-spinner></app-loading-spinner>
     }
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-[50rem] flex flex-col justify-center items-center flex-col">
+    
         <div class="py-2">
             <span class="text-xl font-bold">
                 FiscoLab
             </span>
         </div>
-        <label class="flex flex-col items-center justify-center w-full">
-            <p-message variant="simple" severity="contrast" class="mb-2">
-                Ingresa aquí la CURP o el RFC con homoclave
-            </p-message>
-            <p-card class="w-full">
-                <div>
-                    <div class="flex items-center mb-2">
-                        <input formControlName="clave" type="text" class="w-full focus:outline-none" placeholder="ej. QURE021108HCHXMDA9 o QURE021108RI4">
-                        <p-button  type="submit" ariaLabel="Continuar" icon="pi pi-chevron-right" [rounded]="true"/>
-                    </div>
-                    <app-tipo-sujeto-control [isRfc]="queryMethod === 'rfc'" formControlName="tipoSujeto"></app-tipo-sujeto-control>
-                </div>
-            </p-card>
-        </label>
-        <div class="self-start">
-            <p-button type="button" [link]="true" label="Calcular la CURP o el RFC"/>            
-        </div>
-    </form>
-    
-    @if (responseError || form.get('clave')?.hasError('clave')) {
-        <p-message severity="error" class="max-w-[50rem]">
-            {{ responseError || form.get('clave')?.getError('clave')}}
-        </p-message>
-    }
-</div>
-<!-- <div class="w-full h-full flex flex-col items-center justify-center">
-    @if (loading) {
-        <app-loading-spinner></app-loading-spinner>
-    } @else {
-
-        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="w-[50rem] flex flex-col justify-center items-center flex-col">
-            <div class="py-2">
-                <span class="text-xl font-bold">
-                    FiscoLab
-                </span>
-            </div>
-            <label class="flex flex-col items-center justify-center w-full">
-                <p-message variant="simple" severity="contrast" class="mb-2">
-                    Ingresa aquí la CURP o el RFC con homoclave
-                </p-message>
-                <p-card class="w-full">
-                    <div>
-                        <div class="flex items-center mb-2">
-                            <input formControlName="clave" type="text" class="w-full focus:outline-none" placeholder="ej. QURE021108HCHXMDA9 o QURE021108RI4">
+        <div class="flex flex-col items-center justify-center">
+            <ng-container>
+                @if (formType === "clave") {
+                    <p-message variant="simple" severity="contrast" class="mb-2">
+                        Ingresa aquí la CURP o el RFC con homoclave
+                    </p-message>
+                } @else if (formType === "data") {
+                    <p-message variant="simple" severity="contrast" class="mb-2">
+                        Rellena los datos para calcular la CURP o el RFC
+                    </p-message>                    
+                }
+            </ng-container>
+            <p-card class="w-[50rem]">
+            @if (formType === "clave") {
+                
+                <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col justify-center items-center flex-col">
+                    
+                        <div class="flex items-center mb-2 w-full">
+                            <input formControlName="clave" type="text" class="w-full focus:outline-none text-xl" placeholder="ej. QURE021108HCHXMDA9 o QURE021108RI4">
                             <p-button  type="submit" ariaLabel="Continuar" icon="pi pi-chevron-right" [rounded]="true"/>
                         </div>
-                        <app-tipo-sujeto-control [isRfc]="queryMethod === 'rfc'" formControlName="tipoSujeto"></app-tipo-sujeto-control>
-                    </div>
-                </p-card>
-            </label>
+                        <app-tipo-sujeto-control class="self-start" [isRfc]="queryMethod === 'rfc'" formControlName="tipoSujeto"></app-tipo-sujeto-control>
+                    
+                </form>
+
+            } @else if (formType === "data") {
+                <app-main-data-form></app-main-data-form>
+            }
+            </p-card>
             <div class="self-start">
-                <p-button type="button" [link]="true" label="Calcular la CURP o el RFC"/>            
+                @if (formType === "clave") {
+                    <p-button type="button" [link]="true" label="Calcular la CURP o el RFC" (onClick)="formType = 'data'" />            
+                }
+        
+                @if (formType === "data") {
+                    <p-button type="button" [link]="true" label="Ingresar con CURP o RFC" (onClick)="formType = 'clave'" />                    
+                }
             </div>
-        </form>
+        </div>        
+
     
-    }
-    @if (responseError || form.get('clave')?.hasError('clave')) {
-        <p-message severity="error" class="max-w-[50rem]">
-            {{ responseError || form.get('clave')?.getError('clave')}}
-        </p-message>
-    }
-</div> -->
+        @if (getResponseError() || form.get('clave')?.hasError('clave')) {
+            <p-message severity="error" [life]="3000" class="max-w-[50rem] absolute left-[0.5rem] bottom-[1rem]">
+                {{ getResponseError() || form.get('clave')?.getError('clave')}}
+            </p-message>
+        }
+    </div>
