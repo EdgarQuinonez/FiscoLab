@@ -103,7 +103,6 @@ export class RfcDataFormComponent {
   }
 
   onSubmit() {
-    console.log('submitted.', this.form.invalid);
     this.mainFormService.responseError = null;
     if (this.form.invalid) {
       markAllAsDirty(this.form);
@@ -258,14 +257,17 @@ export class RfcDataFormComponent {
   private handleSuccessResponse(response: Rfc | RFCWithData) {
     if (response.status === 'SUCCESS') {
       const rfcData = response.response.rfcs[0];
-      this.storageService.setItem('rfc', rfcData.rfc);
-      this.storageService.setItem('result', rfcData.result);
-      if (this.form.value.tipoSujeto) {
-        this.storageService.setItem('tipoSujeto', this.form.value.tipoSujeto);
-      }
 
       if (rfcData.result === 'RFC válido, y susceptible de recibir facturas') {
-        this.router.navigateByUrl('/dashboard');
+        this.storageService.setItemValue('RFC', rfcData.rfc);
+        this.storageService.setItemValue('RFC_RESULT', rfcData.result);
+        if (this.form.value.tipoSujeto) {
+          this.storageService.setItemValue(
+            'TIPO_SUJETO',
+            this.form.value.tipoSujeto
+          );
+        }
+        this.router.navigateByUrl('');
       } else {
         this.mainFormService.responseError = rfcData.result;
       }

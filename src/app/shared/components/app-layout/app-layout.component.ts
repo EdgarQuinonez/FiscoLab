@@ -19,15 +19,4 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   templateUrl: './app-layout.component.html',
   styleUrl: './app-layout.component.scss',
 })
-export class AppLayoutComponent {
-  // tipoTopBar: "landing" | "main" = "landing"
-  // constructor(private router: Router, private route: ActivatedRoute) {
-  //   this.router.events
-  //     .pipe(filter(event => event instanceof NavigationEnd))
-  //     .subscribe(() => {
-  //       let child = this.route.firstChild;
-  //       const topBar = child!.snapshot.data["topBar"];
-  //       this.tipoTopBar = topBar || 'landing';
-  //     });
-  // }
-}
+export class AppLayoutComponent {}

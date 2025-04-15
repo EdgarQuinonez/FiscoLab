@@ -7,10 +7,10 @@ import {
   GenerateRfcPfSuccessResponse,
   GenerateRfcPm,
   GenerateRfcPmRequest,
-  ObtainPersonalDataPfRFC,
-  ObtainPersonalDataPfRFCSuccessResponse,
+  ObtainPersonalDataPfRfc,
   Rfc,
   RFCWithData,
+  ValidateCodigoPostal,
   ValidateRfcCpQueryRequest,
   ValidateRFCRequestBody,
   ValidateRFCWithDataRequest,
@@ -102,12 +102,10 @@ export class RfcService {
       // Iterate through all states and mnpios to retrieve all of their cps
     }
 
-    return of(null).pipe(
-      switchMapWithLoading(() => this.validateRFCWithData$(rfcs))
-    );
+    return this.validateRFCWithData$(rfcs);
   }
 
-  getFinalResponse$(validateRfcResponse: ValidateRFCWithDataSuccessResponse) {
+  getFinalResponse(validateRfcResponse: ValidateRFCWithDataSuccessResponse) {
     // Goes through all results of the rfcFormResponse to set the final result SUCCESS - INVALID or VALID, or BAD REQUEST (Validation errors.)
 
     const response = validateRfcResponse.response;
@@ -133,6 +131,15 @@ export class RfcService {
     };
     const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId=${params.testCaseId}`;
 
-    return this.http.post<ObtainPersonalDataPfRFC>(endpoint, { rfc: rfc });
+    return this.http.post<ObtainPersonalDataPfRfc>(endpoint, { rfc: rfc });
+  }
+
+  validateCodigoPostal$(cp: string) {
+    const params = {
+      testCaseId: '663567bb713cf2110a1106dd', // SUCCESS
+    };
+    const endpoint = `${environment.apiUrl}/sepomex/search?testCaseId=${params.testCaseId}`;
+
+    return this.http.post<ValidateCodigoPostal>(endpoint, { codigoPostal: cp });
   }
 }

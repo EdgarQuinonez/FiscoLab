@@ -1,1 +1,0 @@
-import { SuccessKibanResponse } from '@types';

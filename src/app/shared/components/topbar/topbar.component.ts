@@ -12,11 +12,10 @@ import { MenuModule } from 'primeng/menu';
   styleUrl: './topbar.component.scss',
 })
 export class TopbarComponent {
-
-  constructor(private storageService: StorageService, private router: Router) { }
+  constructor(private storageService: StorageService, private router: Router) {}
   // TODO: Use service method instead when backend exists
   logout() {
     this.storageService.clear();
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/home');
   }
 }

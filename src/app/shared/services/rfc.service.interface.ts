@@ -6,6 +6,7 @@ import {
   ClavesEstados,
   ClavesMunicipios,
 } from '@shared/types';
+import { ValidateCurpSuccessResponse } from './curp.service.interface';
 
 export interface ValidateRFCRequestBody {
   rfcs: { rfc: string }[];
@@ -122,24 +123,50 @@ export type GenerateRfcPf =
   | GenerateRfcPfBadRequestResponse
   | GenerateRfcPfServiceUnavailableResponse;
 
-export interface ObtainPersonalDataPfRFCRequest {
+export interface ObtainPersonalDataPfRfcRequest {
   rfc: string;
 }
 
-type Status = 'FOUND' | 'NOT_FOUND';
-
-export interface ObtainPersonalDataPfRFCSuccessResponse
+export interface ObtainPersonalDataPfRfcSuccessResponse
   extends SuccessKibanResponse {
-  request: ObtainPersonalDataPfRFCRequest;
-  response: {
-    curp: string;
-    email: string;
-    estatus: Status;
-    nombreCompleto: string;
+  request: ObtainPersonalDataPfRfcRequest;
+  response:
+    | ObtainPersonalDataPfRfcSuccessFoundResponse
+    | ObtainPersonalDataPfRfcSuccessNotFoundResponse;
+}
+
+export interface ObtainPersonalDataPfRfcSuccessFoundResponse {
+  curp: string;
+  email: string;
+  estatus: 'FOUND';
+  nombreCompleto: string;
+}
+
+export interface ObtainPersonalDataPfRfcSuccessNotFoundResponse {
+  estatus: 'NOT_FOUND';
+  message: string;
+}
+
+export interface ObtainPersonalDataPfRfcBadRequest extends HttpErrorResponse {
+  error: {
+    code: KibanBadRequestCode | 'LENGTH_ERROR';
+    message: string;
+    field: 'rfc';
+  }[];
+}
+
+// TODO: all ServiceUnavailable responses should look like this.
+export interface ObtainPersonalDataPfRfcServiceUnavailable
+  extends HttpErrorResponse {
+  error: Omit<ServiceUnavailableResponse, 'request'> & {
+    request: ObtainPersonalDataPfRfcRequest;
   };
 }
 
-export type ObtainPersonalDataPfRFC = ObtainPersonalDataPfRFCSuccessResponse;
+export type ObtainPersonalDataPfRfc =
+  | ObtainPersonalDataPfRfcSuccessResponse
+  | ObtainPersonalDataPfRfcBadRequest
+  | ObtainPersonalDataPfRfcServiceUnavailable;
 
 export interface GenerateRfcPmRequest {
   razonSocial: string;
@@ -179,3 +206,44 @@ export interface ValidateRfcCpQueryRequest {
   estado?: ClavesEstados;
   municipio?: ClavesMunicipios;
 }
+
+export interface ValidateCodigoPostalRequest {
+  codigoPostal: string;
+}
+
+export interface ValidateCodigoPostalSuccessFoundResponse {
+  Asentamiento: string;
+  Ciudad: string;
+  ClaveDeOficina: string;
+  CodigoPostal: string;
+  DelegacionMunicipio: string;
+  Estado: string;
+  TipoDeAsentamiento: string;
+}
+
+export interface ValidateCodigoPostalSuccessResponse
+  extends SuccessKibanResponse {
+  request: ValidateCodigoPostalRequest;
+  response: ValidateCodigoPostalSuccessFoundResponse[] | []; // empty array when not found
+}
+
+export interface ValidateCodigoPostalBadRequestResponse
+  extends HttpErrorResponse {
+  error: {
+    code: 'LENGTH_ERROR' | 'FORMAT_ERROR';
+    message: string;
+    field: string;
+  }[];
+}
+
+export interface ValidateCodigoPostalServiceUnavailableResponse
+  extends HttpErrorResponse {
+  error: ServiceUnavailableResponse & {
+    request: ValidateCodigoPostalRequest;
+  };
+}
+
+export type ValidateCodigoPostal =
+  | ValidateCodigoPostalSuccessResponse
+  | ValidateCodigoPostalBadRequestResponse
+  | ValidateCodigoPostalServiceUnavailableResponse;

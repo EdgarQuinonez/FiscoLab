@@ -2,8 +2,11 @@ import {
   SuccessKibanResponse,
   KibanBadRequestCode,
   ServiceUnavailableResponse,
+  ClavesEstados,
+  ClavesMunicipios,
 } from '@types';
 import { HttpErrorResponse } from '@angular/common/http';
+import curpCatalog from '@public/curp.catalog.json';
 
 export type Gender = 'HOMBRE' | 'MUJER' | 'NO BINARIO';
 export type GenderCode = 'H' | 'M' | 'X';
@@ -53,12 +56,12 @@ export interface ValidateCurpRequest {
 }
 
 export interface ValidateCurpFoundResponse {
-  claveEntidad: string;
+  claveEntidad: keyof (typeof curpCatalog)['STATES'];
   curp: string;
   datosDocProbatorio: {
     anioReg: string;
-    claveEntidadRegistro: string;
-    claveMunicipioRegistro: string;
+    claveEntidadRegistro: ClavesEstados;
+    claveMunicipioRegistro: ClavesMunicipios;
     entidadRegistro: string;
     municipioRegistro: string;
     numActa: string;

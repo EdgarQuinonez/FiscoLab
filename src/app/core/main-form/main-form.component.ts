@@ -145,10 +145,10 @@ export class MainFormComponent {
                 return;
               }
 
-              this.storageService.setItem('rfc', response.rfc);
-              this.storageService.setItem('result', response.result);
+              this.storageService.setItemValue('RFC', response.rfc);
+              this.storageService.setItemValue('RFC_RESULT', response.result);
 
-              this.router.navigateByUrl('/dashboard');
+              this.router.navigateByUrl('');
             }
             return;
           }
@@ -158,13 +158,13 @@ export class MainFormComponent {
             const response = value.data.response;
 
             if (response.status === 'FOUND') {
-              this.router.navigateByUrl('dashboard');
+              this.router.navigateByUrl('');
 
-              this.storageService.setItem('tipoSujeto', 'PF'); // Only PF have curps.
-              this.storageService.setItem('curp', response.curp);
-              this.storageService.setItem(
-                'personalData',
-                JSON.stringify(response)
+              this.storageService.setItemValue('TIPO_SUJETO', 'PF'); // Only PF have curps.
+              this.storageService.setItemValue('CURP', response.curp);
+              this.storageService.setItemValue(
+                'VALIDATE_CURP_FOUND_RESPONSE',
+                response
               );
             }
 
