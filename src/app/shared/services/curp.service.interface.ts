@@ -55,8 +55,10 @@ export interface ValidateCurpRequest {
   curp: string;
 }
 
+export type LetterClaveEntidad = keyof (typeof curpCatalog)['STATES'];
+
 export interface ValidateCurpFoundResponse {
-  claveEntidad: keyof (typeof curpCatalog)['STATES'];
+  claveEntidad: LetterClaveEntidad;
   curp: string;
   datosDocProbatorio: {
     anioReg: string;

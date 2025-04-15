@@ -1,0 +1,94 @@
+@if (data | async; as state) {
+    @if (state.loading) {
+      <!-- Loading State -->
+      <div class="loading-state">
+        <p>Loading CURP information...</p>
+        <!-- You could add a spinner here -->
+      </div>
+    } @else if (state.error) {
+      <!-- Error State -->
+      <div class="error-state">
+        <p>Error loading CURP information:</p>
+        <p class="error-message">{{ state.error.message }}</p>
+        <!-- You could add a retry button here -->
+      </div>
+    } @else {
+      <!-- Success State -->
+      <table>
+        <tr>
+          <th>CURP</th>
+          <td>{{ state.data?.curp }}</td>
+        </tr>
+        <tr>
+          <th>Nombre Completo</th>
+          <td>{{ state.data?.nombreCompleto }}</td>
+        </tr>
+        <tr>
+          <th>Sexo</th>
+          <td>{{ state.data?.sexo }}</td>
+        </tr>
+        <tr>
+          <th>Fecha de Nacimiento</th>
+          <td>{{ state.data?.fechaNacimiento }}</td>
+        </tr>
+        <tr>
+          <th>Entidad de Nacimiento</th>
+          <td>{{ state.data?.entidad }}</td>
+        </tr>
+        <tr>
+          <th>Nombres</th>
+          <td>{{ state.data?.nombres }}</td>
+        </tr>
+        <tr>
+          <th>Apellido Paterno</th>
+          <td>{{ state.data?.apellidoPaterno }}</td>
+        </tr>
+        <tr>
+          <th>Apellido Materno</th>
+          <td>{{ state.data?.apellidoMaterno }}</td>
+        </tr>
+        <tr>
+          <th>Clave Entidad</th>
+          <td>{{ state.data?.claveEntidad }}</td>
+        </tr>
+        <tr>
+          <th>Status CURP</th>
+          <td>{{ state.data?.statusCurp }}</td>
+        </tr>
+        <tr>
+          <th>Descripción Status</th>
+          <td>{{ state.data?.statusCurpDescripcion }}</td>
+        </tr>
+        <tr>
+          <th>Nacionalidad</th>
+          <td>{{ state.data?.nacionalidad }}</td>
+        </tr>
+        
+        <!-- Documento Probatorio Section -->
+        <div class="px-4 py-8">
+            <i class="pi pi-file"></i>
+            <span>Documento Probatorio</span>
+        </div>
+        <tr>
+          <th>Tipo Documento</th>
+          <td>{{ state.data?.docProbatorioDescripcion }}</td>
+        </tr>
+        <tr>
+          <th>Año Registro</th>
+          <td>{{ state.data?.datosDocProbatorio?.anioReg }}</td>
+        </tr>
+        <tr>
+          <th>Entidad Registro</th>
+          <td>{{ state.data?.datosDocProbatorio?.entidadRegistro }}</td>
+        </tr>
+        <tr>
+          <th>Municipio Registro</th>
+          <td>{{ state.data?.datosDocProbatorio?.municipioRegistro }}</td>
+        </tr>
+        <tr>
+          <th>Número de Acta</th>
+          <td>{{ state.data?.datosDocProbatorio?.numActa }}</td>
+        </tr>
+      </table>
+    }
+  }
