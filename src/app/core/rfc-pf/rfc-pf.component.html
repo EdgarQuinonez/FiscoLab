@@ -1,1 +1,67 @@
-<p>rfc-pf works!</p>
+@if (data | async; as state) {
+    @if (state.loading) {
+      <!-- Loading State -->
+      <div class="loading-state">
+        <p>Loading RFC information...</p>
+        <!-- You could add a spinner here -->
+      </div>
+    } @else if (state.error) {
+      <!-- Error State -->
+      <div class="error-state">
+        <p>Error loading RFC information:</p>
+        <p class="error-message">{{ state.error.message }}</p>
+        <!-- You could add a retry button here -->
+      </div>
+    } @else {
+      <!-- Success State -->
+      <table>
+        <tr>
+          <th>RFC</th>
+          <td>{{ state.data?.rfc }}</td>
+        </tr>
+        <tr>
+          <th>Estado</th>
+          <td>{{ state.data?.rfcResult }}</td>
+        </tr>
+        <tr>
+          <th>Código Postal</th>
+          <td>{{ state.data?.codigoPostal }}</td>
+        </tr>
+        <tr>
+          <th>Asentamiento</th>
+          <td>{{ state.data?.asentamiento }}</td>
+        </tr>
+        <tr>
+          <th>Ciudad</th>
+          <td>{{ state.data?.ciudad }}</td>
+        </tr>
+        <tr>
+          <th>Clave de Oficina</th>
+          <td>{{ state.data?.claveDeOficina }}</td>
+        </tr>
+        <tr>
+          <th>Delegación o Municipio</th>
+          <td>{{ state.data?.delegacionMunicipio }}</td>
+        </tr>
+        <tr>
+          <th>Estado</th>
+          <td>{{ state.data?.estado }}</td>
+        </tr>
+        <tr>
+          <th>Tipo de Asentamiento</th>
+          <td>{{ state.data?.tipoDeAsentamiento }}</td>
+        </tr>
+    
+
+      <div class="px-4 py-8">
+        <i class="pi pi-address-book"></i>
+        <span>Medios de Contacto</span>
+      </div>
+
+        <tr>
+            <th>Correo Electrónico</th>
+            <td>{{state.data?.email}}</td>
+        </tr>
+      </table>
+    }
+  }

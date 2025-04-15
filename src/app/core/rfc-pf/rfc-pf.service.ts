@@ -19,6 +19,7 @@ import {
 } from '@shared/types';
 import { catchError, Observable, of, switchMap, throwError, tap } from 'rxjs';
 import curpCatalog from '@public/curp.catalog.json';
+import { RfcPfData } from './rfc-pf.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -40,11 +41,9 @@ export class RfcPfService {
       );
     }
 
-    // if (startingPoint === 'RFC') {
-    //   return this.initWithRfc();
-    // } else if (startingPoint === 'CURP') {
-    //   return this.initWithCurp$();
-    // }
+    if (startingPoint === 'RFC') {
+      return this.initWithRfc$();
+    }
 
     return this.initWithCurp$();
   }
@@ -60,21 +59,9 @@ export class RfcPfService {
   }
 
   private initWithCurp$() {
-    const rfcPfData: Partial<{
-      rfc: string;
-      curp: string;
-      email: string;
-      nombreCompleto: string;
-      codigoPostal: string;
-      rfcResult: string;
-      asentamiento: string;
-      ciudad: string;
-      claveDeOficina: string;
-      delegacionMunicipio: string;
-      estado: string;
-      tipoDeAsentamiento: string;
-    }> = {};
+    const rfcPfData: Partial<RfcPfData> = {};
 
+    // we assume CURP key exits
     return this.getValidateCurpFoundResponse$().pipe(
       switchMap(() => this.getRfc$()),
       tap((value) => (rfcPfData.rfc = value)),
@@ -99,11 +86,42 @@ export class RfcPfService {
         rfcPfData.estado = value.Estado;
         rfcPfData.tipoDeAsentamiento = value.TipoDeAsentamiento;
       }),
-      switchMap(() => of(rfcPfData))
+      switchMap(() => of(rfcPfData as Required<typeof rfcPfData>))
     );
   }
 
-  private initWithRfc() {}
+  private initWithRfc$() {
+    const rfcPfData: Partial<RfcPfData> = {};
+
+    // We assume RFC key exists and then set CURP key to continue normally.
+    return this.getRfc$().pipe(
+      tap((value) => (rfcPfData.rfc = value)),
+      switchMap(() => this.obtainPersonalDataFromRfcPf$()),
+      tap((value) => {
+        this.storageService.setItemValue('CURP', value.curp);
+
+        rfcPfData.curp = value.curp;
+        rfcPfData.email = value.email;
+        rfcPfData.nombreCompleto = value.nombreCompleto;
+      }),
+      switchMap(() => this.getCodigoPostal$()),
+      tap((value) => {
+        rfcPfData.codigoPostal = value;
+        rfcPfData.rfcResult =
+          this.storageService.getItemValue('RFC_RESULT') ?? ''; // I'm assuming at this point it will always be string
+      }),
+      switchMap(() => this.getValidateCodigoPostal$()),
+      tap((value: ValidateCodigoPostalSuccessFoundResponse) => {
+        rfcPfData.asentamiento = value.Asentamiento;
+        rfcPfData.ciudad = value.Ciudad;
+        rfcPfData.claveDeOficina = value.ClaveDeOficina;
+        rfcPfData.delegacionMunicipio = value.DelegacionMunicipio;
+        rfcPfData.estado = value.Estado;
+        rfcPfData.tipoDeAsentamiento = value.TipoDeAsentamiento;
+      }),
+      switchMap(() => of(rfcPfData as Required<typeof rfcPfData>))
+    );
+  }
 
   private getValidateCurpFoundResponse$(): Observable<ValidateCurpFoundResponse> {
     const cachedData: ValidateCurpFoundResponse =

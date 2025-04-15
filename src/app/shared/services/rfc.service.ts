@@ -127,7 +127,7 @@ export class RfcService {
 
   obtainPersonalDataRfcPF$(rfc: string) {
     const params = {
-      testCaseId: '663567bb713cf2110a1106d2', // SUCCESS
+      testCaseId: '67fe9b8f383eb43c09d5f896', // SUCCESS
     };
     const endpoint = `${environment.apiUrl}/sat/pf_data_from_rfc?testCaseId=${params.testCaseId}`;
 

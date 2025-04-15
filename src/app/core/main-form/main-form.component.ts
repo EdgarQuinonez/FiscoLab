@@ -145,6 +145,10 @@ export class MainFormComponent {
                 return;
               }
 
+              this.storageService.setItemValue(
+                'TIPO_SUJETO',
+                formValue.tipoSujeto
+              );
               this.storageService.setItemValue('RFC', response.rfc);
               this.storageService.setItemValue('RFC_RESULT', response.result);
 
