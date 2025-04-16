@@ -14,81 +14,92 @@
       </div>
     } @else {
       <!-- Success State -->
-      <table>
-        <tr>
-          <th>CURP</th>
-          <td>{{ state.data?.curp }}</td>
-        </tr>
-        <tr>
-          <th>Nombre Completo</th>
-          <td>{{ state.data?.nombreCompleto }}</td>
-        </tr>
-        <tr>
-          <th>Sexo</th>
-          <td>{{ state.data?.sexo }}</td>
-        </tr>
-        <tr>
-          <th>Fecha de Nacimiento</th>
-          <td>{{ state.data?.fechaNacimiento }}</td>
-        </tr>
-        <tr>
-          <th>Entidad de Nacimiento</th>
-          <td>{{ state.data?.entidad }}</td>
-        </tr>
-        <tr>
-          <th>Nombres</th>
-          <td>{{ state.data?.nombres }}</td>
-        </tr>
-        <tr>
-          <th>Apellido Paterno</th>
-          <td>{{ state.data?.apellidoPaterno }}</td>
-        </tr>
-        <tr>
-          <th>Apellido Materno</th>
-          <td>{{ state.data?.apellidoMaterno }}</td>
-        </tr>
-        <tr>
-          <th>Clave Entidad</th>
-          <td>{{ state.data?.claveEntidad }}</td>
-        </tr>
-        <tr>
-          <th>Status CURP</th>
-          <td>{{ state.data?.statusCurp }}</td>
-        </tr>
-        <tr>
-          <th>Descripción Status</th>
-          <td>{{ state.data?.statusCurpDescripcion }}</td>
-        </tr>
-        <tr>
-          <th>Nacionalidad</th>
-          <td>{{ state.data?.nacionalidad }}</td>
-        </tr>
+
+      <div class="grid grid-cols-2 grid-rows-4 h-full w-full">
+        <div class="row-span-full col-start-1 col-end-2">
+          <div>
+            <h2>Datos Generales</h2>
+            <span>{{ state.data?.nombreCompleto }}</span>
+            <table>
+              <tr>
+                <th>Sexo</th>
+                <td>{{ state.data?.sexo }}</td>
+              </tr>
+              <tr>
+                <th>Fecha de Nacimiento</th>
+                <td>{{ state.data?.fechaNacimiento }}</td>
+              </tr>
+              <tr>
+                <th>Entidad</th>
+                <td>{{ state.data?.entidad }} ({{ state.data?.claveEntidad }})</td>
+              </tr>
+              <tr>
+                <th>Nacionalidad</th>
+                <td>{{ state.data?.nacionalidad }}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="flex items-center justify-center">
+            <div class="flex flex-col">
+              <span>CURP</span>
+              <span>{{state.data?.curp}}</span>
+            </div>
+            <p-button label="Descargar PDF" icon="pi pi-file-pdf" />
+          </div>
+          <table >
         
-        <!-- Documento Probatorio Section -->
-        <div class="px-4 py-8">
-            <i class="pi pi-file"></i>
-            <span>Documento Probatorio</span>
+      
+        
+            <tr>
+              <th>Descripción Status</th>
+              <td>{{ state.data?.statusCurpDescripcion }}</td>
+            </tr>
+            
+            
+            <!-- Documento Probatorio Section -->
+            <div class="px-4 py-8">
+                <i class="pi pi-file"></i>
+                <span>Documento Probatorio</span>
+            </div>
+            <tr>
+              <th>Tipo Documento</th>
+              <td>{{ state.data?.docProbatorioDescripcion }}</td>
+            </tr>
+            <tr>
+              <th>Año Registro</th>
+              <td>{{ state.data?.datosDocProbatorio?.anioReg }}</td>
+            </tr>
+            <tr>
+              <th>Entidad Registro</th>
+              <td>{{ state.data?.datosDocProbatorio?.entidadRegistro }}</td>
+            </tr>
+            <tr>
+              <th>Municipio Registro</th>
+              <td>{{ state.data?.datosDocProbatorio?.municipioRegistro }}</td>
+            </tr>
+            <tr>
+              <th>Número de Acta</th>
+              <td>{{ state.data?.datosDocProbatorio?.numActa }}</td>
+            </tr>
+          </table>
         </div>
-        <tr>
-          <th>Tipo Documento</th>
-          <td>{{ state.data?.docProbatorioDescripcion }}</td>
-        </tr>
-        <tr>
-          <th>Año Registro</th>
-          <td>{{ state.data?.datosDocProbatorio?.anioReg }}</td>
-        </tr>
-        <tr>
-          <th>Entidad Registro</th>
-          <td>{{ state.data?.datosDocProbatorio?.entidadRegistro }}</td>
-        </tr>
-        <tr>
-          <th>Municipio Registro</th>
-          <td>{{ state.data?.datosDocProbatorio?.municipioRegistro }}</td>
-        </tr>
-        <tr>
-          <th>Número de Acta</th>
-          <td>{{ state.data?.datosDocProbatorio?.numActa }}</td>
-        </tr>
-      </table>
+        <div class="row-start-1 row-end-2 col-start-2 col-end-3">
+          <table >
+            <tr>
+              <th>Nombres</th>
+              <td>{{ state.data?.nombres }}</td>
+            </tr>
+            <tr>
+              <th>Apellido Paterno</th>
+              <td>{{ state.data?.apellidoPaterno }}</td>
+            </tr>
+            <tr>
+              <th>Apellido Materno</th>
+              <td>{{ state.data?.apellidoMaterno }}</td>
+            </tr>
+  
+          </table>
+        </div>
+      </div>
     }
   }

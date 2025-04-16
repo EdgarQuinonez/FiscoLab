@@ -10,3 +10,9 @@ th {
 td {
     padding: 0.25rem;
 }
+
+:host {
+    display: block;
+    height: 100%;
+    width: 100%;
+}

@@ -5,10 +5,11 @@ import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
 import { LoadingState } from '@types';
 import { CurpDataService } from './curp-data.service';
 import { CurpDataData } from './curp-data.interface';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-curp-data',
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, ButtonModule],
   templateUrl: './curp-data.component.html',
   styleUrl: './curp-data.component.scss',
   standalone: true,
