@@ -8,27 +8,33 @@ import { CommonModule } from '@angular/common';
 import { StorageService } from '@shared/services/storage.service';
 import { ButtonModule } from 'primeng/button';
 
-
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, MenuModule, ButtonModule, BadgeModule, RippleModule, AvatarModule],
+  imports: [
+    CommonModule,
+    MenuModule,
+    ButtonModule,
+    BadgeModule,
+    RippleModule,
+    AvatarModule,
+  ],
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss'
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-
   items: MenuItem[] | undefined;
-  tipoPersona: 'PF' | 'PM' | null = null
+  tipoPersona: 'PF' | 'PM' | null = null;
 
-  constructor(private storageService: StorageService){
-    this.tipoPersona = (this.storageService.getItem("tipoPersona")) as "PF" | "PM"
+  constructor(private storageService: StorageService) {
+    this.tipoPersona = this.storageService.getItem('tipoPersona') as
+      | 'PF'
+      | 'PM';
   }
-
 
   ngOnInit() {
     this.items = [
       {
-        separator: true
+        separator: true,
       },
       {
         label: 'Buro',
@@ -49,8 +55,8 @@ export class SidebarComponent {
           {
             label: 'NIP Buros',
             icon: 'pi pi-plus',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Validacion de documentos',
@@ -70,13 +76,13 @@ export class SidebarComponent {
           {
             label: 'Validacion de CFID',
             icon: 'pi pi-cog',
-            shortcut: '⌘+O'
+            shortcut: '⌘+O',
           },
           {
             label: 'Validacion de CEP',
             icon: 'pi pi-inbox',
-          }
-        ]
+          },
+        ],
       },
       {
         label: 'Obtencion de informacion',
@@ -96,17 +102,14 @@ export class SidebarComponent {
           {
             label: 'Obtencin de NSS',
             icon: 'pi pi-cog',
-            shortcut: '⌘+O'
+            shortcut: '⌘+O',
           },
           {
             label: 'Validacion de CEP',
             icon: 'pi pi-inbox',
-          }
-        ]
+          },
+        ],
       },
-      {
-        separator: true
-      }
     ];
   }
 }
