@@ -1,0 +1,32 @@
+@if (data | async; as state) {
+    @if (state.loading) {
+        <span>Loading Personal Data...</span>
+    } @else if (state.error) {
+        <div class="error-state">
+            <p>Error loading personal data information:</p>
+            <p class="error-message">{{ state.error.message }}</p>            
+          </div>
+    } @else {
+        <div class="flex gap-4 justify-start items-center px-2 py-4">
+            <div class="flex items-center justify-center">
+              <i class="pi pi-user mr-4"></i>
+              <div class="flex flex-col items-start justify-center">
+                <span class="text-sm">NOMBRE COMPLETO</span>
+                <span>{{state.data?.nombreCompleto}}</span>
+              </div>
+            </div>
+            <div class="flex flex-col items-start justify-center">
+              <span class="text-sm">SEXO</span>
+              <span>{{state.data?.sexo}}</span>
+            </div>
+            <div class="flex flex-col items-start justify-center">
+              <span class="text-sm">FECHA DE NACIMIENTO</span>
+              <span>{{state.data?.fechaNacimiento}}</span>
+            </div>
+            <div class="flex flex-col items-start justify-center">
+              <span class="text-sm">NACIONALIDAD</span>
+              <span>{{state.data?.nacionalidad}}</span>
+            </div>
+          </div>
+    }
+}

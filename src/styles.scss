@@ -2,20 +2,34 @@
 @use "tailwindcss";
 @plugin "tailwindcss-primeui";
 
+
+
+body, html {
+  font-family: 'Inter', sans-serif;
+}
+
+/* Ensure PrimeNG components also use Inter */
+body .p-component {
+  font-family: 'Inter', sans-serif;
+}
+
 @theme {
   /* Text Button Variables */
   --color-button-text-primary-color: var(--p-button-text-primary-color);
   --color-button-text-primary-hover-background: var(--p-button-text-primary-hover-background);
-  --color-radio-button-text-not-selected-color: var(--p-surface-900);
+  --color-radio-button-text-not-selected-color: var(--p-text-color);
   
   /* General Button Variables */
   --spacing-button-padding-y: var(--p-button-padding-y);
   --spacing-button-padding-x: var(--p-button-padding-x);
   --radius-button-border-radius: var(--p-button-border-radius);
   --app-button-transition-duration: var(--p-button-transition-duration);
-  --spacing-button-gap: var(--p-button-gap);
+  --spacing-button-gap: var(--p-button-gap);  
 
-  --color-main: var(--p-stone-50)
+  --color-surface-ground: "#F8F8FE";
+  --color-surface-ground-secondary: "#FBFBFE";
+
+  --color-primary-50op: rgba(45, 212, 191, 0.5)
 }
 
 html {

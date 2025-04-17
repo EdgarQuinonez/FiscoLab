@@ -1,4 +1,13 @@
-<div class="grid grid-cols-2 grid-rows-4 h-full w-full">
-    <app-curp-data class="row-start-[1] row-end-5 col-start-1 col-end-3"></app-curp-data>
-    <app-rfc-pf class="row-start-[2] row-end-5 col-start-2 col-end-3"></app-rfc-pf>
+<div>
+    <div class="flex items-center justify-start bg-primary-50op px-2 py-2 rounded-sm mb-6">
+        <i class="pi pi-user mr-4"></i>
+        <span class="font-bold text-xl">Datos Generales</span>
+    </div>
+
+    <app-personal-data></app-personal-data>
+    
+    <div class="grid grid-cols-1 grid-rows-1 mt-8">        
+        <app-curp-data class="col-span-full row-span-full"></app-curp-data>
+        <app-rfc-pf class="col-span-full row-span-full"></app-rfc-pf>
+    </div>    
 </div>

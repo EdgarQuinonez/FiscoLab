@@ -1,4 +1,4 @@
-@if (data | async; as state) {
+@if (data$ | async; as state) {
     @if (state.loading) {
       <!-- Loading State -->
       <div class="loading-state">
@@ -14,54 +14,60 @@
       </div>
     } @else {
       <!-- Success State -->
-      <table>
-        <tr>
-          <th>RFC</th>
-          <td>{{ state.data?.rfc }}</td>
-        </tr>
-        <tr>
-          <th>Estado</th>
-          <td>{{ state.data?.rfcResult }}</td>
-        </tr>
-        <tr>
-          <th>Código Postal</th>
-          <td>{{ state.data?.codigoPostal }}</td>
-        </tr>
-        <tr>
-          <th>Asentamiento</th>
-          <td>{{ state.data?.asentamiento }}</td>
-        </tr>
-        <tr>
-          <th>Ciudad</th>
-          <td>{{ state.data?.ciudad }}</td>
-        </tr>
-        <tr>
-          <th>Clave de Oficina</th>
-          <td>{{ state.data?.claveDeOficina }}</td>
-        </tr>
-        <tr>
-          <th>Delegación o Municipio</th>
-          <td>{{ state.data?.delegacionMunicipio }}</td>
-        </tr>
-        <tr>
-          <th>Estado</th>
-          <td>{{ state.data?.estado }}</td>
-        </tr>
-        <tr>
-          <th>Tipo de Asentamiento</th>
-          <td>{{ state.data?.tipoDeAsentamiento }}</td>
-        </tr>
-    
-
-      <div class="px-4 py-8">
-        <i class="pi pi-address-book"></i>
-        <span>Medios de Contacto</span>
+      <div class="grid grid-cols-2 grid-rows-2">      
+        <div class="flex flex-col items-start justify-center mr-2 px-2 py-2 col-start-2 row-start-1">
+          <span class="text-sm">RFC</span>
+          <span>{{state.data?.rfc}}</span>
+        </div>                
+        <div class="flex flex-col items-start justify-center col-start-2 row-start-2 px-2 py-2">
+          <span class="text-sm">ESTADO</span>
+          <span>{{state.data?.rfcResult}}</span>
+        </div>
       </div>
 
-        <tr>
-            <th>Correo Electrónico</th>
-            <td>{{state.data?.email}}</td>
-        </tr>
-      </table>
+      <div class="mt-8 grid grid-cols-2 grid-rows-1">
+        <div class="lg:w-[28rem] col-start-2 col-end-3">
+          @if (codigoPostalData$ | async; as items) {
+            <p-table [value]="items">
+              <ng-template #caption>       
+                <span>
+                  Código Postal
+                </span>          
+              </ng-template>
+              <ng-template #body let-item>
+                <tr>
+                  <th>
+                    {{ item.name }}
+                  </th>
+                  <td>
+                    {{ item.content }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          }
+      
+          @if (mediosContacto$ | async; as items) {
+            <p-table [value]="items" class="mt-4">
+              <ng-template #caption>       
+                <span>
+                  Medios de Contacto
+                </span>          
+              </ng-template>
+              <ng-template #body let-item>
+                <tr>
+                  <th>
+                    {{ item.name }}
+                  </th>
+                  <td>
+                    {{ item.content }}
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          }
+        </div>
+      </div>
     }
-  }
+}
+  
