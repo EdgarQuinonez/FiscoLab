@@ -1,4 +1,4 @@
-@if (data$ | async; as state) {
+@if (data$() | async; as state) {
     @if (state.loading) {
       <!-- Loading State -->
       <div class="loading-state">

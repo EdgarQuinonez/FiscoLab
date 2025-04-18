@@ -1,4 +1,4 @@
-@if (data$ | async; as state) {
+@if (data$() | async; as state) {
     @if (state.loading) {
       <!-- Loading State -->
       <div class="loading-state">
@@ -9,7 +9,7 @@
       <!-- Error State -->
       <div class="error-state">
         <p>Error loading RFC information:</p>
-        <p class="error-message">{{ state.error.message }}</p>
+        <p class="error-message">{{ state.error }}</p>
         <!-- You could add a retry button here -->
       </div>
     } @else {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { RfcPfService } from './rfc-pf.service';
 import { map, Observable, of } from 'rxjs';
 import {
@@ -19,8 +19,8 @@ import { TableModule } from 'primeng/table';
 })
 export class RfcPfComponent {
   constructor(private rfcPfService: RfcPfService) {}
-
-  data$!: Observable<LoadingState<RfcPfData>>;
+  data$ = input.required<Observable<LoadingState<RfcPfData>>>();
+  // data$!: Observable<LoadingState<RfcPfData>>;
 
   // Codigo Postal
   private codigoPostalNames: Record<keyof CodigoPostalData, string> = {
@@ -55,11 +55,11 @@ export class RfcPfComponent {
   mediosContacto$!: Observable<{ name: string; content: string }[] | null>;
 
   ngOnInit() {
-    this.data$ = of(null).pipe(
-      switchMapWithLoading<RfcPfData>(() => this.rfcPfService.getRfcPfData$())
-    );
+    // this.data$ = of(null).pipe(
+    //   switchMapWithLoading<RfcPfData>(() => this.rfcPfService.getRfcPfData$())
+    // );
 
-    this.codigoPostalData$ = this.data$.pipe(
+    this.codigoPostalData$ = computed(() => this.data$())().pipe(
       map((value) => {
         if (!value?.data) return null;
 
@@ -80,7 +80,7 @@ export class RfcPfComponent {
       })
     );
 
-    this.mediosContacto$ = this.data$.pipe(
+    this.mediosContacto$ = computed(() => this.data$())().pipe(
       map((value) => {
         if (!value?.data) return null;
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { switchMapWithLoading } from '@shared/utils/switchMapWithLoading';
@@ -18,7 +18,9 @@ import { TableModule } from 'primeng/table';
 export class CurpDataComponent {
   constructor(private curpDataService: CurpDataService) {}
 
-  data$!: Observable<LoadingState<CurpDataData>>;
+  data$ = input.required<Observable<LoadingState<CurpDataData>>>();
+
+  // data$!: Observable<LoadingState<CurpDataData>>;
 
   private documentoProbatorioNames: Record<
     keyof CurpDataData['datosDocProbatorio'],
@@ -45,13 +47,13 @@ export class CurpDataComponent {
   documentoProbatorio$!: Observable<{ name: string; content: string }[] | null>;
 
   ngOnInit() {
-    this.data$ = of(null).pipe(
-      switchMapWithLoading<CurpDataData>(() =>
-        this.curpDataService.getCurpData$()
-      )
-    );
+    // this.data$ = of(null).pipe(
+    //   switchMapWithLoading<CurpDataData>(() =>
+    //     this.curpDataService.getCurpData$()
+    //   )
+    // );
 
-    this.documentoProbatorio$ = this.data$.pipe(
+    this.documentoProbatorio$ = computed(() => this.data$())().pipe(
       map((value) => {
         if (!value?.data?.datosDocProbatorio) return null;
 

@@ -254,10 +254,19 @@ export class RfcPfService {
         requestBody.estado = claveEstado;
         requestBody.municipio = claveMnpio;
       }),
-      switchMap(() =>
-        this.rfcService.cpQuery$(requestBody as Required<typeof requestBody>)
-      ),
+      switchMap(() => {
+        return this.rfcService.cpQuery$(
+          requestBody as Required<typeof requestBody>
+        );
+      }),
       switchMap((value) => {
+        console.log('cpQuery result: ', value); // this is null for some reason
+        if (!value) {
+          return throwError(
+            () => new Error('El resultado de cpQuery regresó como nulo.')
+          );
+        }
+
         if (value.status === 'SUCCESS') {
           return of(value);
         }

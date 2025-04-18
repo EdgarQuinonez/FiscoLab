@@ -1,4 +1,4 @@
-@if (data | async; as state) {
+@if (data$() | async; as state) {
     @if (state.loading) {
         <span>Loading Personal Data...</span>
     } @else if (state.error) {

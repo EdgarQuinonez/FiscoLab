@@ -15,6 +15,7 @@ import {
   withInterceptors,
 } from '@angular/common/http';
 import { kibanApiKeyInterceptor } from './interceptors/kiban-api-key.interceptor';
+import { httpCacheInterceptor } from './interceptors/http-cache.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +23,16 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideAnimationsAsync(),
-    provideHttpClient(withFetch(), withInterceptors([kibanApiKeyInterceptor])),
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([
+        kibanApiKeyInterceptor,
+        httpCacheInterceptor({
+          urlsNotToCache: ['/sat/rfc_validate_from_data'],
+          globalTTL: 3000,
+        }),
+      ])
+    ),
     providePrimeNG({
       theme: {
         preset: MyPreset,

@@ -4,10 +4,10 @@
         <span class="font-bold text-xl">Datos Generales</span>
     </div>
 
-    <app-personal-data></app-personal-data>
+    <app-personal-data [data$]="this.personalData$"></app-personal-data>
     
     <div class="grid grid-cols-1 grid-rows-1 mt-8">        
-        <app-curp-data class="col-span-full row-span-full"></app-curp-data>
-        <app-rfc-pf class="col-span-full row-span-full"></app-rfc-pf>
+        <app-curp-data [data$]="this.curpData$" class="col-span-full row-span-full"></app-curp-data>
+        <app-rfc-pf [data$]="this.rfcPfData$" class="col-span-full row-span-full"></app-rfc-pf>
     </div>    
 </div>
