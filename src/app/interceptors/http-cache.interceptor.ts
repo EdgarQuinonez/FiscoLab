@@ -33,7 +33,6 @@ export const httpCacheInterceptor = (options?: CacheOptions) => {
     };
 
     const prevReq = prevRequest();
-    console.log(prevReq);
 
     if (!skipCache) {
       if (prevReq) {

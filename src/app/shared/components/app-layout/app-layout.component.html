@@ -1,11 +1,14 @@
 
 
-<app-sidebar></app-sidebar>
-
-<div class="flex-1 bg-surface-ground">
+<div class="flex flex-col h-full w-full">
+  <!-- layout-header -->
   <app-topbar></app-topbar>
-  <div class="p-2">
-
-    <router-outlet />
+  <!-- layout content -->
+  <div class="flex px-[3.5rem] pt-[5.25rem] mx-auto max-w-[1728px] w-full">
+    <app-sidebar></app-sidebar>
+    <!-- content-slot -->
+    <div class="flex-1">  
+      <router-outlet />
+    </div>
   </div>
 </div>

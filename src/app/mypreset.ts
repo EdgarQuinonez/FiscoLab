@@ -21,7 +21,6 @@ export const MyPreset = definePreset(Aura, {
   components: {
     menu: {
       extend: {
-        background: '{surface.50}',
         border: {
           color: 'transparent',
         },
